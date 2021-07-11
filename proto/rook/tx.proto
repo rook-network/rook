@@ -2,12 +2,45 @@ syntax = "proto3";
 package cmwaters.rook.rook;
 
 // this line is used by starport scaffolding # proto/tx/import
+import "rook/position.proto";
 
 option go_package = "github.com/cmwaters/rook/x/rook/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
+  // this line is used by starport scaffolding # proto/tx/rpc
+  rpc Move(MsgMove) returns (MsgMoveResponse);
+  rpc Build(MsgBuild) returns (MsgBuildResponse);
+  rpc Create(MsgCreate) returns (MsgCreateResponse);
 }
 
-// this line is used by starport scaffolding # proto/tx/message
+message MsgMove {
+  string creator = 1;
+  string game_id = 2;
+  string position = 3;
+  string direction = 4;
+  string population = 5;
+}
+
+message MsgMoveResponse {
+}
+
+message MsgBuild {
+  string creator = 1;
+  string game_id = 2;
+  string settlement = 3;
+  string position = 4;
+}
+
+message MsgBuildResponse {
+}
+
+message MsgCreate {
+  string creator = 1;
+  repeated string players = 2;
+  Config config = 3;
+}
+
+message MsgCreateResponse {
+  uint64 game_id = 1; 
+}

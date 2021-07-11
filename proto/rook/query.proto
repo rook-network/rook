@@ -4,12 +4,27 @@ package cmwaters.rook.rook;
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
+import "rook/position.proto";
 
 option go_package = "github.com/cmwaters/rook/x/rook/types";
 
 // Query defines the gRPC querier service.
 service Query {
     // this line is used by starport scaffolding # 2
+
+	// Queries a game state by id.
+	rpc Game(QueryGetGameRequest) returns (QueryGetGameResponse) {
+		option (google.api.http).get = "/cmwaters/rook/rook/game/{id}";
+	}
+
 }
 
 // this line is used by starport scaffolding # 3
+message QueryGetGameRequest {
+	uint64 id = 1;
+}
+
+message QueryGetGameResponse {
+	Game game = 1;
+}
+

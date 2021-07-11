@@ -1,0 +1,46 @@
+syntax = "proto3";
+package cmwaters.rook.rook;
+
+option go_package = "github.com/cmwaters/rook/x/rook/types";
+
+import "gogoproto/gogo.proto";
+
+message Tile {
+  Landscape landscape = 1;
+}
+
+message Faction {
+  ResourceSet resources = 1;
+  map<uint32, uint32> population = 2;
+  map<uint32, Settlement> settlements = 3;
+}
+
+message Position {
+  uint32 x = 3; 
+  uint32 y = 4; 
+}
+
+enum Landscape {
+  UNKNOWN = 0; 
+  PLAINS = 1;
+  FOREST = 2;
+  MOUNTAINS = 3;
+  LAKE = 4;
+}
+
+enum Settlement {
+  NONE = 0;
+  TOWN = 1;
+  CITY = 2;
+  CAPITAL = 3;
+  LUMBERMILL = 4;
+  QUARRY = 5;
+  FARM = 6;
+  ROOK = 7;
+}
+
+message ResourceSet {
+  uint32 food = 1;
+  uint32 stone = 2;
+  uint32 wood = 3;
+}

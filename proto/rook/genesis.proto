@@ -2,11 +2,11 @@ syntax = "proto3";
 package cmwaters.rook.rook;
 
 // this line is used by starport scaffolding # genesis/proto/import
+import "rook/position.proto";
 
 option go_package = "github.com/cmwaters/rook/x/rook/types";
 
 // GenesisState defines the rook module's genesis state.
 message GenesisState {
-    // this line is used by starport scaffolding # genesis/proto/state
     // this line is used by starport scaffolding # ibc/genesis/proto
 }
