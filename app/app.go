@@ -85,9 +85,6 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
-	"github.com/cmwaters/rook/x/market"
-	marketkeeper "github.com/cmwaters/rook/x/market/keeper"
-	markettypes "github.com/cmwaters/rook/x/market/types"
 	"github.com/cmwaters/rook/x/matchmaker"
 	matchmakerkeeper "github.com/cmwaters/rook/x/matchmaker/keeper"
 	matchmakertypes "github.com/cmwaters/rook/x/matchmaker/types"
@@ -140,7 +137,6 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
-		market.AppModuleBasic{},
 		matchmaker.AppModuleBasic{},
 		rook.AppModuleBasic{},
 	)
@@ -209,12 +205,8 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
-
-	MarketKeeper marketkeeper.Keeper
-
 	MatchmakerKeeper matchmakerkeeper.Keeper
-
-	RookKeeper rookkeeper.Keeper
+	RookKeeper       rookkeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -244,7 +236,6 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
-		markettypes.StoreKey,
 		matchmakertypes.StoreKey,
 		rooktypes.StoreKey,
 	)
@@ -338,14 +329,6 @@ func New(
 	app.EvidenceKeeper = *evidenceKeeper
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
-
-	app.MarketKeeper = *marketkeeper.NewKeeper(
-		appCodec,
-		keys[markettypes.StoreKey],
-		keys[markettypes.MemStoreKey],
-	)
-	marketModule := market.NewAppModule(appCodec, app.MarketKeeper)
-
 	app.MatchmakerKeeper = *matchmakerkeeper.NewKeeper(
 		appCodec,
 		keys[matchmakertypes.StoreKey],
@@ -401,7 +384,6 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
-		marketModule,
 		matchmakerModule,
 		rookModule,
 	)
@@ -437,7 +419,6 @@ func New(
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
-		markettypes.ModuleName,
 		matchmakertypes.ModuleName,
 		rooktypes.ModuleName,
 	)
@@ -627,7 +608,6 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
-	paramsKeeper.Subspace(markettypes.ModuleName)
 	paramsKeeper.Subspace(matchmakertypes.ModuleName)
 	paramsKeeper.Subspace(rooktypes.ModuleName)
 

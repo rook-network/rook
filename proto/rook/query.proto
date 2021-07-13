@@ -2,9 +2,9 @@ syntax = "proto3";
 package cmwaters.rook.rook;
 
 import "google/api/annotations.proto";
-import "cosmos/base/query/v1beta1/pagination.proto";
 // this line is used by starport scaffolding # 1
-import "rook/position.proto";
+import "rook/state.proto";
+import "rook/config.proto";
 
 option go_package = "github.com/cmwaters/rook/x/rook/types";
 
@@ -14,7 +14,11 @@ service Query {
 
 	// Queries a game state by id.
 	rpc Game(QueryGetGameRequest) returns (QueryGetGameResponse) {
-		option (google.api.http).get = "/cmwaters/rook/rook/game/{id}";
+		option (google.api.http).get = "/rook/game/{id}";
+	}
+
+	rpc Params(QueryGetParamsRequest) returns (QueryGetParamsResponse) {
+		option (google.api.http).get = "/rook/params";
 	}
 
 }
@@ -26,5 +30,12 @@ message QueryGetGameRequest {
 
 message QueryGetGameResponse {
 	Game game = 1;
+}
+
+message QueryGetParamsRequest {
+}
+
+message QueryGetParamsResponse {
+	Params params = 1;
 }
 

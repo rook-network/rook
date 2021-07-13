@@ -3,8 +3,107 @@ export interface ProtobufAny {
     /** @format byte */
     value?: string;
 }
+export declare enum RookDirection {
+    LEFT = "LEFT",
+    RIGHT = "RIGHT",
+    UP = "UP",
+    DOWN = "DOWN"
+}
+export interface RookFaction {
+    resources?: RookResourceSet;
+    population?: Record<string, number>;
+    settlements?: Record<string, RookSettlement>;
+}
+export interface RookGame {
+    players?: Record<string, RookFaction>;
+    config?: RookGameConfig;
+    /** @format uint64 */
+    step?: string;
+    map?: RookMap;
+}
+export interface RookGameConfig {
+    initial?: RookInitializationConfig;
+    map?: RookMapConfig;
+}
+export interface RookInitializationConfig {
+    /** @format int64 */
+    teams?: number;
+    resources?: RookResourceSet;
+}
+export declare enum RookLandscape {
+    UNKNOWN = "UNKNOWN",
+    PLAINS = "PLAINS",
+    FOREST = "FOREST",
+    MOUNTAINS = "MOUNTAINS",
+    LAKE = "LAKE"
+}
+export interface RookMap {
+    tiles?: RookTile[];
+    /** @format int64 */
+    width?: number;
+}
+export interface RookMapConfig {
+    /** @format int64 */
+    width?: number;
+    /** @format int64 */
+    height?: number;
+    /** @format int64 */
+    seed?: string;
+    /** @format int64 */
+    mountainsDensity?: number;
+    /** @format int64 */
+    forestDensity?: number;
+    /** @format int64 */
+    lakeDensity?: number;
+    /** @format int64 */
+    plainsDensity?: number;
+}
 export declare type RookMsgBuildResponse = object;
+export interface RookMsgCreateResponse {
+    /** @format uint64 */
+    gameId?: string;
+}
 export declare type RookMsgMoveResponse = object;
+export interface RookParams {
+    productionRate?: Record<string, RookResourceSet>;
+    constructionCost?: Record<string, RookResourceSet>;
+}
+export interface RookPosition {
+    /** @format int64 */
+    x?: number;
+    /** @format int64 */
+    y?: number;
+}
+export interface RookQueryGetGameResponse {
+    game?: RookGame;
+}
+export interface RookQueryGetParamsResponse {
+    params?: RookParams;
+}
+export interface RookResourceSet {
+    /** @format int64 */
+    food?: number;
+    /** @format int64 */
+    stone?: number;
+    /** @format int64 */
+    wood?: number;
+    /** @format int64 */
+    population?: number;
+}
+export declare enum RookSettlement {
+    NONE = "NONE",
+    TOWN = "TOWN",
+    CITY = "CITY",
+    CAPITAL = "CAPITAL",
+    LUMBERMILL = "LUMBERMILL",
+    QUARRY = "QUARRY",
+    FARM = "FARM",
+    ROOK = "ROOK"
+}
+export interface RookTile {
+    landscape?: RookLandscape;
+    faction?: string;
+}
 export interface RpcStatus {
     /** @format int32 */
     code?: number;
@@ -65,9 +164,26 @@ export declare class HttpClient<SecurityDataType = unknown> {
     request: <T = any, E = any>({ body, secure, path, type, query, format, baseUrl, cancelToken, ...params }: FullRequestParams) => Promise<HttpResponse<T, E>>;
 }
 /**
- * @title rook/genesis.proto
+ * @title rook/config.proto
  * @version version not set
  */
 export declare class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+    /**
+     * No description
+     *
+     * @tags Query
+     * @name QueryGame
+     * @summary Queries a game state by id.
+     * @request GET:/rook/game/{id}
+     */
+    queryGame: (id: string, params?: RequestParams) => Promise<HttpResponse<RookQueryGetGameResponse, RpcStatus>>;
+    /**
+     * No description
+     *
+     * @tags Query
+     * @name QueryParams
+     * @request GET:/rook/params
+     */
+    queryParams: (params?: RequestParams) => Promise<HttpResponse<RookQueryGetParamsResponse, RpcStatus>>;
 }
 export {};

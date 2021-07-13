@@ -9,9 +9,7 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// this line is used by starport scaffolding # 2
-cdc.RegisterConcrete(&MsgCreatePosition{}, "rook/CreatePosition", nil)
-cdc.RegisterConcrete(&MsgUpdatePosition{}, "rook/UpdatePosition", nil)
-cdc.RegisterConcrete(&MsgDeletePosition{}, "rook/DeletePosition", nil)
+	cdc.RegisterConcrete(&MsgCreate{}, "rook/Create", nil)
 
 	cdc.RegisterConcrete(&MsgMove{}, "rook/Move", nil)
 
@@ -21,11 +19,9 @@ cdc.RegisterConcrete(&MsgDeletePosition{}, "rook/DeletePosition", nil)
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	// this line is used by starport scaffolding # 3
-registry.RegisterImplementations((*sdk.Msg)(nil),
-	&MsgCreatePosition{},
-	&MsgUpdatePosition{},
-	&MsgDeletePosition{},
-)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgCreate{},
+	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgMove{},
 	)

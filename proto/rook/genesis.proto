@@ -2,11 +2,13 @@ syntax = "proto3";
 package cmwaters.rook.rook;
 
 // this line is used by starport scaffolding # genesis/proto/import
-import "rook/position.proto";
+import "rook/config.proto";
 
 option go_package = "github.com/cmwaters/rook/x/rook/types";
 
 // GenesisState defines the rook module's genesis state.
 message GenesisState {
+    // the global configuration of all rook games
+    Params params = 1;
     // this line is used by starport scaffolding # ibc/genesis/proto
 }

@@ -8,6 +8,32 @@
  * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
  * ---------------------------------------------------------------
  */
+export var RookDirection;
+(function (RookDirection) {
+    RookDirection["LEFT"] = "LEFT";
+    RookDirection["RIGHT"] = "RIGHT";
+    RookDirection["UP"] = "UP";
+    RookDirection["DOWN"] = "DOWN";
+})(RookDirection || (RookDirection = {}));
+export var RookLandscape;
+(function (RookLandscape) {
+    RookLandscape["UNKNOWN"] = "UNKNOWN";
+    RookLandscape["PLAINS"] = "PLAINS";
+    RookLandscape["FOREST"] = "FOREST";
+    RookLandscape["MOUNTAINS"] = "MOUNTAINS";
+    RookLandscape["LAKE"] = "LAKE";
+})(RookLandscape || (RookLandscape = {}));
+export var RookSettlement;
+(function (RookSettlement) {
+    RookSettlement["NONE"] = "NONE";
+    RookSettlement["TOWN"] = "TOWN";
+    RookSettlement["CITY"] = "CITY";
+    RookSettlement["CAPITAL"] = "CAPITAL";
+    RookSettlement["LUMBERMILL"] = "LUMBERMILL";
+    RookSettlement["QUARRY"] = "QUARRY";
+    RookSettlement["FARM"] = "FARM";
+    RookSettlement["ROOK"] = "ROOK";
+})(RookSettlement || (RookSettlement = {}));
 export var ContentType;
 (function (ContentType) {
     ContentType["Json"] = "application/json";
@@ -130,8 +156,38 @@ export class HttpClient {
     }
 }
 /**
- * @title rook/genesis.proto
+ * @title rook/config.proto
  * @version version not set
  */
 export class Api extends HttpClient {
+    constructor() {
+        super(...arguments);
+        /**
+         * No description
+         *
+         * @tags Query
+         * @name QueryGame
+         * @summary Queries a game state by id.
+         * @request GET:/rook/game/{id}
+         */
+        this.queryGame = (id, params = {}) => this.request({
+            path: `/rook/game/${id}`,
+            method: "GET",
+            format: "json",
+            ...params,
+        });
+        /**
+         * No description
+         *
+         * @tags Query
+         * @name QueryParams
+         * @request GET:/rook/params
+         */
+        this.queryParams = (params = {}) => this.request({
+            path: `/rook/params`,
+            method: "GET",
+            format: "json",
+            ...params,
+        });
+    }
 }

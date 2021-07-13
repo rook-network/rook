@@ -26,6 +26,6 @@ func KeyPrefix(p string) []byte {
 }
 
 const (
-	PositionKey= "Position-value-"
-	PositionCountKey= "Position-count-"
+	PositionKey      = "Position-value-"
+	PositionCountKey = "Position-count-"
 )

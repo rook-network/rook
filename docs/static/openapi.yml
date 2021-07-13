@@ -4,6 +4,228 @@ info:
   name: ''
   description: ''
 paths:
+  '/rook/game/{id}':
+    get:
+      summary: Queries a game state by id.
+      operationId: CmwatersRookRookGame
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              game:
+                type: object
+                properties:
+                  players:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        resources:
+                          type: object
+                          properties:
+                            food:
+                              type: integer
+                              format: int64
+                            stone:
+                              type: integer
+                              format: int64
+                            wood:
+                              type: integer
+                              format: int64
+                            population:
+                              type: integer
+                              format: int64
+                        population:
+                          type: object
+                          additionalProperties:
+                            type: integer
+                            format: int64
+                        settlements:
+                          type: object
+                          additionalProperties:
+                            type: string
+                            enum:
+                              - NONE
+                              - TOWN
+                              - CITY
+                              - CAPITAL
+                              - LUMBERMILL
+                              - QUARRY
+                              - FARM
+                              - ROOK
+                            default: NONE
+                  config:
+                    type: object
+                    properties:
+                      initial:
+                        type: object
+                        properties:
+                          teams:
+                            type: integer
+                            format: int64
+                          resources:
+                            type: object
+                            properties:
+                              food:
+                                type: integer
+                                format: int64
+                              stone:
+                                type: integer
+                                format: int64
+                              wood:
+                                type: integer
+                                format: int64
+                              population:
+                                type: integer
+                                format: int64
+                      map:
+                        type: object
+                        properties:
+                          width:
+                            type: integer
+                            format: int64
+                          height:
+                            type: integer
+                            format: int64
+                          seed:
+                            type: string
+                            format: int64
+                          mountainsDensity:
+                            type: integer
+                            format: int64
+                          forestDensity:
+                            type: integer
+                            format: int64
+                          lakeDensity:
+                            type: integer
+                            format: int64
+                          plainsDensity:
+                            type: integer
+                            format: int64
+                  step:
+                    type: string
+                    format: uint64
+                  map:
+                    type: object
+                    properties:
+                      tiles:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            landscape:
+                              type: string
+                              enum:
+                                - UNKNOWN
+                                - PLAINS
+                                - FOREST
+                                - MOUNTAINS
+                                - LAKE
+                              default: UNKNOWN
+                            faction:
+                              type: string
+                      width:
+                        type: integer
+                        format: int64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    typeUrl:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          format: uint64
+      tags:
+        - Query
+  /rook/params:
+    get:
+      operationId: CmwatersRookRookParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                type: object
+                properties:
+                  productionRate:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        food:
+                          type: integer
+                          format: int64
+                        stone:
+                          type: integer
+                          format: int64
+                        wood:
+                          type: integer
+                          format: int64
+                        population:
+                          type: integer
+                          format: int64
+                    title: maps are indexed by settlement id
+                  constructionCost:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        food:
+                          type: integer
+                          format: int64
+                        stone:
+                          type: integer
+                          format: int64
+                        wood:
+                          type: integer
+                          format: int64
+                        population:
+                          type: integer
+                          format: int64
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    typeUrl:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
   '/cosmos/bank/v1beta1/balances/{address}':
     get:
       summary: AllBalances queries the balance of all coins for a single account.
@@ -19275,10 +19497,547 @@ paths:
       tags:
         - Query
 definitions:
+  cmwaters.rook.rook.Direction:
+    type: string
+    enum:
+      - LEFT
+      - RIGHT
+      - UP
+      - DOWN
+    default: LEFT
+  cmwaters.rook.rook.Faction:
+    type: object
+    properties:
+      resources:
+        type: object
+        properties:
+          food:
+            type: integer
+            format: int64
+          stone:
+            type: integer
+            format: int64
+          wood:
+            type: integer
+            format: int64
+          population:
+            type: integer
+            format: int64
+      population:
+        type: object
+        additionalProperties:
+          type: integer
+          format: int64
+      settlements:
+        type: object
+        additionalProperties:
+          type: string
+          enum:
+            - NONE
+            - TOWN
+            - CITY
+            - CAPITAL
+            - LUMBERMILL
+            - QUARRY
+            - FARM
+            - ROOK
+          default: NONE
+  cmwaters.rook.rook.Game:
+    type: object
+    properties:
+      players:
+        type: object
+        additionalProperties:
+          type: object
+          properties:
+            resources:
+              type: object
+              properties:
+                food:
+                  type: integer
+                  format: int64
+                stone:
+                  type: integer
+                  format: int64
+                wood:
+                  type: integer
+                  format: int64
+                population:
+                  type: integer
+                  format: int64
+            population:
+              type: object
+              additionalProperties:
+                type: integer
+                format: int64
+            settlements:
+              type: object
+              additionalProperties:
+                type: string
+                enum:
+                  - NONE
+                  - TOWN
+                  - CITY
+                  - CAPITAL
+                  - LUMBERMILL
+                  - QUARRY
+                  - FARM
+                  - ROOK
+                default: NONE
+      config:
+        type: object
+        properties:
+          initial:
+            type: object
+            properties:
+              teams:
+                type: integer
+                format: int64
+              resources:
+                type: object
+                properties:
+                  food:
+                    type: integer
+                    format: int64
+                  stone:
+                    type: integer
+                    format: int64
+                  wood:
+                    type: integer
+                    format: int64
+                  population:
+                    type: integer
+                    format: int64
+          map:
+            type: object
+            properties:
+              width:
+                type: integer
+                format: int64
+              height:
+                type: integer
+                format: int64
+              seed:
+                type: string
+                format: int64
+              mountainsDensity:
+                type: integer
+                format: int64
+              forestDensity:
+                type: integer
+                format: int64
+              lakeDensity:
+                type: integer
+                format: int64
+              plainsDensity:
+                type: integer
+                format: int64
+      step:
+        type: string
+        format: uint64
+      map:
+        type: object
+        properties:
+          tiles:
+            type: array
+            items:
+              type: object
+              properties:
+                landscape:
+                  type: string
+                  enum:
+                    - UNKNOWN
+                    - PLAINS
+                    - FOREST
+                    - MOUNTAINS
+                    - LAKE
+                  default: UNKNOWN
+                faction:
+                  type: string
+          width:
+            type: integer
+            format: int64
+  cmwaters.rook.rook.GameConfig:
+    type: object
+    properties:
+      initial:
+        type: object
+        properties:
+          teams:
+            type: integer
+            format: int64
+          resources:
+            type: object
+            properties:
+              food:
+                type: integer
+                format: int64
+              stone:
+                type: integer
+                format: int64
+              wood:
+                type: integer
+                format: int64
+              population:
+                type: integer
+                format: int64
+      map:
+        type: object
+        properties:
+          width:
+            type: integer
+            format: int64
+          height:
+            type: integer
+            format: int64
+          seed:
+            type: string
+            format: int64
+          mountainsDensity:
+            type: integer
+            format: int64
+          forestDensity:
+            type: integer
+            format: int64
+          lakeDensity:
+            type: integer
+            format: int64
+          plainsDensity:
+            type: integer
+            format: int64
+  cmwaters.rook.rook.InitializationConfig:
+    type: object
+    properties:
+      teams:
+        type: integer
+        format: int64
+      resources:
+        type: object
+        properties:
+          food:
+            type: integer
+            format: int64
+          stone:
+            type: integer
+            format: int64
+          wood:
+            type: integer
+            format: int64
+          population:
+            type: integer
+            format: int64
+  cmwaters.rook.rook.Landscape:
+    type: string
+    enum:
+      - UNKNOWN
+      - PLAINS
+      - FOREST
+      - MOUNTAINS
+      - LAKE
+    default: UNKNOWN
+  cmwaters.rook.rook.Map:
+    type: object
+    properties:
+      tiles:
+        type: array
+        items:
+          type: object
+          properties:
+            landscape:
+              type: string
+              enum:
+                - UNKNOWN
+                - PLAINS
+                - FOREST
+                - MOUNTAINS
+                - LAKE
+              default: UNKNOWN
+            faction:
+              type: string
+      width:
+        type: integer
+        format: int64
+  cmwaters.rook.rook.MapConfig:
+    type: object
+    properties:
+      width:
+        type: integer
+        format: int64
+      height:
+        type: integer
+        format: int64
+      seed:
+        type: string
+        format: int64
+      mountainsDensity:
+        type: integer
+        format: int64
+      forestDensity:
+        type: integer
+        format: int64
+      lakeDensity:
+        type: integer
+        format: int64
+      plainsDensity:
+        type: integer
+        format: int64
   cmwaters.rook.rook.MsgBuildResponse:
     type: object
+  cmwaters.rook.rook.MsgCreateResponse:
+    type: object
+    properties:
+      gameId:
+        type: string
+        format: uint64
   cmwaters.rook.rook.MsgMoveResponse:
     type: object
+  cmwaters.rook.rook.Params:
+    type: object
+    properties:
+      productionRate:
+        type: object
+        additionalProperties:
+          type: object
+          properties:
+            food:
+              type: integer
+              format: int64
+            stone:
+              type: integer
+              format: int64
+            wood:
+              type: integer
+              format: int64
+            population:
+              type: integer
+              format: int64
+        title: maps are indexed by settlement id
+      constructionCost:
+        type: object
+        additionalProperties:
+          type: object
+          properties:
+            food:
+              type: integer
+              format: int64
+            stone:
+              type: integer
+              format: int64
+            wood:
+              type: integer
+              format: int64
+            population:
+              type: integer
+              format: int64
+  cmwaters.rook.rook.Position:
+    type: object
+    properties:
+      x:
+        type: integer
+        format: int64
+      'y':
+        type: integer
+        format: int64
+  cmwaters.rook.rook.QueryGetGameResponse:
+    type: object
+    properties:
+      game:
+        type: object
+        properties:
+          players:
+            type: object
+            additionalProperties:
+              type: object
+              properties:
+                resources:
+                  type: object
+                  properties:
+                    food:
+                      type: integer
+                      format: int64
+                    stone:
+                      type: integer
+                      format: int64
+                    wood:
+                      type: integer
+                      format: int64
+                    population:
+                      type: integer
+                      format: int64
+                population:
+                  type: object
+                  additionalProperties:
+                    type: integer
+                    format: int64
+                settlements:
+                  type: object
+                  additionalProperties:
+                    type: string
+                    enum:
+                      - NONE
+                      - TOWN
+                      - CITY
+                      - CAPITAL
+                      - LUMBERMILL
+                      - QUARRY
+                      - FARM
+                      - ROOK
+                    default: NONE
+          config:
+            type: object
+            properties:
+              initial:
+                type: object
+                properties:
+                  teams:
+                    type: integer
+                    format: int64
+                  resources:
+                    type: object
+                    properties:
+                      food:
+                        type: integer
+                        format: int64
+                      stone:
+                        type: integer
+                        format: int64
+                      wood:
+                        type: integer
+                        format: int64
+                      population:
+                        type: integer
+                        format: int64
+              map:
+                type: object
+                properties:
+                  width:
+                    type: integer
+                    format: int64
+                  height:
+                    type: integer
+                    format: int64
+                  seed:
+                    type: string
+                    format: int64
+                  mountainsDensity:
+                    type: integer
+                    format: int64
+                  forestDensity:
+                    type: integer
+                    format: int64
+                  lakeDensity:
+                    type: integer
+                    format: int64
+                  plainsDensity:
+                    type: integer
+                    format: int64
+          step:
+            type: string
+            format: uint64
+          map:
+            type: object
+            properties:
+              tiles:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    landscape:
+                      type: string
+                      enum:
+                        - UNKNOWN
+                        - PLAINS
+                        - FOREST
+                        - MOUNTAINS
+                        - LAKE
+                      default: UNKNOWN
+                    faction:
+                      type: string
+              width:
+                type: integer
+                format: int64
+  cmwaters.rook.rook.QueryGetParamsResponse:
+    type: object
+    properties:
+      params:
+        type: object
+        properties:
+          productionRate:
+            type: object
+            additionalProperties:
+              type: object
+              properties:
+                food:
+                  type: integer
+                  format: int64
+                stone:
+                  type: integer
+                  format: int64
+                wood:
+                  type: integer
+                  format: int64
+                population:
+                  type: integer
+                  format: int64
+            title: maps are indexed by settlement id
+          constructionCost:
+            type: object
+            additionalProperties:
+              type: object
+              properties:
+                food:
+                  type: integer
+                  format: int64
+                stone:
+                  type: integer
+                  format: int64
+                wood:
+                  type: integer
+                  format: int64
+                population:
+                  type: integer
+                  format: int64
+  cmwaters.rook.rook.ResourceSet:
+    type: object
+    properties:
+      food:
+        type: integer
+        format: int64
+      stone:
+        type: integer
+        format: int64
+      wood:
+        type: integer
+        format: int64
+      population:
+        type: integer
+        format: int64
+  cmwaters.rook.rook.Settlement:
+    type: string
+    enum:
+      - NONE
+      - TOWN
+      - CITY
+      - CAPITAL
+      - LUMBERMILL
+      - QUARRY
+      - FARM
+      - ROOK
+    default: NONE
+  cmwaters.rook.rook.Tile:
+    type: object
+    properties:
+      landscape:
+        type: string
+        enum:
+          - UNKNOWN
+          - PLAINS
+          - FOREST
+          - MOUNTAINS
+          - LAKE
+        default: UNKNOWN
+      faction:
+        type: string
   google.protobuf.Any:
     type: object
     properties:

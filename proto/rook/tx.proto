@@ -2,7 +2,8 @@ syntax = "proto3";
 package cmwaters.rook.rook;
 
 // this line is used by starport scaffolding # proto/tx/import
-import "rook/position.proto";
+import "rook/types.proto";
+import "rook/config.proto";
 
 option go_package = "github.com/cmwaters/rook/x/rook/types";
 
@@ -16,10 +17,10 @@ service Msg {
 
 message MsgMove {
   string creator = 1;
-  string game_id = 2;
-  string position = 3;
-  string direction = 4;
-  string population = 5;
+  uint64 game_id = 2;
+  Position position = 3;
+  Direction direction = 4;
+  uint32 population = 5;
 }
 
 message MsgMoveResponse {
@@ -27,18 +28,17 @@ message MsgMoveResponse {
 
 message MsgBuild {
   string creator = 1;
-  string game_id = 2;
-  string settlement = 3;
-  string position = 4;
+  uint64 game_id = 2;
+  Settlement settlement = 3;
+  Position position = 4;
 }
 
 message MsgBuildResponse {
 }
 
 message MsgCreate {
-  string creator = 1;
-  repeated string players = 2;
-  Config config = 3;
+  repeated string players = 2; // all players must be signers
+  GameConfig config = 3;
 }
 
 message MsgCreateResponse {

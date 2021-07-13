@@ -1,0 +1,46 @@
+syntax = "proto3";
+package cmwaters.rook.matchmaker;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/cmwaters/rook/x/matchmaker/types";
+
+message Room {
+  // the config to be used for the game. Either this or the mode need to be set
+  // Using this should only be done for custom games
+  bytes config = 1;
+
+  // the game mode to be played
+  Mode mode = 2;
+
+  // the current players in the room
+  repeated string players = 3;
+
+  // pending invitations for players that can join (like a whitelist)
+  repeated string pending = 4;
+
+  // anyone can join
+  bool public = 5;
+
+  // the minimum amount of players needed to start a game
+  uint32 quorum = 6;
+
+  // the max amount of players that can join the room
+  uint32 capacity = 7;
+
+  // when the room was created. Rooms get garbage collected after a while
+  google.protobuf.Timestamp created = 8;
+}
+
+// Modes are a way of accumulating a small set of possible games that people can choose between
+message Mode {
+  uint32 id = 1;
+  bytes config = 2;
+}
+
+message Params {
+  // the maximum duration a room can last for before it is closed and all
+  // players are kicked
+  google.protobuf.Duration room_lifespan = 1;
+}

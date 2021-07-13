@@ -1,22 +1,31 @@
+import { Direction, Settlement, Position } from '../rook/types';
 import { Reader, Writer } from 'protobufjs/minimal';
+import { GameConfig } from '../rook/config';
 export declare const protobufPackage = "cmwaters.rook.rook";
-/** this line is used by starport scaffolding # proto/tx/message */
 export interface MsgMove {
     creator: string;
-    gameId: string;
-    position: string;
-    direction: string;
-    population: string;
+    gameId: number;
+    position: Position | undefined;
+    direction: Direction;
+    population: number;
 }
 export interface MsgMoveResponse {
 }
 export interface MsgBuild {
     creator: string;
-    gameId: string;
-    settlement: string;
-    position: string;
+    gameId: number;
+    settlement: Settlement;
+    position: Position | undefined;
 }
 export interface MsgBuildResponse {
+}
+export interface MsgCreate {
+    /** all players must be signers */
+    players: string[];
+    config: GameConfig | undefined;
+}
+export interface MsgCreateResponse {
+    gameId: number;
 }
 export declare const MsgMove: {
     encode(message: MsgMove, writer?: Writer): Writer;
@@ -46,17 +55,33 @@ export declare const MsgBuildResponse: {
     toJSON(_: MsgBuildResponse): unknown;
     fromPartial(_: DeepPartial<MsgBuildResponse>): MsgBuildResponse;
 };
+export declare const MsgCreate: {
+    encode(message: MsgCreate, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): MsgCreate;
+    fromJSON(object: any): MsgCreate;
+    toJSON(message: MsgCreate): unknown;
+    fromPartial(object: DeepPartial<MsgCreate>): MsgCreate;
+};
+export declare const MsgCreateResponse: {
+    encode(message: MsgCreateResponse, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): MsgCreateResponse;
+    fromJSON(object: any): MsgCreateResponse;
+    toJSON(message: MsgCreateResponse): unknown;
+    fromPartial(object: DeepPartial<MsgCreateResponse>): MsgCreateResponse;
+};
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
     Move(request: MsgMove): Promise<MsgMoveResponse>;
     Build(request: MsgBuild): Promise<MsgBuildResponse>;
+    Create(request: MsgCreate): Promise<MsgCreateResponse>;
 }
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
     constructor(rpc: Rpc);
     Move(request: MsgMove): Promise<MsgMoveResponse>;
     Build(request: MsgBuild): Promise<MsgBuildResponse>;
+    Create(request: MsgCreate): Promise<MsgCreateResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;

@@ -3,16 +3,12 @@ package cmwaters.rook.rook;
 
 option go_package = "github.com/cmwaters/rook/x/rook/types";
 
-import "gogoproto/gogo.proto";
+import "rook/config.proto";
+import "rook/types.proto";
 
 message Game { 
     map<string, Faction> players = 1;
-    Config config = 2;
+    GameConfig config = 2;
     uint64 step = 3;
     Map map = 4;
-}
-
-message Map {
-    repeated Tile tiles = 1;
-    uint32 width = 2;
 }

@@ -8,6 +8,46 @@ option go_package = "github.com/cmwaters/rook/x/matchmaker/types";
 // Msg defines the Msg service.
 service Msg {
     // this line is used by starport scaffolding # proto/tx/rpc
+    rpc Host(MsgHost) returns (MsgHostResponse);
+    rpc Join(MsgJoin) returns (MsgJoinResponse);
+    rpc Find(MsgFind) returns (MsgFindResponse);
+    rpc Ready(MsgReady) returns (MsgReadyResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
+message MsgHost {
+    string creator = 1;
+    repeated string invitees = 2;
+    bytes config = 3;
+    bool public = 4;
+    uint32 quorum = 5;
+    uint32 capacity = 6;
+}
+
+message MsgHostResponse {
+    uint64 room_id = 1;
+}
+
+message MsgJoin {
+    string creator = 1;
+    uint64 room_id = 2;
+}
+
+message MsgJoinResponse {
+}
+
+message MsgFind {
+    string creator = 1;
+    uint32 mode = 2;
+}
+
+message MsgFindResponse {
+}
+
+message MsgReady {
+    string creator = 1;
+    uint64 room_id = 2;
+}
+
+message MsgReadyResponse {
+}

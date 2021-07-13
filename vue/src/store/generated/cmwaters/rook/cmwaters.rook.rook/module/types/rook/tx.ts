@@ -1,46 +1,58 @@
 /* eslint-disable */
-import { Reader, Writer } from 'protobufjs/minimal'
+import { Direction, Settlement, Position, directionFromJSON, directionToJSON, settlementFromJSON, settlementToJSON } from '../rook/types'
+import { Reader, util, configure, Writer } from 'protobufjs/minimal'
+import * as Long from 'long'
+import { GameConfig } from '../rook/config'
 
 export const protobufPackage = 'cmwaters.rook.rook'
 
-/** this line is used by starport scaffolding # proto/tx/message */
 export interface MsgMove {
   creator: string
-  gameId: string
-  position: string
-  direction: string
-  population: string
+  gameId: number
+  position: Position | undefined
+  direction: Direction
+  population: number
 }
 
 export interface MsgMoveResponse {}
 
 export interface MsgBuild {
   creator: string
-  gameId: string
-  settlement: string
-  position: string
+  gameId: number
+  settlement: Settlement
+  position: Position | undefined
 }
 
 export interface MsgBuildResponse {}
 
-const baseMsgMove: object = { creator: '', gameId: '', position: '', direction: '', population: '' }
+export interface MsgCreate {
+  /** all players must be signers */
+  players: string[]
+  config: GameConfig | undefined
+}
+
+export interface MsgCreateResponse {
+  gameId: number
+}
+
+const baseMsgMove: object = { creator: '', gameId: 0, direction: 0, population: 0 }
 
 export const MsgMove = {
   encode(message: MsgMove, writer: Writer = Writer.create()): Writer {
     if (message.creator !== '') {
       writer.uint32(10).string(message.creator)
     }
-    if (message.gameId !== '') {
-      writer.uint32(18).string(message.gameId)
+    if (message.gameId !== 0) {
+      writer.uint32(16).uint64(message.gameId)
     }
-    if (message.position !== '') {
-      writer.uint32(26).string(message.position)
+    if (message.position !== undefined) {
+      Position.encode(message.position, writer.uint32(26).fork()).ldelim()
     }
-    if (message.direction !== '') {
-      writer.uint32(34).string(message.direction)
+    if (message.direction !== 0) {
+      writer.uint32(32).int32(message.direction)
     }
-    if (message.population !== '') {
-      writer.uint32(42).string(message.population)
+    if (message.population !== 0) {
+      writer.uint32(40).uint32(message.population)
     }
     return writer
   },
@@ -56,16 +68,16 @@ export const MsgMove = {
           message.creator = reader.string()
           break
         case 2:
-          message.gameId = reader.string()
+          message.gameId = longToNumber(reader.uint64() as Long)
           break
         case 3:
-          message.position = reader.string()
+          message.position = Position.decode(reader, reader.uint32())
           break
         case 4:
-          message.direction = reader.string()
+          message.direction = reader.int32() as any
           break
         case 5:
-          message.population = reader.string()
+          message.population = reader.uint32()
           break
         default:
           reader.skipType(tag & 7)
@@ -83,24 +95,24 @@ export const MsgMove = {
       message.creator = ''
     }
     if (object.gameId !== undefined && object.gameId !== null) {
-      message.gameId = String(object.gameId)
+      message.gameId = Number(object.gameId)
     } else {
-      message.gameId = ''
+      message.gameId = 0
     }
     if (object.position !== undefined && object.position !== null) {
-      message.position = String(object.position)
+      message.position = Position.fromJSON(object.position)
     } else {
-      message.position = ''
+      message.position = undefined
     }
     if (object.direction !== undefined && object.direction !== null) {
-      message.direction = String(object.direction)
+      message.direction = directionFromJSON(object.direction)
     } else {
-      message.direction = ''
+      message.direction = 0
     }
     if (object.population !== undefined && object.population !== null) {
-      message.population = String(object.population)
+      message.population = Number(object.population)
     } else {
-      message.population = ''
+      message.population = 0
     }
     return message
   },
@@ -109,8 +121,8 @@ export const MsgMove = {
     const obj: any = {}
     message.creator !== undefined && (obj.creator = message.creator)
     message.gameId !== undefined && (obj.gameId = message.gameId)
-    message.position !== undefined && (obj.position = message.position)
-    message.direction !== undefined && (obj.direction = message.direction)
+    message.position !== undefined && (obj.position = message.position ? Position.toJSON(message.position) : undefined)
+    message.direction !== undefined && (obj.direction = directionToJSON(message.direction))
     message.population !== undefined && (obj.population = message.population)
     return obj
   },
@@ -125,22 +137,22 @@ export const MsgMove = {
     if (object.gameId !== undefined && object.gameId !== null) {
       message.gameId = object.gameId
     } else {
-      message.gameId = ''
+      message.gameId = 0
     }
     if (object.position !== undefined && object.position !== null) {
-      message.position = object.position
+      message.position = Position.fromPartial(object.position)
     } else {
-      message.position = ''
+      message.position = undefined
     }
     if (object.direction !== undefined && object.direction !== null) {
       message.direction = object.direction
     } else {
-      message.direction = ''
+      message.direction = 0
     }
     if (object.population !== undefined && object.population !== null) {
       message.population = object.population
     } else {
-      message.population = ''
+      message.population = 0
     }
     return message
   }
@@ -184,21 +196,21 @@ export const MsgMoveResponse = {
   }
 }
 
-const baseMsgBuild: object = { creator: '', gameId: '', settlement: '', position: '' }
+const baseMsgBuild: object = { creator: '', gameId: 0, settlement: 0 }
 
 export const MsgBuild = {
   encode(message: MsgBuild, writer: Writer = Writer.create()): Writer {
     if (message.creator !== '') {
       writer.uint32(10).string(message.creator)
     }
-    if (message.gameId !== '') {
-      writer.uint32(18).string(message.gameId)
+    if (message.gameId !== 0) {
+      writer.uint32(16).uint64(message.gameId)
     }
-    if (message.settlement !== '') {
-      writer.uint32(26).string(message.settlement)
+    if (message.settlement !== 0) {
+      writer.uint32(24).int32(message.settlement)
     }
-    if (message.position !== '') {
-      writer.uint32(34).string(message.position)
+    if (message.position !== undefined) {
+      Position.encode(message.position, writer.uint32(34).fork()).ldelim()
     }
     return writer
   },
@@ -214,13 +226,13 @@ export const MsgBuild = {
           message.creator = reader.string()
           break
         case 2:
-          message.gameId = reader.string()
+          message.gameId = longToNumber(reader.uint64() as Long)
           break
         case 3:
-          message.settlement = reader.string()
+          message.settlement = reader.int32() as any
           break
         case 4:
-          message.position = reader.string()
+          message.position = Position.decode(reader, reader.uint32())
           break
         default:
           reader.skipType(tag & 7)
@@ -238,19 +250,19 @@ export const MsgBuild = {
       message.creator = ''
     }
     if (object.gameId !== undefined && object.gameId !== null) {
-      message.gameId = String(object.gameId)
+      message.gameId = Number(object.gameId)
     } else {
-      message.gameId = ''
+      message.gameId = 0
     }
     if (object.settlement !== undefined && object.settlement !== null) {
-      message.settlement = String(object.settlement)
+      message.settlement = settlementFromJSON(object.settlement)
     } else {
-      message.settlement = ''
+      message.settlement = 0
     }
     if (object.position !== undefined && object.position !== null) {
-      message.position = String(object.position)
+      message.position = Position.fromJSON(object.position)
     } else {
-      message.position = ''
+      message.position = undefined
     }
     return message
   },
@@ -259,8 +271,8 @@ export const MsgBuild = {
     const obj: any = {}
     message.creator !== undefined && (obj.creator = message.creator)
     message.gameId !== undefined && (obj.gameId = message.gameId)
-    message.settlement !== undefined && (obj.settlement = message.settlement)
-    message.position !== undefined && (obj.position = message.position)
+    message.settlement !== undefined && (obj.settlement = settlementToJSON(message.settlement))
+    message.position !== undefined && (obj.position = message.position ? Position.toJSON(message.position) : undefined)
     return obj
   },
 
@@ -274,17 +286,17 @@ export const MsgBuild = {
     if (object.gameId !== undefined && object.gameId !== null) {
       message.gameId = object.gameId
     } else {
-      message.gameId = ''
+      message.gameId = 0
     }
     if (object.settlement !== undefined && object.settlement !== null) {
       message.settlement = object.settlement
     } else {
-      message.settlement = ''
+      message.settlement = 0
     }
     if (object.position !== undefined && object.position !== null) {
-      message.position = object.position
+      message.position = Position.fromPartial(object.position)
     } else {
-      message.position = ''
+      message.position = undefined
     }
     return message
   }
@@ -328,11 +340,146 @@ export const MsgBuildResponse = {
   }
 }
 
+const baseMsgCreate: object = { players: '' }
+
+export const MsgCreate = {
+  encode(message: MsgCreate, writer: Writer = Writer.create()): Writer {
+    for (const v of message.players) {
+      writer.uint32(18).string(v!)
+    }
+    if (message.config !== undefined) {
+      GameConfig.encode(message.config, writer.uint32(26).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgCreate {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = { ...baseMsgCreate } as MsgCreate
+    message.players = []
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 2:
+          message.players.push(reader.string())
+          break
+        case 3:
+          message.config = GameConfig.decode(reader, reader.uint32())
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MsgCreate {
+    const message = { ...baseMsgCreate } as MsgCreate
+    message.players = []
+    if (object.players !== undefined && object.players !== null) {
+      for (const e of object.players) {
+        message.players.push(String(e))
+      }
+    }
+    if (object.config !== undefined && object.config !== null) {
+      message.config = GameConfig.fromJSON(object.config)
+    } else {
+      message.config = undefined
+    }
+    return message
+  },
+
+  toJSON(message: MsgCreate): unknown {
+    const obj: any = {}
+    if (message.players) {
+      obj.players = message.players.map((e) => e)
+    } else {
+      obj.players = []
+    }
+    message.config !== undefined && (obj.config = message.config ? GameConfig.toJSON(message.config) : undefined)
+    return obj
+  },
+
+  fromPartial(object: DeepPartial<MsgCreate>): MsgCreate {
+    const message = { ...baseMsgCreate } as MsgCreate
+    message.players = []
+    if (object.players !== undefined && object.players !== null) {
+      for (const e of object.players) {
+        message.players.push(e)
+      }
+    }
+    if (object.config !== undefined && object.config !== null) {
+      message.config = GameConfig.fromPartial(object.config)
+    } else {
+      message.config = undefined
+    }
+    return message
+  }
+}
+
+const baseMsgCreateResponse: object = { gameId: 0 }
+
+export const MsgCreateResponse = {
+  encode(message: MsgCreateResponse, writer: Writer = Writer.create()): Writer {
+    if (message.gameId !== 0) {
+      writer.uint32(8).uint64(message.gameId)
+    }
+    return writer
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgCreateResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = { ...baseMsgCreateResponse } as MsgCreateResponse
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.gameId = longToNumber(reader.uint64() as Long)
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MsgCreateResponse {
+    const message = { ...baseMsgCreateResponse } as MsgCreateResponse
+    if (object.gameId !== undefined && object.gameId !== null) {
+      message.gameId = Number(object.gameId)
+    } else {
+      message.gameId = 0
+    }
+    return message
+  },
+
+  toJSON(message: MsgCreateResponse): unknown {
+    const obj: any = {}
+    message.gameId !== undefined && (obj.gameId = message.gameId)
+    return obj
+  },
+
+  fromPartial(object: DeepPartial<MsgCreateResponse>): MsgCreateResponse {
+    const message = { ...baseMsgCreateResponse } as MsgCreateResponse
+    if (object.gameId !== undefined && object.gameId !== null) {
+      message.gameId = object.gameId
+    } else {
+      message.gameId = 0
+    }
+    return message
+  }
+}
+
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
   Move(request: MsgMove): Promise<MsgMoveResponse>
   Build(request: MsgBuild): Promise<MsgBuildResponse>
+  Create(request: MsgCreate): Promise<MsgCreateResponse>
 }
 
 export class MsgClientImpl implements Msg {
@@ -351,11 +498,27 @@ export class MsgClientImpl implements Msg {
     const promise = this.rpc.request('cmwaters.rook.rook.Msg', 'Build', data)
     return promise.then((data) => MsgBuildResponse.decode(new Reader(data)))
   }
+
+  Create(request: MsgCreate): Promise<MsgCreateResponse> {
+    const data = MsgCreate.encode(request).finish()
+    const promise = this.rpc.request('cmwaters.rook.rook.Msg', 'Create', data)
+    return promise.then((data) => MsgCreateResponse.decode(new Reader(data)))
+  }
 }
 
 interface Rpc {
   request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>
 }
+
+declare var self: any | undefined
+declare var window: any | undefined
+var globalThis: any = (() => {
+  if (typeof globalThis !== 'undefined') return globalThis
+  if (typeof self !== 'undefined') return self
+  if (typeof window !== 'undefined') return window
+  if (typeof global !== 'undefined') return global
+  throw 'Unable to locate global object'
+})()
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined
 export type DeepPartial<T> = T extends Builtin
@@ -367,3 +530,15 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>
+
+function longToNumber(long: Long): number {
+  if (long.gt(Number.MAX_SAFE_INTEGER)) {
+    throw new globalThis.Error('Value is larger than Number.MAX_SAFE_INTEGER')
+  }
+  return long.toNumber()
+}
+
+if (util.Long !== Long) {
+  util.Long = Long as any
+  configure()
+}

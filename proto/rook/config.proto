@@ -1,15 +1,13 @@
 syntax = "proto3";
-package rook.rook;
+package cmwaters.rook.rook;
 
 option go_package = "github.com/cmwaters/rook/x/rook/types";
 
-import "rook/state.proto";
+import "rook/types.proto";
 
 message GameConfig {
   InitializationConfig initial = 1;
   MapConfig map = 2; 
-  ProductionRatesConfig production = 3;
-  SettlementCostsConfig construction = 4;
 }
 
 message MapConfig {
@@ -22,26 +20,13 @@ message MapConfig {
   uint32 plains_density = 7;
 }
 
-message ProductionRatesConfig {
-  uint32 town = 1;
-  uint32 city = 2; // capital and city have the same production rates
-  uint32 lumbermill = 3;
-  uint32 quarry = 4;
-  uint32 farm = 5;
-  // rooks don't produce anything (we could change this in the future)
-}
-
-message SettlementCostsConfig {
-  ResourceSet town = 1;
-  ResourceSet city = 2;
-  ResourceSet capital = 3;
-  ResourceSet farm = 4;
-  ResourceSet lumbermill = 5;
-  ResourceSet quarry = 6;
-}
-
 message InitializationConfig {
   uint32 teams = 1;
-  ResourceSet resources = 2; 
-  uint32 population = 3;
+  ResourceSet resources = 2;
+}
+
+message Params {
+  // maps are indexed by settlement id
+  map<uint32, ResourceSet> production_rate = 1;
+  map<uint32, ResourceSet> construction_cost = 2;
 }

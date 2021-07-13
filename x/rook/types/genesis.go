@@ -1,7 +1,6 @@
 package types
 
 import (
-"fmt"
 // this line is used by starport scaffolding # ibc/genesistype/import
 )
 
@@ -13,7 +12,7 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		// this line is used by starport scaffolding # ibc/genesistype/default
 		// this line is used by starport scaffolding # genesis/types/default
-PositionList: []*Position{},
+		Params: DefaultParams(),
 	}
 }
 
@@ -21,17 +20,6 @@ PositionList: []*Position{},
 // failure.
 func (gs GenesisState) Validate() error {
 	// this line is used by starport scaffolding # ibc/genesistype/validate
-
-	// this line is used by starport scaffolding # genesis/types/validate
-// Check for duplicated ID in position
-positionIdMap := make(map[uint64]bool)
-
-for _, elem := range gs.PositionList {
-	if _, ok := positionIdMap[elem.Id]; ok {
-		return fmt.Errorf("duplicated id for position")
-	}
-	positionIdMap[elem.Id] = true
-}
 
 	return nil
 }
