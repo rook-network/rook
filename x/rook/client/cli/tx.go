@@ -7,7 +7,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	// "github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cmwaters/rook/x/rook/types"
 )
 
@@ -42,19 +43,17 @@ func CmdCreate() *cobra.Command {
 		Short: "Broadcast message create",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			argsGame_id := uint64(args[0])
-			argsSettlement := string(args[1])
-			argsPosition := string(args[2])
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg := types.NewMsgCreate(clientCtx.GetFromAddress().String(), uint64(argsGame_id), string(argsSettlement), string(argsPosition))
+			msg := types.NewMsgCreate(args, types.DefaultGameConfig())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
+
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

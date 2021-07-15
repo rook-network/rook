@@ -1,15 +1,14 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 	"strconv"
-	// "strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	// "github.com/cosmos/cosmos-sdk/client/flags"
-	// sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 
 	"github.com/cmwaters/rook/x/rook/types"
 )
@@ -46,11 +45,11 @@ func CmdQueryGame() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.Query{
-				Pagination: pageReq,
+			params := &types.QueryGetGameRequest{
+				Id: id,
 			}
 
-			res, err := queryClient.PositionAll(context.Background(), params)
+			res, err := queryClient.Game(context.Background(), params)
 			if err != nil {
 				return err
 			}
@@ -59,7 +58,6 @@ func CmdQueryGame() *cobra.Command {
 		},
 	}
 
-	flags.AddPaginationFlagsToCmd(cmd, cmd.Use)
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd

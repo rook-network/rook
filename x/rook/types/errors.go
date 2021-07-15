@@ -8,6 +8,6 @@ import (
 
 // x/rook module sentinel errors
 var (
-	ErrSample = sdkerrors.Register(ModuleName, 1100, "sample error")
+	ErrInvalidMapSize = sdkerrors.Register(ModuleName, 1100, "invalid map size")
 	// this line is used by starport scaffolding # ibc/errors
 )

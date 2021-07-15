@@ -1,5 +1,14 @@
 package types
 
+import (
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+)
+
+const (
+	MinMapSize = 10
+	MaxMapSize = 100
+)
+
 func DefaultGameConfig() *GameConfig {
 	return &GameConfig{
 		Initial: DefaultInitializationConfig(), // all on all
@@ -7,11 +16,15 @@ func DefaultGameConfig() *GameConfig {
 	}
 }
 
-func (cfg *GameConfig) ValidateBasic() error { 
-	if cfg.Map == nil {
-		return 
+func (cfg *GameConfig) ValidateBasic() error {
+	if cfg.Map != nil {
+		if err := cfg.Map.ValidateBasic(); err != nil {
+			return err
+		}
 	}
-} 
+
+	return nil
+}
 
 func DefaultInitializationConfig() *InitializationConfig {
 	return &InitializationConfig{
@@ -30,6 +43,26 @@ func DefaultMapConfig() *MapConfig {
 		ForestDensity:    4,
 		PlainsDensity:    6,
 	}
+}
+
+func (cfg MapConfig) ValidateBasic() error {
+	if cfg.Width < MinMapSize {
+		return sdkerrors.Wrapf(ErrInvalidMapSize, "width %d is smaller than minimum %d", cfg.Width, MinMapSize)
+	}
+
+	if cfg.Width > MaxMapSize {
+		return sdkerrors.Wrapf(ErrInvalidMapSize, "width %d is greater than maximum %d", cfg.Width, MaxMapSize)
+	}
+
+	if cfg.Height < MinMapSize {
+		return sdkerrors.Wrapf(ErrInvalidMapSize, "height %d is smaller than minimum %d", cfg.Height, MinMapSize)
+	}
+
+	if cfg.Height > MaxMapSize {
+		return sdkerrors.Wrapf(ErrInvalidMapSize, "height %d is greater than maximum %d", cfg.Height, MaxMapSize)
+	}
+
+	return nil
 }
 
 func DefaultParams() *Params {
