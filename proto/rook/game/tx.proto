@@ -1,9 +1,9 @@
 syntax = "proto3";
-package cmwaters.rook.rook;
+package rook.game;
 
 // this line is used by starport scaffolding # proto/tx/import
-import "rook/types.proto";
-import "rook/config.proto";
+import "rook/game/types.proto";
+import "rook/game/config.proto";
 
 option go_package = "github.com/cmwaters/rook/x/rook/types";
 

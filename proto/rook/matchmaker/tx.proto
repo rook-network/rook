@@ -1,5 +1,5 @@
 syntax = "proto3";
-package cmwaters.rook.matchmaker;
+package rook.matchmaker;
 
 // this line is used by starport scaffolding # proto/tx/import
 

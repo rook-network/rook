@@ -1,8 +1,8 @@
 syntax = "proto3";
-package cmwaters.rook.matchmaker;
+package rook.matchmaker;
 
 import "google/api/annotations.proto";
-import "matchmaker/types.proto";
+import "rook/matchmaker/types.proto";
 
 // this line is used by starport scaffolding # 1
 

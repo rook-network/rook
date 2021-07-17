@@ -1,9 +1,9 @@
 syntax = "proto3";
-package cmwaters.rook.rook;
+package rook.game;
 
 option go_package = "github.com/cmwaters/rook/x/rook/types";
 
-import "rook/types.proto";
+import "rook/game/types.proto";
 
 message GameConfig {
   InitializationConfig initial = 1;
