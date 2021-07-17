@@ -1,5 +1,5 @@
 syntax = "proto3";
-package game.game;
+package rook.game;
 
 option go_package = "github.com/cmwaters/rook/x/game/types";
 

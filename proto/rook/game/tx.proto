@@ -1,5 +1,5 @@
 syntax = "proto3";
-package game.game;
+package rook.game;
 
 // this line is used by starport scaffolding # proto/tx/import
 import "rook/game/types.proto";
