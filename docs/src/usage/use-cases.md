@@ -1,0 +1,5 @@
+# Use Cases
+
+Plural is designed in a flexible and abstract manner, concerning itself predominantly with providing the infrastructure to build well-incentivised and scalable governance entities. It might therefore seem unclear as to how exactly can someone use it. In this section we explore a few of the ways that Plural can be used.
+
+The most predominant case is the decentralized management of smart contracts on Solana. The Solana ecosystem is seeing a plethora of exciting new defi products, games and nft marketplaces. Most of these contracts, or more so the builders of them, want to find a way to allow the community of invested users to help steer what they've built in a direction that will continue to benefit it's users. Plural can serve as a feature-rich governance toolkit where developers can set up a contract, and use some form of tokenization to allow the users to propose, vote and eventually execute changes to the contract.

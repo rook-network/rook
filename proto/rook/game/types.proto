@@ -1,7 +1,7 @@
 syntax = "proto3";
-package rook.game;
+package game.game;
 
-option go_package = "github.com/cmwaters/rook/x/rook/types";
+option go_package = "github.com/cmwaters/rook/x/game/types";
 
 message Map {
     repeated Tile tiles = 1;

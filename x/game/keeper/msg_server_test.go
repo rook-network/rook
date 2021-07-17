@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/cmwaters/rook/x/rook/types"
+	"github.com/cmwaters/rook/x/game/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

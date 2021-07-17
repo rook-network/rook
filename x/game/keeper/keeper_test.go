@@ -3,7 +3,7 @@ package keeper
 import (
 	"testing"
 
-	"github.com/cmwaters/rook/x/rook/types"
+	"github.com/cmwaters/rook/x/game/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"

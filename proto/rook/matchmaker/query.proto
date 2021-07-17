@@ -1,5 +1,5 @@
 syntax = "proto3";
-package rook.matchmaker;
+package game.matchmaker;
 
 import "google/api/annotations.proto";
 import "rook/matchmaker/types.proto";

@@ -1,5 +1,5 @@
 syntax = "proto3";
-package rook.matchmaker;
+package game.matchmaker;
 
 // this line is used by starport scaffolding # genesis/proto/import
 

@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"github.com/cmwaters/rook/x/rook/types"
+	"github.com/cmwaters/rook/x/game/types"
 )
 
 var _ types.QueryServer = Keeper{}

@@ -1,12 +1,12 @@
 syntax = "proto3";
-package rook.game;
+package game.game;
 
 import "google/api/annotations.proto";
 // this line is used by starport scaffolding # 1
 import "rook/game/state.proto";
 import "rook/game/config.proto";
 
-option go_package = "github.com/cmwaters/rook/x/rook/types";
+option go_package = "github.com/cmwaters/rook/x/game/types";
 
 // Query defines the gRPC querier service.
 service Query {

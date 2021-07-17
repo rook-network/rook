@@ -8,15 +8,15 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
+	"github.com/gorilla/mux"
+	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
-	"github.com/tendermint/spm/openapiconsole"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
 	appparams "github.com/cmwaters/rook/app/params"
-	"github.com/cmwaters/rook/docs"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -84,13 +84,14 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
+	"github.com/cmwaters/rook/x/game"
+	gamekeeper "github.com/cmwaters/rook/x/game/keeper"
+	gametypes "github.com/cmwaters/rook/x/game/types"
 	"github.com/cmwaters/rook/x/matchmaker"
 	matchmakerkeeper "github.com/cmwaters/rook/x/matchmaker/keeper"
 	matchmakertypes "github.com/cmwaters/rook/x/matchmaker/types"
-	"github.com/cmwaters/rook/x/rook"
-	rookkeeper "github.com/cmwaters/rook/x/rook/keeper"
-	rooktypes "github.com/cmwaters/rook/x/rook/types"
 )
 
 const Name = "rook"
@@ -138,7 +139,7 @@ var (
 		vesting.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 		matchmaker.AppModuleBasic{},
-		rook.AppModuleBasic{},
+		game.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -206,7 +207,7 @@ type App struct {
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 	MatchmakerKeeper matchmakerkeeper.Keeper
-	RookKeeper       rookkeeper.Keeper
+	gamekeeper       gamekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -237,7 +238,7 @@ func New(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 		matchmakertypes.StoreKey,
-		rooktypes.StoreKey,
+		gametypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -336,12 +337,12 @@ func New(
 	)
 	matchmakerModule := matchmaker.NewAppModule(appCodec, app.MatchmakerKeeper)
 
-	app.RookKeeper = *rookkeeper.NewKeeper(
+	app.gamekeeper = *gamekeeper.NewKeeper(
 		appCodec,
-		keys[rooktypes.StoreKey],
-		keys[rooktypes.MemStoreKey],
+		keys[gametypes.StoreKey],
+		keys[gametypes.MemStoreKey],
 	)
-	rookModule := rook.NewAppModule(appCodec, app.RookKeeper)
+	rookModule := game.NewAppModule(appCodec, app.gamekeeper)
 
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
@@ -420,7 +421,7 @@ func New(
 		ibctransfertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 		matchmakertypes.ModuleName,
-		rooktypes.ModuleName,
+		gametypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -569,9 +570,21 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// register app's OpenAPI routes.
-	apiSvr.Router.Handle("/static/openapi.yml", http.FileServer(http.FS(docs.Docs)))
-	apiSvr.Router.HandleFunc("/", openapiconsole.Handler(Name, "/static/openapi.yml"))
+	// register swagger API from root so that other applications can override easily
+	if apiConfig.Swagger {
+		RegisterSwaggerAPI(clientCtx, apiSvr.Router)
+	}
+}
+
+// RegisterSwaggerAPI registers swagger route with API Server
+func RegisterSwaggerAPI(ctx client.Context, rtr *mux.Router) {
+	statikFS, err := fs.New()
+	if err != nil {
+		panic(err)
+	}
+
+	staticServer := http.FileServer(statikFS)
+	rtr.PathPrefix("/swagger/").Handler(http.StripPrefix("/swagger/", staticServer))
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
@@ -609,7 +622,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 	paramsKeeper.Subspace(matchmakertypes.ModuleName)
-	paramsKeeper.Subspace(rooktypes.ModuleName)
+	paramsKeeper.Subspace(gametypes.ModuleName)
 
 	return paramsKeeper
 }

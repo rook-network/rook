@@ -1,4 +1,4 @@
-package rook
+package game
 
 import (
 	"context"
@@ -11,9 +11,9 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/cmwaters/rook/x/rook/client/cli"
-	"github.com/cmwaters/rook/x/rook/keeper"
-	"github.com/cmwaters/rook/x/rook/types"
+	"github.com/cmwaters/rook/x/game/client/cli"
+	"github.com/cmwaters/rook/x/game/keeper"
+	"github.com/cmwaters/rook/x/game/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"

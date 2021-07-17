@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/cmwaters/rook/app"
-	"github.com/cmwaters/rook/cmd/rookd/cmd"
+	"github.com/cmwaters/rook/cmd/rook/cmd"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 )
 

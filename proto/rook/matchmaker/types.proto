@@ -1,16 +1,17 @@
 syntax = "proto3";
-package rook.matchmaker;
+package game.matchmaker;
 
+import "gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
-// import "rook/game/config.proto";
+import "rook/game/config.proto";
 
 option go_package = "github.com/cmwaters/rook/x/matchmaker/types";
 
 message Room {
   // the config to be used for the game. Either this or the mode need to be set
   // Using this should only be done for custom games
-  bytes config = 1;
+  GameConfig config = 1;
 
   // the game mode to be played
   Mode mode = 2;
@@ -31,17 +32,24 @@ message Room {
   uint32 capacity = 7;
 
   // when the room was created. Rooms get garbage collected after a while
-  google.protobuf.Timestamp created = 8;
+  google.protobuf.Timestamp created = 8 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false
+  ];
 }
 
 // Modes are a way of accumulating a small set of possible games that people can choose between
 message Mode {
   uint32 id = 1;
-  bytes config = 2;
+  GameConfig config = 2;
 }
 
 message Params {
   // the maximum duration a room can last for before it is closed and all
   // players are kicked
-  google.protobuf.Duration room_lifespan = 1;
+  google.protobuf.Duration room_lifespan = 1 [
+    (gogoproto.stdduration) = true,
+    (gogoproto.nullable) = false
+  ];
 }
+
