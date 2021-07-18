@@ -27,7 +27,7 @@ func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 		return nil, err
 	}
 
-	gameID, err := m.Keeper.GetNextGameID(ctx)	
+	gameID, err := m.Keeper.GetNextGameID(ctx)
 	if err != nil {
 		return nil, err
 	}

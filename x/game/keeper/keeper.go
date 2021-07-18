@@ -17,6 +17,9 @@ type (
 	Keeper struct {
 		cdc        codec.Marshaler
 		storeKey   sdk.StoreKey
+		// we save all the state transitions throughout the game in memory and
+		// then persist the game state to disk during the end blocker so that
+		// all the moves in a step appear atomic
 		games      map[uint64]*types.Game
 		paramSpace paramtypes.Subspace
 	}
@@ -30,6 +33,7 @@ func NewKeeper(
 	return &Keeper{
 		cdc:        cdc,
 		storeKey:   storeKey,
+		games:      make(map[uint64]*types.Game),
 		paramSpace: paramSpace,
 	}
 }
@@ -38,11 +42,42 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
+func (k Keeper) GetGame(ctx sdk.Context, gameID uint64) (*types.State, error) {
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(GameKey(gameID))
+	state := &types.State{}
+	err := k.cdc.UnmarshalBinaryBare(bz, state)
+	if err != nil {
+		return nil, err
+	}
+	return state, nil
+}
+
+// FlushGames writes all current game states to disk. This is done in EndBlock
+// and is used to calculate the state hash
 func (k Keeper) FlushGames(ctx sdk.Context) {
 	store := ctx.KVStore(k.storeKey)
 	for id, game := range k.games {
 		store.Set(GameKey(id), k.cdc.MustMarshalBinaryBare(game.State()))
 	}
+}
+
+// LoadGames loads all the games persisted to disk.
+func (k Keeper) LoadGames(ctx sdk.Context) error {
+	store := ctx.KVStore(k.storeKey)
+	iter := store.Iterator(GameKey(1), nil)
+
+	for ; iter.Valid(); iter.Next() {
+		bz := iter.Value()
+		state := &types.State{}
+		err := k.cdc.UnmarshalBinaryBare(bz, state)
+		if err != nil {
+			return err
+		}
+		gameID := GameKeyFromBytes(iter.Key())
+		k.games[gameID] = types.NewGameFromState(state)
+	}
+	return nil
 }
 
 func (k Keeper) GetParams(ctx sdk.Context) types.Params {

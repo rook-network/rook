@@ -99,7 +99,6 @@ func TestStartingPoints(t *testing.T) {
 	gameMap := GenerateMap(config)
 	r := rand.New(rand.NewSource(config.Seed))
 
-
 	startingPoints, err := gameMap.RandomStartingPoints(r, 4)
 	require.NoError(t, err)
 	require.Len(t, startingPoints, 4)
@@ -110,8 +109,8 @@ func TestStartingPoints(t *testing.T) {
 			if i == j {
 				continue
 			}
-			if math.Abs(float64(pointA.X) - float64(pointB.X)) <= 2 && 
-				math.Abs(float64(pointA.Y) - float64(pointB.Y)) <= 2 {
+			if math.Abs(float64(pointA.X)-float64(pointB.X)) <= 2 &&
+				math.Abs(float64(pointA.Y)-float64(pointB.Y)) <= 2 {
 				t.Fatalf("starting point (x: %d, y: %d) too close to other point (x: %d, y: %d)",
 					pointA.X, pointA.Y, pointB.X, pointB.Y)
 			}

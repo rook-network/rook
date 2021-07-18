@@ -6,8 +6,17 @@ import (
 
 type Game struct {
 	Factions []*Faction
+
+	// FIXME: map never changes throughout the game - we should probably save
+	// this somewhere separately instead of having to continually save it. 
+	// NOTE: This caould also be saved alongside the games config file which
+	// also doesn't need to change over the duration of the game but so far none
+	// of the config parameters are needed after initialization
 	Map      *Map
 	Step     uint64
+
+	// FIXME: The params could change throughout the game. We should add a
+	// version number so we can track which version we should be referring to.
 }
 
 func NewGame(players []string, config *Config) (*Game, error) {
@@ -27,6 +36,14 @@ func NewGame(players []string, config *Config) (*Game, error) {
 		Map:      gameMap,
 		Step:     0,
 	}, nil
+}
+
+func NewGameFromState(state *State) *Game {
+	return &Game{
+		Factions: state.Players,
+		Map: state.Map,
+		Step: state.Step,
+	}
 }
 
 func (g Game) State() *State {

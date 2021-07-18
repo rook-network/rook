@@ -165,7 +165,7 @@ func (m *Map) Print() string {
 
 func (m *Map) NormalizePosition(x, y int) Position {
 	width := int(m.Width)
-	height := len(m.Tiles)/width
+	height := len(m.Tiles) / width
 
 	normX := (x + width) % width
 	normY := (y + height) % height

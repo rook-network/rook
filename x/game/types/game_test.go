@@ -8,7 +8,7 @@ import (
 
 var (
 	players = []string{"alice", "bob", "charles"}
-	config = DefaultConfig()
+	config  = DefaultConfig()
 )
 
 func TestNewGame(t *testing.T) {
