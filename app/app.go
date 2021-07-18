@@ -241,7 +241,9 @@ func New(
 		gametypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
-	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
+	memKeys := sdk.NewMemoryStoreKeys(
+		capabilitytypes.MemStoreKey, gametypes.MemStoreKey, matchmakertypes.MemStoreKey,
+	)
 
 	app := &App{
 		BaseApp:           bApp,
@@ -333,14 +335,14 @@ func New(
 	app.MatchmakerKeeper = *matchmakerkeeper.NewKeeper(
 		appCodec,
 		keys[matchmakertypes.StoreKey],
-		keys[matchmakertypes.MemStoreKey],
+		memKeys[matchmakertypes.MemStoreKey],
 	)
 	matchmakerModule := matchmaker.NewAppModule(appCodec, app.MatchmakerKeeper)
 
 	app.gamekeeper = *gamekeeper.NewKeeper(
 		appCodec,
 		keys[gametypes.StoreKey],
-		keys[gametypes.MemStoreKey],
+		app.GetSubspace(gametypes.ModuleName),
 	)
 	rookModule := game.NewAppModule(appCodec, app.gamekeeper)
 

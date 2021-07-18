@@ -2,7 +2,7 @@ syntax = "proto3";
 package rook.game;
 
 // this line is used by starport scaffolding # genesis/proto/import
-import "rook/game/config.proto";
+import "rook/game/game.proto";
 
 option go_package = "github.com/cmwaters/rook/x/game/types";
 
@@ -10,5 +10,6 @@ option go_package = "github.com/cmwaters/rook/x/game/types";
 message GenesisState {
     // the global configuration of all rook games
     Params params = 1;
-    // this line is used by starport scaffolding # ibc/genesis/proto
+    
+    uint64 next_game_id = 2;
 }

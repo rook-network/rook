@@ -7,7 +7,7 @@ import (
 
 var _ sdk.Msg = &MsgCreate{}
 
-func NewMsgCreate(players []string, config *GameConfig) *MsgCreate {
+func NewMsgCreate(players []string, config *Config) *MsgCreate {
 	return &MsgCreate{
 		Players: players,
 		Config:  config,
@@ -45,7 +45,7 @@ func (msg *MsgCreate) ValidateBasic() error {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid player address (%s)", err)
 		}
 	}
-	return nil
+	return msg.Config.ValidateBasic(len(msg.Players))
 }
 
 var _ sdk.Msg = &MsgMove{}

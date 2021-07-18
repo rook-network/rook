@@ -2,9 +2,7 @@ syntax = "proto3";
 package rook.game;
 
 import "google/api/annotations.proto";
-// this line is used by starport scaffolding # 1
-import "rook/game/state.proto";
-import "rook/game/config.proto";
+import "rook/game/game.proto";
 
 option go_package = "github.com/cmwaters/rook/x/game/types";
 
@@ -29,7 +27,7 @@ message QueryGetGameRequest {
 }
 
 message QueryGetGameResponse {
-	Game game = 1;
+	State game_state = 1;
 }
 
 message QueryGetParamsRequest {

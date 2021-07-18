@@ -20,7 +20,20 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 var _ types.MsgServer = msgServer{}
 
 func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.MsgCreateResponse, error) {
-	return &types.MsgCreateResponse{GameId: 1}, nil
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	game, err := types.NewGame(msg.Players, msg.Config)
+	if err != nil {
+		return nil, err
+	}
+
+	gameID, err := m.Keeper.GetNextGameID(ctx)	
+	if err != nil {
+		return nil, err
+	}
+
+	m.Keeper.games[gameID] = game
+	return &types.MsgCreateResponse{GameId: gameID}, nil
 }
 
 func (m msgServer) Build(goCtx context.Context, msg *types.MsgBuild) (*types.MsgBuildResponse, error) {

@@ -8,6 +8,8 @@ import (
 
 // x/rook module sentinel errors
 var (
-	ErrInvalidMapSize = sdkerrors.Register(ModuleName, 1100, "invalid map size")
+	ErrInvalidMapSize  = sdkerrors.Register(ModuleName, 1, "invalid map size")
+	ErrGameCountNotSet = sdkerrors.Register(ModuleName, 2, "game ID counter not set in genesis")
+	ErrSeedNotSet = sdkerrors.Register(ModuleName, 3, "game seed is not set (must be non zero)")
 	// this line is used by starport scaffolding # ibc/errors
 )

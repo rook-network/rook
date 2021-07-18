@@ -2,7 +2,7 @@ syntax = "proto3";
 package rook.matchaker;
 
 import "google/api/annotations.proto";
-import "rook/matchmaker/types.proto";
+import "rook/matchmaker/matchmaker.proto";
 
 // this line is used by starport scaffolding # 1
 

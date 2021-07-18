@@ -49,7 +49,7 @@ func CmdCreate() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreate(args, types.DefaultGameConfig())
+			msg := types.NewMsgCreate(args, types.DefaultConfig())
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

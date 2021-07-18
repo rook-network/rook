@@ -2,8 +2,7 @@ syntax = "proto3";
 package rook.game;
 
 // this line is used by starport scaffolding # proto/tx/import
-import "rook/game/types.proto";
-import "rook/game/config.proto";
+import "rook/game/game.proto";
 
 option go_package = "github.com/cmwaters/rook/x/game/types";
 
@@ -38,7 +37,7 @@ message MsgBuildResponse {
 
 message MsgCreate {
   repeated string players = 2; // all players must be signers
-  GameConfig config = 3;
+  Config config = 3;
 }
 
 message MsgCreateResponse {
