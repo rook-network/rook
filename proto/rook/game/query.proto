@@ -11,26 +11,40 @@ service Query {
     // this line is used by starport scaffolding # 2
 
 	// Queries a game state by id.
+	rpc GameState(QueryGetGameStateRequest) returns (QueryGetGameStateResponse) {
+		option (google.api.http).get = "/rook/game_state/{id}";
+	}
+
 	rpc Game(QueryGetGameRequest) returns (QueryGetGameResponse) {
 		option (google.api.http).get = "/rook/game/{id}";
 	}
 
 	rpc Params(QueryGetParamsRequest) returns (QueryGetParamsResponse) {
-		option (google.api.http).get = "/rook/params";
+		option (google.api.http).get = "/rook/params/{version}";
 	}
 
 }
 
 // this line is used by starport scaffolding # 3
+message QueryGetGameStateRequest {
+	uint64 id = 1;
+}
+
+message QueryGetGameStateResponse {
+	State game_state = 1;
+}
+
 message QueryGetGameRequest {
 	uint64 id = 1;
 }
 
 message QueryGetGameResponse {
-	State game_state = 1;
+	repeated string players = 1;
+	Overview overview = 2;
 }
 
 message QueryGetParamsRequest {
+	uint32 version = 1;
 }
 
 message QueryGetParamsResponse {

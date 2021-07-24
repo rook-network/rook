@@ -3,10 +3,15 @@ package rook.game;
 
 option go_package = "github.com/cmwaters/rook/x/game/types";
 
+message Overview {
+  Map map = 1; 
+  uint32 param_version = 2;
+}
+
 message State { 
-    repeated Faction players = 1;
-    Map map = 2;
-    uint64 step = 3;
+  repeated Faction players = 1;
+  repeated Populace gaia = 2;
+  uint64 step = 3;
 }
 
 message Map {

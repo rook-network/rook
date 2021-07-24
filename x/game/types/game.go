@@ -4,22 +4,18 @@ import (
 	"math/rand"
 )
 
+// Game is the in memory representation of an instance of the rook game. 
 type Game struct {
 	Factions []*Faction
-
-	// FIXME: map never changes throughout the game - we should probably save
-	// this somewhere separately instead of having to continually save it. 
-	// NOTE: This caould also be saved alongside the games config file which
-	// also doesn't need to change over the duration of the game but so far none
-	// of the config parameters are needed after initialization
-	Map      *Map
-	Step     uint64
-
-	// FIXME: The params could change throughout the game. We should add a
-	// version number so we can track which version we should be referring to.
+	Gaia   []*Populace
+	Map    *Map
+	Step   uint64
+	Params *Params
+	Version uint32
 }
 
-func NewGame(players []string, config *Config) (*Game, error) {
+// CONSTRUCTORS
+func NewGame(players []string, config *Config, params *Params) (*Game, error) {
 	gameMap := GenerateMap(config.Map)
 	factions := make([]*Faction, len(players))
 
@@ -34,38 +30,67 @@ func NewGame(players []string, config *Config) (*Game, error) {
 	return &Game{
 		Factions: factions,
 		Map:      gameMap,
+		Gaia:     make([]*Populace, 0),
 		Step:     0,
+		Params:   params,
 	}, nil
 }
 
-func NewGameFromState(state *State) *Game {
+func LoadGame(state *State, overview *Overview, params *Params) *Game {
 	return &Game{
 		Factions: state.Players,
-		Map: state.Map,
-		Step: state.Step,
+		Gaia:     state.Gaia,
+		Map:      overview.Map,
+		Step:     state.Step,
+		Params:   params,
+		Version:  overview.ParamVersion,
 	}
 }
 
+// ACTIONS
+//
+// The game is characterised by two possible actions. Moving and building. The
+// following two methods entail how each of these actions changes the games
+// state
+
+func (g *Game) Build(player string, settlement Settlement, position *Position) {
+
+}
+
+func (g *Game) Move(player string, ) {
+
+}
+
+
+
+// The persistence of a game is divided into two parts. The overview which
+// remains constant throughout the duration of the game, and state which gets
+// updated after each height.
+
+// State extracts out the state component of the game
 func (g Game) State() *State {
 	return &State{
 		Players: g.Factions,
-		Map:     g.Map,
+		Gaia:    g.Gaia,
 		Step:    g.Step,
 	}
 }
 
-func NewFaction(player string, resources *ResourceSet, startingPosition *Position) *Faction {
-	return &Faction{
-		Player:    player,
-		Resources: resources,
-		Population: []*Populace{
-			{
-				Amount:   resources.Population,
-				Position: startingPosition,
-			},
-		},
+// Overview extracts out the overview component of the game
+func (g Game) Overview() *Overview {
+	return &Overview{
+		Map: g.Map,
+		ParamVersion: g.Version,
 	}
+}
 
+// Update loops through all factions and calculates how many resources were reaped
+// in that step, updates the population and performs any other passive actions
+func (g Game) Update() {
+	for _, faction := range g.Factions {
+		faction.Reap()
+	}
+	g.Step++
 }
 
 func NewPosition(x, y uint32) *Position {

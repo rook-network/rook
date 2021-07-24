@@ -89,14 +89,14 @@ func (cfg MapConfig) Area() int {
 func DefaultParams() *Params {
 	return &Params{
 		ProductionRate: []*ResourceSet{
-			// 0 is NONE
+			{}, // 0 is NONE
 			{Wood: 0, Food: 0, Stone: 0, Population: 1}, // TOWN
 			{Wood: 0, Food: 0, Stone: 0, Population: 2}, // CITY
 			{Wood: 0, Food: 0, Stone: 0, Population: 2}, // CAPITAL
 			{Wood: 1, Food: 0, Stone: 0, Population: 0}, // LUMBERMILL
 			{Wood: 0, Food: 0, Stone: 1, Population: 0}, // QUARRY
 			{Wood: 0, Food: 1, Stone: 0, Population: 0}, // FARM
-			{},
+			{}, // ROOK
 		},
 		ConstructionCost: []*ResourceSet{
 			{},

@@ -10,6 +10,6 @@ option go_package = "github.com/cmwaters/rook/x/game/types";
 message GenesisState {
     // the global configuration of all rook games
     Params params = 1;
-    
-    uint64 next_game_id = 2;
+    uint32 params_version = 2;
+    uint64 next_game_id = 3;
 }

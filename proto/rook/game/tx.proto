@@ -12,6 +12,7 @@ service Msg {
   rpc Move(MsgMove) returns (MsgMoveResponse);
   rpc Build(MsgBuild) returns (MsgBuildResponse);
   rpc Create(MsgCreate) returns (MsgCreateResponse);
+  rpc ChangeParams(MsgChangeParams) returns (MsgChangeParamsResponse);
 }
 
 message MsgMove {
@@ -42,4 +43,12 @@ message MsgCreate {
 
 message MsgCreateResponse {
   uint64 game_id = 1; 
+}
+
+message MsgChangeParams {
+  Params params = 1;
+}
+
+message MsgChangeParamsResponse {
+  uint32 version = 1;
 }

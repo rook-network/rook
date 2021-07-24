@@ -13,10 +13,14 @@ func (q Keeper) Game(ctx context.Context, req *types.QueryGetGameRequest) (*type
 	return &types.QueryGetGameResponse{}, nil
 }
 
+func (q Keeper) GameState(ctx context.Context, req *types.QueryGetGameStateRequest) (*types.QueryGetGameStateResponse, error) {
+	return &types.QueryGetGameStateResponse{}, nil
+}
+
 func (q Keeper) Params(goCtx context.Context, req *types.QueryGetParamsRequest) (*types.QueryGetParamsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	params := q.GetParams(ctx)
+	params := q.GetParams(ctx, req.Version)
 
-	return &types.QueryGetParamsResponse{Params: &params}, nil
+	return &types.QueryGetParamsResponse{Params: params}, nil
 }

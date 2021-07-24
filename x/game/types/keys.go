@@ -1,5 +1,10 @@
 package types
 
+import (
+	"encoding/binary"
+	"fmt"
+)
+
 const (
 	// ModuleName defines the module name
 	ModuleName = "rook"
@@ -13,20 +18,50 @@ const (
 	// QuerierRoute defines the module's query routing key
 	QuerierRoute = ModuleName
 
-	// MemStoreKey defines the in-memory store key
-	MemStoreKey = "mem_rook"
-
 	// this line is used by starport scaffolding # ibc/keys/name
 )
 
-// this line is used by starport scaffolding # ibc/keys/port
+// store subkeys
+var (
+	LatestGameIDKey        = []byte{0x00}
+	GameOverviewKeyPrefix     = []byte{0x01}
+	GameStateKeyPrefix     = []byte{0x02}
+	LatestParamsVersionKey = []byte{0x03}
+	ParamsKeyPrefix        = []byte{0x04}
+)
 
-func KeyPrefix(p string) []byte {
-	return []byte(p)
+func GameOverviewKey(gameID uint64) []byte {
+	return append(GameOverviewKeyPrefix, GameIDBytes(gameID)...)
 }
 
-var (
-	ParamsStoreKey = []byte("params")
+func GameStateKey(gameID uint64) []byte {
+	return append(GameStateKeyPrefix, GameIDBytes(gameID)...)
+}
 
-	GameIDKey = []byte{0x00}
-)
+func GameIDFromBytes(key []byte) uint64 {
+	if len(key) != 9 {
+		panic(fmt.Sprintf("unexpected key length; got: %d, expected: %d", len(key), 9))
+	}
+
+	return binary.BigEndian.Uint64(key[1:])
+}
+
+func GameIDBytes(gameID uint64) []byte {
+	gameIDBytes := make([]byte, 8)
+	binary.BigEndian.PutUint64(gameIDBytes, gameID)
+	return gameIDBytes
+}
+
+func ParamsKey(version uint32) []byte {
+	paramsKeyBytes := make([]byte, 4)
+	binary.BigEndian.PutUint32(paramsKeyBytes, version)
+	return append(ParamsKeyPrefix, paramsKeyBytes...)
+}
+
+func ParamsVersionFromKey(key []byte) uint32 {
+	if len(key) != 5 {
+		panic(fmt.Sprintf("unexpected key length; got: %d, expected: %d", len(key), 5))
+	}
+
+	return binary.BigEndian.Uint32(key[1:])
+}

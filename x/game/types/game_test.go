@@ -9,11 +9,12 @@ import (
 var (
 	players = []string{"alice", "bob", "charles"}
 	config  = DefaultConfig()
+	params  = DefaultParams()
 )
 
 func TestNewGame(t *testing.T) {
 	config.Map.Seed = 9876
-	game, err := NewGame(players, config)
+	game, err := NewGame(players, config, params)
 	require.NoError(t, err)
 	for idx, faction := range game.Factions {
 		require.Equal(t, players[idx], faction.Player)
@@ -25,5 +26,4 @@ func TestNewGame(t *testing.T) {
 	state := game.State()
 	require.Equal(t, uint64(0), state.Step)
 	require.Len(t, state.Players, len(players))
-	require.True(t, state.Map.Equal(game.Map))
 }

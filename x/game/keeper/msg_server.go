@@ -22,7 +22,12 @@ var _ types.MsgServer = msgServer{}
 func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.MsgCreateResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	game, err := types.NewGame(msg.Players, msg.Config)
+	params, ok := m.Keeper.params[m.Keeper.latestVersion]
+	if !ok {
+		panic("unable to find latest params")
+	}
+
+	game, err := types.NewGame(msg.Players, msg.Config, params)
 	if err != nil {
 		return nil, err
 	}
@@ -32,12 +37,17 @@ func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 		return nil, err
 	}
 
+	// persist the game overview. We will save game state in the end block
+	m.Keeper.SaveGameOverview(ctx, gameID, game.Overview())
+
 	m.Keeper.games[gameID] = game
 	return &types.MsgCreateResponse{GameId: gameID}, nil
 }
 
 func (m msgServer) Build(goCtx context.Context, msg *types.MsgBuild) (*types.MsgBuildResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	
 
 	// TODO: Handling the message
 	_ = ctx
@@ -52,4 +62,8 @@ func (m msgServer) Move(goCtx context.Context, msg *types.MsgMove) (*types.MsgMo
 	_ = ctx
 
 	return &types.MsgMoveResponse{}, nil
+}
+
+func (m msgServer) ChangeParams(goCtx context.Context, msg *types.MsgChangeParams) (*types.MsgChangeParamsResponse, error) {
+	return &types.MsgChangeParamsResponse{Version: 1}, nil
 }
