@@ -31,6 +31,10 @@ func (cfg *Config) ValidateBasic(players int) error {
 	return nil
 }
 
+func (c *Config) AddSeed(seed int64) {
+	c.Map.Seed = seed
+}
+
 func DefaultInitializationConfig() *InitializationConfig {
 	return &InitializationConfig{
 		Teams:     0, // free for all
@@ -86,6 +90,8 @@ func (cfg MapConfig) Area() int {
 	return int(cfg.Width * cfg.Height)
 }
 
+// Params
+
 func DefaultParams() *Params {
 	return &Params{
 		ProductionRate: []*ResourceSet{
@@ -111,6 +117,6 @@ func DefaultParams() *Params {
 	}
 }
 
-func (c *Config) AddSeed(seed int64) {
-	c.Map.Seed = seed
+func (p Params) ValidateBasic() error {
+	return nil
 }

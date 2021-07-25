@@ -17,3 +17,5 @@ func NewFaction(player string, resources *ResourceSet, startingPosition *Positio
 func (f *Faction) Reap() {
 
 }
+
+func (f *Faction) FindPopulace()

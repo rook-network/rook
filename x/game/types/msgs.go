@@ -50,11 +50,11 @@ func (msg *MsgCreate) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgMove{}
 
-func NewMsgMove(creator string, gameId uint64, position *Position, direction Direction, population uint32) *MsgMove {
+func NewMsgMove(creator string, gameId uint64, populace uint32, direction Direction, population uint32) *MsgMove {
 	return &MsgMove{
 		Creator:    creator,
 		GameId:     gameId,
-		Position:   position,
+		Populace:   populace,
 		Direction:  direction,
 		Population: population,
 	}
@@ -91,12 +91,12 @@ func (msg *MsgMove) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgBuild{}
 
-func NewMsgBuild(creator string, gameId uint64, settlement Settlement, position *Position) *MsgBuild {
+func NewMsgBuild(creator string, gameId uint64, populace uint32, settlement Settlement) *MsgBuild {
 	return &MsgBuild{
 		Creator:    creator,
 		GameId:     gameId,
+		Populace:   populace,
 		Settlement: settlement,
-		Position:   position,
 	}
 }
 

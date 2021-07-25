@@ -24,7 +24,7 @@ const (
 // store subkeys
 var (
 	LatestGameIDKey        = []byte{0x00}
-	GameOverviewKeyPrefix     = []byte{0x01}
+	GameOverviewKeyPrefix  = []byte{0x01}
 	GameStateKeyPrefix     = []byte{0x02}
 	LatestParamsVersionKey = []byte{0x03}
 	ParamsKeyPrefix        = []byte{0x04}

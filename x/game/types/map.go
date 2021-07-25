@@ -32,7 +32,7 @@ func GenerateMap(config *MapConfig) *Map {
 	return gameMap
 }
 
-func (m *Map) GetLandscape(position Position) Landscape {
+func (m *Map) GetLandscape(position *Position) Landscape {
 	return m.Tiles[position.Y*m.Width+position.X]
 }
 
@@ -52,8 +52,12 @@ func (m *Map) Right(index int) int {
 	return (index + 1) % len(m.Tiles)
 }
 
-func (m *Map) GetPosition(index int) Position {
-	return Position{X: uint32(index) % m.Width, Y: uint32(index) / m.Width}
+func (m *Map) GetPosition(index int) *Position {
+	return &Position{X: uint32(index) % m.Width, Y: uint32(index) / m.Width}
+}
+
+func (m *Map) GetIndex(pos *Position) int {
+	return int(pos.Y*m.Width + pos.X)
 }
 
 func (m *Map) GetNeighbor(index int, direction Direction) int {
@@ -98,8 +102,8 @@ func (m *Map) Equal(m2 *Map) bool {
 }
 
 func (m *Map) RandomStartingPoints(r *rand.Rand, amount int) ([]*Position, error) {
-	points := make([]Position, 0)
-	pointMap := make(map[Position]struct{})
+	points := make([]*Position, 0)
+	pointMap := make(map[*Position]struct{})
 	// loop through and find all the possible starting positions
 	for idx, tile := range m.Tiles {
 		if tile == Landscape_PLAINS {
@@ -116,7 +120,7 @@ func (m *Map) RandomStartingPoints(r *rand.Rand, amount int) ([]*Position, error
 		for !found && attempts < 50 {
 			pos := points[r.Intn(len(points))]
 			if _, ok := pointMap[pos]; ok {
-				positions[i] = &pos
+				positions[i] = pos
 				found = true
 				// delete all the surrounding positions as possible options.
 				// This prevents two starting points from being that close to
@@ -163,13 +167,13 @@ func (m *Map) Print() string {
 	return str
 }
 
-func (m *Map) NormalizePosition(x, y int) Position {
+func (m *Map) NormalizePosition(x, y int) *Position {
 	width := int(m.Width)
 	height := len(m.Tiles) / width
 
 	normX := (x + width) % width
 	normY := (y + height) % height
-	return Position{X: uint32(normX), Y: uint32(normY)}
+	return &Position{X: uint32(normX), Y: uint32(normY)}
 }
 
 func fillMapWithTerrain(gameMap *Map, r *rand.Rand, config *MapConfig) {

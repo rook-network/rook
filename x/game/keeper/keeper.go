@@ -76,7 +76,7 @@ func (k *Keeper) LoadGames(ctx sdk.Context) {
 	overviews := k.loadAllGameOverviews(ctx)
 	states := k.loadAllGameStates(ctx)
 	params := k.loadAllParams(ctx)
-	
+
 	for id, overview := range overviews {
 		param, ok := params[overview.ParamVersion]
 		if !ok {
@@ -113,6 +113,10 @@ func (k Keeper) GetLatestParams(ctx sdk.Context) *types.Params {
 	paramBytes := store.Get(types.ParamsKey(k.latestVersion))
 	k.cdc.MustUnmarshalJSON(paramBytes, params)
 	return params
+}
+
+func (k Keeper) LatestParamsVersion() uint32 {
+	return k.latestVersion
 }
 
 func (k *Keeper) SetLatestParamVersion(ctx sdk.Context, version uint32) {
@@ -207,4 +211,3 @@ func (k Keeper) loadAllParams(ctx sdk.Context) map[uint32]*types.Params {
 	}
 	return params
 }
-

@@ -44,26 +44,41 @@ func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 	return &types.MsgCreateResponse{GameId: gameID}, nil
 }
 
-func (m msgServer) Build(goCtx context.Context, msg *types.MsgBuild) (*types.MsgBuildResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+func (m msgServer) Build(_ context.Context, msg *types.MsgBuild) (*types.MsgBuildResponse, error) {
+	resp := &types.MsgBuildResponse{}
 
-	
+	game, err := m.Keeper.GetGame(msg.GameId)
+	if err != nil {
+		return resp, err
+	}
 
-	// TODO: Handling the message
-	_ = ctx
+	err = game.Build(msg.Creator, msg.Populace, msg.Settlement)
 
-	return &types.MsgBuildResponse{}, nil
+	return resp, err
 }
 
-func (m msgServer) Move(goCtx context.Context, msg *types.MsgMove) (*types.MsgMoveResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+func (m msgServer) Move(_ context.Context, msg *types.MsgMove) (*types.MsgMoveResponse, error) {
+	resp := &types.MsgMoveResponse{}
 
-	// TODO: Handling the message
-	_ = ctx
+	game, err := m.Keeper.GetGame(msg.GameId)
+	if err != nil {
+		return resp, err
+	}
 
-	return &types.MsgMoveResponse{}, nil
+	err = game.Move(msg.Creator, msg.Populace, msg.Direction, msg.Population)
+
+	return resp, err
 }
 
 func (m msgServer) ChangeParams(goCtx context.Context, msg *types.MsgChangeParams) (*types.MsgChangeParamsResponse, error) {
-	return &types.MsgChangeParamsResponse{Version: 1}, nil
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	err := msg.Params.ValidateBasic()
+	if err != nil {
+		return &types.MsgChangeParamsResponse{}, err
+	}
+
+	m.Keeper.SetParams(ctx, msg.Params)
+
+	return &types.MsgChangeParamsResponse{Version: m.Keeper.LatestParamsVersion()}, nil
 }

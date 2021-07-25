@@ -18,7 +18,7 @@ service Msg {
 message MsgMove {
   string creator = 1;
   uint64 game_id = 2;
-  Position position = 3;
+  uint32 populace = 3;
   Direction direction = 4;
   uint32 population = 5;
 }
@@ -29,8 +29,8 @@ message MsgMoveResponse {
 message MsgBuild {
   string creator = 1;
   uint64 game_id = 2;
-  Settlement settlement = 3;
-  Position position = 4;
+  uint32 populace = 3;
+  Settlement settlement = 4;
 }
 
 message MsgBuildResponse {
