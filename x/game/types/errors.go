@@ -21,5 +21,6 @@ var (
 	ErrNotEnoughPopulation   = sdkerrors.Register(ModuleName, 11, "not enough population within populace")
 	ErrUnpassableTerrain     = sdkerrors.Register(ModuleName, 12, "terrain is unpassable")
 	ErrPopulaceAlreadActed   = sdkerrors.Register(ModuleName, 13, "players populace has already acted in this step")
+	ErrAbandoningCapital     = sdkerrors.Register(ModuleName, 14, "not allowed to abandon capital")
 	// this line is used by starport scaffolding # ibc/errors
 )

@@ -242,7 +242,7 @@ func New(
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(
-		capabilitytypes.MemStoreKey, gametypes.MemStoreKey, matchmakertypes.MemStoreKey,
+		capabilitytypes.MemStoreKey, matchmakertypes.MemStoreKey,
 	)
 
 	app := &App{

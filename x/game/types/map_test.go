@@ -35,6 +35,17 @@ func TestDirections(t *testing.T) {
 	require.Equal(t, 7, mock.Right(6))
 }
 
+func TestGetNeighbor(t *testing.T) {
+	mock := MockMap(3, 3, Landscape_PLAINS)
+	require.Equal(t, 2, mock.GetNeighbor(0, Direction_LEFT))
+}
+
+func TestGetPosition(t *testing.T) {
+	mock := MockMap(3, 3, Landscape_PLAINS)
+	require.Equal(t, NewPosition(2, 0), mock.GetPosition(2))
+	require.Equal(t, NewPosition(0, 2), mock.GetPosition(6))
+}
+
 func TestFindPos(t *testing.T) {
 	mock := MockMap(3, 3, Landscape_PLAINS)
 

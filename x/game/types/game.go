@@ -14,14 +14,14 @@ type Game struct {
 	Gaia     []*Populace
 	Step     uint64
 	// overview
-	Map      *Map
-	Version  uint32
-	
+	Map     *Map
+	Version uint32
+
 	// cached fields
-	params   *Params
-	players  []string // immutable
+	params  *Params
+	players []string // immutable
 	// map position index -> { player index, populace index }
-	territory map[int]territory 
+	territory map[int]territory
 	// check to see if the player/populace has already done their turn
 	used map[string]map[uint32]struct{}
 }
@@ -40,14 +40,16 @@ func NewGame(players []string, config *Config, params *Params) (*Game, error) {
 		factions[player] = NewFaction(player, config.Initial.Resources, startingPositions[idx])
 	}
 	g := &Game{
-		Factions: factions,
-		Map:      gameMap,
-		Gaia:     make([]*Populace, 0),
-		Step:     0,
-		params:   params,
+		Factions:  factions,
+		Map:       gameMap,
+		Gaia:      make([]*Populace, 0),
+		Step:      0,
+		params:    params,
+		players:   players,
 		territory: make(map[int]territory),
-		used: make(map[string]map[uint32]struct{}),
+		used:      make(map[string]map[uint32]struct{}),
 	}
+	g.initializeUsedMap()
 	g.calculateTerritory()
 	return g, nil
 }
@@ -61,16 +63,17 @@ func LoadGame(state *State, overview *Overview, params *Params) *Game {
 	}
 
 	g := &Game{
-		Factions: factions,
-		players:  players,
-		Gaia:     state.Gaia,
-		Map:      overview.Map,
-		Step:     state.Step,
-		params:   params,
-		Version:  overview.ParamVersion,
+		Factions:  factions,
+		players:   players,
+		Gaia:      state.Gaia,
+		Map:       overview.Map,
+		Step:      state.Step,
+		params:    params,
+		Version:   overview.ParamVersion,
 		territory: make(map[int]territory),
-		used: make(map[string]map[uint32]struct{}),
+		used:      make(map[string]map[uint32]struct{}),
 	}
+	g.initializeUsedMap()
 	g.calculateTerritory()
 
 	return g
@@ -101,13 +104,19 @@ func (g *Game) Build(player string, populace uint32, settlement Settlement) erro
 
 	// Validate that the player's populace has not already acted
 	if _, ok := g.used[player][populace]; ok {
-		return sdkerrors.Wrap(ErrPopulaceAlreadActed, 
+		return sdkerrors.Wrap(ErrPopulaceAlreadActed,
 			fmt.Sprintf("step=%d, populace=%d", g.Step, populace))
 	}
 
 	// Check that the faction has sufficient resources
 	if !faction.Resources.CanAfford(g.params.ConstructionCost[int(settlement)]) {
 		return sdkerrors.Wrap(ErrInsufficientResources, player)
+	}
+
+	// Check that the user isn't building over the last remaining capital
+	if faction.Population[int(populace)].Settlement == Settlement_CAPITAL && 
+		faction.Capitals() == 1 {
+		return sdkerrors.Wrap(ErrAbandoningCapital, fmt.Sprintf("populace=%d", populace))
 	}
 
 	// Get the position of the new settlement
@@ -164,7 +173,7 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 
 	// Validate that the player's populace has not already acted
 	if _, ok := g.used[player][populace]; ok {
-		return sdkerrors.Wrap(ErrPopulaceAlreadActed, 
+		return sdkerrors.Wrap(ErrPopulaceAlreadActed,
 			fmt.Sprintf("step=%d, populace=%d", g.Step, populace))
 	}
 
@@ -184,6 +193,14 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 		return sdkerrors.Wrap(ErrUnpassableTerrain, Landscape_name[int32(landscape)])
 	}
 
+	// NOTE: There is no rule within the game that stops a player from
+	// abandoning a settlement with the exception of a capital which
+	// must always be occupied (in conflicts over a capital, there can
+	// never be a draw)
+	if pop.Amount == amount && pop.Settlement == Settlement_CAPITAL {
+		return sdkerrors.Wrap(ErrAbandoningCapital, pop.Position.String())
+	}
+
 	// All validity checks have passed. Now we update state.
 
 	// mark the populace as used it's move
@@ -192,7 +209,7 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 	newIndex := g.Map.GetNeighbor(index, direction)
 	territory, ok := g.territory[newIndex]
 	newPos := g.Map.GetPosition(newIndex)
-	
+
 	// Are we moving into an existing territory?
 	if ok {
 		existingPlayer := g.players[territory.Faction]
@@ -202,7 +219,7 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 			// We increase the population of the new populace and decrease the
 			// population of the old populace
 			existingPopulace.Amount += amount
-			
+
 		} else {
 			// The territory belongs to an opponent
 			switch {
@@ -216,27 +233,42 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 				// reduce the existing population to 0. This will get flushed at
 				// the end of the block
 				existingPopulace.Amount = 0
-				// create a new populace in its place 
+				// create a new populace in its place
 				faction.Population = append(faction.Population, &Populace{
-					Amount: amount,
-					Position: newPos,
+					Amount:     amount,
+					Position:   newPos,
 					Settlement: existingPopulace.Settlement,
 				})
 				// update the territory
-				territory.Faction =  g.playerIndex(player)
+				territory.Faction = g.playerIndex(player)
 				// add the index of the new populace to the territory
 				territory.Populace = len(faction.Population) - 1
 
 			case existingPopulace.Amount == amount:
-				// there is a draw. Reduce populace to zero
-				existingPopulace.Amount = 0
-				// remove the territory
-				delete(g.territory, newIndex)
+				// There is a draw.
+				// If the settlement is a capital than they get the benefit of
+				// the doubt and survive (as there can't be a draw)
+				if existingPopulace.Settlement == Settlement_CAPITAL {
+					existingPopulace.Amount = 1
+				} else {
+					// Else we reduce populace to zero
+					existingPopulace.Amount = 0
+					// and remove the territory
+					delete(g.territory, newIndex)
+					
+					if existingPopulace.Settlement != Settlement_NONE {
+						g.Gaia = append(g.Gaia, &Populace{
+							Amount: 0,
+							Position: existingPopulace.Position,
+							Settlement: existingPopulace.Settlement,
+						})
+					}
+				}
 			}
 
 		}
 
-		// reduce the population 
+		// reduce the population
 		pop.Amount -= amount
 
 		// Is there any remainding population at the old position
@@ -244,21 +276,21 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 			delete(g.territory, index)
 			// the populace itself will get flushed in end block
 		}
-		
+
 	} else {
 		// The player is marching into new unchartered territory
 		if amount == pop.Amount { // with the entire population
 			pop.Position = newPos
-			g.territory[newIndex] = territory
+			g.territory[newIndex] = g.territory[index].Copy()
 			delete(g.territory, index)
 		} else { // with a portion of the population
 			pop.Amount -= amount
 			faction.Population = append(faction.Population, &Populace{
-				Amount: amount,
-				Position: newPos,
+				Amount:     amount,
+				Position:   newPos,
 				Settlement: g.getFactionlessSettlementAtPos(newPos),
 			})
-			g.territory[newIndex] = newTerritory(g.playerIndex(player), len(faction.Population) - 1)
+			g.territory[newIndex] = newTerritory(g.playerIndex(player), len(faction.Population)-1)
 		}
 	}
 
@@ -324,22 +356,29 @@ func (g *Game) calculateTerritory() {
 		faction := g.Factions[player]
 		for popIdx, populace := range faction.Population {
 			posIdx := g.Map.GetIndex(populace.Position)
-			g.territory[posIdx] = territory{
-				Faction: playerIdx,
-				Populace: popIdx,
-			}
+			g.territory[posIdx] = newTerritory(playerIdx, popIdx)
 		}
 	}
 }
 
+func (g *Game) initializeUsedMap() {
+	for _, player := range g.players {
+		g.used[player] = make(map[uint32]struct{})
+	}
+}
+
 type territory struct {
-	Faction int
+	Faction  int
 	Populace int
+}
+
+func (t territory) Copy() territory {
+	return newTerritory(t.Faction, t.Populace)
 }
 
 func newTerritory(faction, populace int) territory {
 	return territory{
-		Faction: faction,
+		Faction:  faction,
 		Populace: populace,
 	}
 }

@@ -45,11 +45,17 @@ func (m *Map) Below(index int) int {
 }
 
 func (m *Map) Left(index int) int {
-	return (index - 1 + len(m.Tiles)) % len(m.Tiles)
+	if index%int(m.Width) == 0 {
+		return index + int(m.Width) - 1
+	}
+	return index - 1
 }
 
 func (m *Map) Right(index int) int {
-	return (index + 1) % len(m.Tiles)
+	if index%int(m.Width) == int(m.Width)-1 {
+		return index - (int(m.Width) - 1)
+	}
+	return index + 1
 }
 
 func (m *Map) GetPosition(index int) *Position {

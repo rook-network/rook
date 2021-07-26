@@ -98,21 +98,21 @@ func DefaultParams() *Params {
 			{}, // 0 is NONE
 			{Wood: 0, Food: 0, Stone: 0, Population: 1}, // TOWN
 			{Wood: 0, Food: 0, Stone: 0, Population: 2}, // CITY
-			{Wood: 0, Food: 0, Stone: 0, Population: 2}, // CAPITAL
-			{Wood: 1, Food: 0, Stone: 0, Population: 0}, // LUMBERMILL
-			{Wood: 0, Food: 0, Stone: 1, Population: 0}, // QUARRY
-			{Wood: 0, Food: 1, Stone: 0, Population: 0}, // FARM
+			{Wood: 1, Food: 1, Stone: 1, Population: 2}, // CAPITAL
+			{Wood: 2, Food: 0, Stone: 0, Population: 0}, // LUMBERMILL
+			{Wood: 0, Food: 0, Stone: 2, Population: 0}, // QUARRY
+			{Wood: 0, Food: 2, Stone: 0, Population: 0}, // FARM
 			{}, // ROOK
 		},
 		ConstructionCost: []*ResourceSet{
 			{},
-			{Wood: 2, Food: 3, Stone: 1},
-			{Wood: 1, Food: 2, Stone: 1},
-			{Wood: 0, Food: 2, Stone: 3},
-			{Wood: 2, Food: 0, Stone: 2},
-			{Wood: 3, Food: 0, Stone: 0},
-			{Wood: 4, Food: 0, Stone: 0},
-			{Wood: 0, Food: 2, Stone: 2},
+			{Wood: 3, Food: 10, Stone: 5}, // TOWN
+			{Wood: 8, Food: 12, Stone: 10}, // CITY
+			{Wood: 10, Food: 20, Stone: 15}, // CAPITAL
+			{Wood: 5, Food: 1, Stone: 2}, // LUMBERMILL
+			{Wood: 9, Food: 1, Stone: 1}, // QUARRY
+			{Wood: 8, Food: 3, Stone: 1}, // FARM
+			{Wood: 0, Food: 5, Stone: 9}, // ROOK
 		},
 	}
 }
