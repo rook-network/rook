@@ -106,13 +106,13 @@ func DefaultParams() *Params {
 		},
 		ConstructionCost: []*ResourceSet{
 			{},
-			{Wood: 3, Food: 10, Stone: 5}, // TOWN
-			{Wood: 8, Food: 12, Stone: 10}, // CITY
+			{Wood: 3, Food: 10, Stone: 5},   // TOWN
+			{Wood: 8, Food: 12, Stone: 10},  // CITY
 			{Wood: 10, Food: 20, Stone: 15}, // CAPITAL
-			{Wood: 5, Food: 1, Stone: 2}, // LUMBERMILL
-			{Wood: 9, Food: 1, Stone: 1}, // QUARRY
-			{Wood: 8, Food: 3, Stone: 1}, // FARM
-			{Wood: 0, Food: 5, Stone: 9}, // ROOK
+			{Wood: 5, Food: 1, Stone: 2},    // LUMBERMILL
+			{Wood: 9, Food: 1, Stone: 1},    // QUARRY
+			{Wood: 8, Food: 3, Stone: 1},    // FARM
+			{Wood: 0, Food: 5, Stone: 9},    // ROOK
 		},
 	}
 }

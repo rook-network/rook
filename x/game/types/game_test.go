@@ -102,8 +102,8 @@ func TestGameMove(t *testing.T) {
 		{"conquer another factions settlement", bob, 0, Direction_RIGHT, 2, nil, func(t *testing.T, game *Game) {
 			assert.Len(t, game.Factions[bob].Population, 2)
 			assert.Equal(t, &Populace{
-				Amount: 1,
-				Position:   &Position{X:1, Y:1},
+				Amount:   1,
+				Position: &Position{X: 1, Y: 1},
 				// NOTE: We may add the law in the future that a rook has double
 				// the protection
 				Settlement: Settlement_ROOK,
@@ -174,13 +174,13 @@ func TestGameMove(t *testing.T) {
 }
 
 func TestGameBuild(t *testing.T) {
-	testCases := []struct{
+	testCases := []struct {
 		description string
-		player string
-		populace uint32
-		settlement Settlement
-		expErr error
-		assertion func(t *testing.T, game *Game)
+		player      string
+		populace    uint32
+		settlement  Settlement
+		expErr      error
+		assertion   func(t *testing.T, game *Game)
 	}{
 		{"invalid settlement", bob, 0, Settlement_NONE, ErrInvalidSettlement, nil},
 		{"player not in game", "jimmy", 0, Settlement_FARM, ErrPlayerNotInGame, nil},
@@ -193,7 +193,7 @@ func TestGameBuild(t *testing.T) {
 		{"lumbermill must be in a forest", bob, 0, Settlement_LUMBERMILL, ErrLumbermillLocation, nil},
 		{"succesful build", bob, 0, Settlement_FARM, nil, func(t *testing.T, game *Game) {
 			assert.Equal(t, Settlement_FARM, game.Factions[bob].Population[0].Settlement)
-			assert.Equal(t, &ResourceSet{Wood:2, Food: 7, Stone: 9, Population: 1}, game.Factions[bob].Resources)
+			assert.Equal(t, &ResourceSet{Wood: 2, Food: 7, Stone: 9, Population: 1}, game.Factions[bob].Resources)
 			assertTurnUsed(t, game, bob, 0)
 		}},
 		{"building over the top of an existing building", charles, 0, Settlement_FARM, nil, func(t *testing.T, game *Game) {

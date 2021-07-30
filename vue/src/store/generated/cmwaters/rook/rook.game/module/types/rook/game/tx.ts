@@ -1,15 +1,14 @@
 /* eslint-disable */
-import { Direction, Settlement, Position, directionFromJSON, directionToJSON, settlementFromJSON, settlementToJSON } from '../../rook/game/types'
+import { Direction, Settlement, Config, Params, directionFromJSON, directionToJSON, settlementFromJSON, settlementToJSON } from '../../rook/game/game'
 import { Reader, util, configure, Writer } from 'protobufjs/minimal'
 import * as Long from 'long'
-import { GameConfig } from '../../rook/game/config'
 
 export const protobufPackage = 'rook.game'
 
 export interface MsgMove {
   creator: string
   gameId: number
-  position: Position | undefined
+  populace: number
   direction: Direction
   population: number
 }
@@ -19,8 +18,8 @@ export interface MsgMoveResponse {}
 export interface MsgBuild {
   creator: string
   gameId: number
+  populace: number
   settlement: Settlement
-  position: Position | undefined
 }
 
 export interface MsgBuildResponse {}
@@ -28,14 +27,22 @@ export interface MsgBuildResponse {}
 export interface MsgCreate {
   /** all players must be signers */
   players: string[]
-  config: GameConfig | undefined
+  config: Config | undefined
 }
 
 export interface MsgCreateResponse {
   gameId: number
 }
 
-const baseMsgMove: object = { creator: '', gameId: 0, direction: 0, population: 0 }
+export interface MsgChangeParams {
+  params: Params | undefined
+}
+
+export interface MsgChangeParamsResponse {
+  version: number
+}
+
+const baseMsgMove: object = { creator: '', gameId: 0, populace: 0, direction: 0, population: 0 }
 
 export const MsgMove = {
   encode(message: MsgMove, writer: Writer = Writer.create()): Writer {
@@ -45,8 +52,8 @@ export const MsgMove = {
     if (message.gameId !== 0) {
       writer.uint32(16).uint64(message.gameId)
     }
-    if (message.position !== undefined) {
-      Position.encode(message.position, writer.uint32(26).fork()).ldelim()
+    if (message.populace !== 0) {
+      writer.uint32(24).uint32(message.populace)
     }
     if (message.direction !== 0) {
       writer.uint32(32).int32(message.direction)
@@ -71,7 +78,7 @@ export const MsgMove = {
           message.gameId = longToNumber(reader.uint64() as Long)
           break
         case 3:
-          message.position = Position.decode(reader, reader.uint32())
+          message.populace = reader.uint32()
           break
         case 4:
           message.direction = reader.int32() as any
@@ -99,10 +106,10 @@ export const MsgMove = {
     } else {
       message.gameId = 0
     }
-    if (object.position !== undefined && object.position !== null) {
-      message.position = Position.fromJSON(object.position)
+    if (object.populace !== undefined && object.populace !== null) {
+      message.populace = Number(object.populace)
     } else {
-      message.position = undefined
+      message.populace = 0
     }
     if (object.direction !== undefined && object.direction !== null) {
       message.direction = directionFromJSON(object.direction)
@@ -121,7 +128,7 @@ export const MsgMove = {
     const obj: any = {}
     message.creator !== undefined && (obj.creator = message.creator)
     message.gameId !== undefined && (obj.gameId = message.gameId)
-    message.position !== undefined && (obj.position = message.position ? Position.toJSON(message.position) : undefined)
+    message.populace !== undefined && (obj.populace = message.populace)
     message.direction !== undefined && (obj.direction = directionToJSON(message.direction))
     message.population !== undefined && (obj.population = message.population)
     return obj
@@ -139,10 +146,10 @@ export const MsgMove = {
     } else {
       message.gameId = 0
     }
-    if (object.position !== undefined && object.position !== null) {
-      message.position = Position.fromPartial(object.position)
+    if (object.populace !== undefined && object.populace !== null) {
+      message.populace = object.populace
     } else {
-      message.position = undefined
+      message.populace = 0
     }
     if (object.direction !== undefined && object.direction !== null) {
       message.direction = object.direction
@@ -196,7 +203,7 @@ export const MsgMoveResponse = {
   }
 }
 
-const baseMsgBuild: object = { creator: '', gameId: 0, settlement: 0 }
+const baseMsgBuild: object = { creator: '', gameId: 0, populace: 0, settlement: 0 }
 
 export const MsgBuild = {
   encode(message: MsgBuild, writer: Writer = Writer.create()): Writer {
@@ -206,11 +213,11 @@ export const MsgBuild = {
     if (message.gameId !== 0) {
       writer.uint32(16).uint64(message.gameId)
     }
-    if (message.settlement !== 0) {
-      writer.uint32(24).int32(message.settlement)
+    if (message.populace !== 0) {
+      writer.uint32(24).uint32(message.populace)
     }
-    if (message.position !== undefined) {
-      Position.encode(message.position, writer.uint32(34).fork()).ldelim()
+    if (message.settlement !== 0) {
+      writer.uint32(32).int32(message.settlement)
     }
     return writer
   },
@@ -229,10 +236,10 @@ export const MsgBuild = {
           message.gameId = longToNumber(reader.uint64() as Long)
           break
         case 3:
-          message.settlement = reader.int32() as any
+          message.populace = reader.uint32()
           break
         case 4:
-          message.position = Position.decode(reader, reader.uint32())
+          message.settlement = reader.int32() as any
           break
         default:
           reader.skipType(tag & 7)
@@ -254,15 +261,15 @@ export const MsgBuild = {
     } else {
       message.gameId = 0
     }
+    if (object.populace !== undefined && object.populace !== null) {
+      message.populace = Number(object.populace)
+    } else {
+      message.populace = 0
+    }
     if (object.settlement !== undefined && object.settlement !== null) {
       message.settlement = settlementFromJSON(object.settlement)
     } else {
       message.settlement = 0
-    }
-    if (object.position !== undefined && object.position !== null) {
-      message.position = Position.fromJSON(object.position)
-    } else {
-      message.position = undefined
     }
     return message
   },
@@ -271,8 +278,8 @@ export const MsgBuild = {
     const obj: any = {}
     message.creator !== undefined && (obj.creator = message.creator)
     message.gameId !== undefined && (obj.gameId = message.gameId)
+    message.populace !== undefined && (obj.populace = message.populace)
     message.settlement !== undefined && (obj.settlement = settlementToJSON(message.settlement))
-    message.position !== undefined && (obj.position = message.position ? Position.toJSON(message.position) : undefined)
     return obj
   },
 
@@ -288,15 +295,15 @@ export const MsgBuild = {
     } else {
       message.gameId = 0
     }
+    if (object.populace !== undefined && object.populace !== null) {
+      message.populace = object.populace
+    } else {
+      message.populace = 0
+    }
     if (object.settlement !== undefined && object.settlement !== null) {
       message.settlement = object.settlement
     } else {
       message.settlement = 0
-    }
-    if (object.position !== undefined && object.position !== null) {
-      message.position = Position.fromPartial(object.position)
-    } else {
-      message.position = undefined
     }
     return message
   }
@@ -348,7 +355,7 @@ export const MsgCreate = {
       writer.uint32(18).string(v!)
     }
     if (message.config !== undefined) {
-      GameConfig.encode(message.config, writer.uint32(26).fork()).ldelim()
+      Config.encode(message.config, writer.uint32(26).fork()).ldelim()
     }
     return writer
   },
@@ -365,7 +372,7 @@ export const MsgCreate = {
           message.players.push(reader.string())
           break
         case 3:
-          message.config = GameConfig.decode(reader, reader.uint32())
+          message.config = Config.decode(reader, reader.uint32())
           break
         default:
           reader.skipType(tag & 7)
@@ -384,7 +391,7 @@ export const MsgCreate = {
       }
     }
     if (object.config !== undefined && object.config !== null) {
-      message.config = GameConfig.fromJSON(object.config)
+      message.config = Config.fromJSON(object.config)
     } else {
       message.config = undefined
     }
@@ -398,7 +405,7 @@ export const MsgCreate = {
     } else {
       obj.players = []
     }
-    message.config !== undefined && (obj.config = message.config ? GameConfig.toJSON(message.config) : undefined)
+    message.config !== undefined && (obj.config = message.config ? Config.toJSON(message.config) : undefined)
     return obj
   },
 
@@ -411,7 +418,7 @@ export const MsgCreate = {
       }
     }
     if (object.config !== undefined && object.config !== null) {
-      message.config = GameConfig.fromPartial(object.config)
+      message.config = Config.fromPartial(object.config)
     } else {
       message.config = undefined
     }
@@ -474,12 +481,123 @@ export const MsgCreateResponse = {
   }
 }
 
+const baseMsgChangeParams: object = {}
+
+export const MsgChangeParams = {
+  encode(message: MsgChangeParams, writer: Writer = Writer.create()): Writer {
+    if (message.params !== undefined) {
+      Params.encode(message.params, writer.uint32(10).fork()).ldelim()
+    }
+    return writer
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgChangeParams {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = { ...baseMsgChangeParams } as MsgChangeParams
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.params = Params.decode(reader, reader.uint32())
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MsgChangeParams {
+    const message = { ...baseMsgChangeParams } as MsgChangeParams
+    if (object.params !== undefined && object.params !== null) {
+      message.params = Params.fromJSON(object.params)
+    } else {
+      message.params = undefined
+    }
+    return message
+  },
+
+  toJSON(message: MsgChangeParams): unknown {
+    const obj: any = {}
+    message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined)
+    return obj
+  },
+
+  fromPartial(object: DeepPartial<MsgChangeParams>): MsgChangeParams {
+    const message = { ...baseMsgChangeParams } as MsgChangeParams
+    if (object.params !== undefined && object.params !== null) {
+      message.params = Params.fromPartial(object.params)
+    } else {
+      message.params = undefined
+    }
+    return message
+  }
+}
+
+const baseMsgChangeParamsResponse: object = { version: 0 }
+
+export const MsgChangeParamsResponse = {
+  encode(message: MsgChangeParamsResponse, writer: Writer = Writer.create()): Writer {
+    if (message.version !== 0) {
+      writer.uint32(8).uint32(message.version)
+    }
+    return writer
+  },
+
+  decode(input: Reader | Uint8Array, length?: number): MsgChangeParamsResponse {
+    const reader = input instanceof Uint8Array ? new Reader(input) : input
+    let end = length === undefined ? reader.len : reader.pos + length
+    const message = { ...baseMsgChangeParamsResponse } as MsgChangeParamsResponse
+    while (reader.pos < end) {
+      const tag = reader.uint32()
+      switch (tag >>> 3) {
+        case 1:
+          message.version = reader.uint32()
+          break
+        default:
+          reader.skipType(tag & 7)
+          break
+      }
+    }
+    return message
+  },
+
+  fromJSON(object: any): MsgChangeParamsResponse {
+    const message = { ...baseMsgChangeParamsResponse } as MsgChangeParamsResponse
+    if (object.version !== undefined && object.version !== null) {
+      message.version = Number(object.version)
+    } else {
+      message.version = 0
+    }
+    return message
+  },
+
+  toJSON(message: MsgChangeParamsResponse): unknown {
+    const obj: any = {}
+    message.version !== undefined && (obj.version = message.version)
+    return obj
+  },
+
+  fromPartial(object: DeepPartial<MsgChangeParamsResponse>): MsgChangeParamsResponse {
+    const message = { ...baseMsgChangeParamsResponse } as MsgChangeParamsResponse
+    if (object.version !== undefined && object.version !== null) {
+      message.version = object.version
+    } else {
+      message.version = 0
+    }
+    return message
+  }
+}
+
 /** Msg defines the Msg service. */
 export interface Msg {
   /** this line is used by starport scaffolding # proto/tx/rpc */
   Move(request: MsgMove): Promise<MsgMoveResponse>
   Build(request: MsgBuild): Promise<MsgBuildResponse>
   Create(request: MsgCreate): Promise<MsgCreateResponse>
+  ChangeParams(request: MsgChangeParams): Promise<MsgChangeParamsResponse>
 }
 
 export class MsgClientImpl implements Msg {
@@ -503,6 +621,12 @@ export class MsgClientImpl implements Msg {
     const data = MsgCreate.encode(request).finish()
     const promise = this.rpc.request('rook.game.Msg', 'Create', data)
     return promise.then((data) => MsgCreateResponse.decode(new Reader(data)))
+  }
+
+  ChangeParams(request: MsgChangeParams): Promise<MsgChangeParamsResponse> {
+    const data = MsgChangeParams.encode(request).finish()
+    const promise = this.rpc.request('rook.game.Msg', 'ChangeParams', data)
+    return promise.then((data) => MsgChangeParamsResponse.decode(new Reader(data)))
   }
 }
 

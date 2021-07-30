@@ -1,11 +1,10 @@
-import { Direction, Settlement, Position } from '../../rook/game/types';
+import { Direction, Settlement, Config, Params } from '../../rook/game/game';
 import { Reader, Writer } from 'protobufjs/minimal';
-import { GameConfig } from '../../rook/game/config';
 export declare const protobufPackage = "rook.game";
 export interface MsgMove {
     creator: string;
     gameId: number;
-    position: Position | undefined;
+    populace: number;
     direction: Direction;
     population: number;
 }
@@ -14,18 +13,24 @@ export interface MsgMoveResponse {
 export interface MsgBuild {
     creator: string;
     gameId: number;
+    populace: number;
     settlement: Settlement;
-    position: Position | undefined;
 }
 export interface MsgBuildResponse {
 }
 export interface MsgCreate {
     /** all players must be signers */
     players: string[];
-    config: GameConfig | undefined;
+    config: Config | undefined;
 }
 export interface MsgCreateResponse {
     gameId: number;
+}
+export interface MsgChangeParams {
+    params: Params | undefined;
+}
+export interface MsgChangeParamsResponse {
+    version: number;
 }
 export declare const MsgMove: {
     encode(message: MsgMove, writer?: Writer): Writer;
@@ -69,12 +74,27 @@ export declare const MsgCreateResponse: {
     toJSON(message: MsgCreateResponse): unknown;
     fromPartial(object: DeepPartial<MsgCreateResponse>): MsgCreateResponse;
 };
+export declare const MsgChangeParams: {
+    encode(message: MsgChangeParams, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): MsgChangeParams;
+    fromJSON(object: any): MsgChangeParams;
+    toJSON(message: MsgChangeParams): unknown;
+    fromPartial(object: DeepPartial<MsgChangeParams>): MsgChangeParams;
+};
+export declare const MsgChangeParamsResponse: {
+    encode(message: MsgChangeParamsResponse, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): MsgChangeParamsResponse;
+    fromJSON(object: any): MsgChangeParamsResponse;
+    toJSON(message: MsgChangeParamsResponse): unknown;
+    fromPartial(object: DeepPartial<MsgChangeParamsResponse>): MsgChangeParamsResponse;
+};
 /** Msg defines the Msg service. */
 export interface Msg {
     /** this line is used by starport scaffolding # proto/tx/rpc */
     Move(request: MsgMove): Promise<MsgMoveResponse>;
     Build(request: MsgBuild): Promise<MsgBuildResponse>;
     Create(request: MsgCreate): Promise<MsgCreateResponse>;
+    ChangeParams(request: MsgChangeParams): Promise<MsgChangeParamsResponse>;
 }
 export declare class MsgClientImpl implements Msg {
     private readonly rpc;
@@ -82,6 +102,7 @@ export declare class MsgClientImpl implements Msg {
     Move(request: MsgMove): Promise<MsgMoveResponse>;
     Build(request: MsgBuild): Promise<MsgBuildResponse>;
     Create(request: MsgCreate): Promise<MsgCreateResponse>;
+    ChangeParams(request: MsgChangeParams): Promise<MsgChangeParamsResponse>;
 }
 interface Rpc {
     request(service: string, method: string, data: Uint8Array): Promise<Uint8Array>;

@@ -114,7 +114,7 @@ func (g *Game) Build(player string, populace uint32, settlement Settlement) erro
 	}
 
 	// Check that the user isn't building over the last remaining capital
-	if faction.Population[int(populace)].Settlement == Settlement_CAPITAL && 
+	if faction.Population[int(populace)].Settlement == Settlement_CAPITAL &&
 		faction.Capitals() == 1 {
 		return sdkerrors.Wrap(ErrAbandoningCapital, fmt.Sprintf("populace=%d", populace))
 	}
@@ -255,11 +255,11 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 					existingPopulace.Amount = 0
 					// and remove the territory
 					delete(g.territory, newIndex)
-					
+
 					if existingPopulace.Settlement != Settlement_NONE {
 						g.Gaia = append(g.Gaia, &Populace{
-							Amount: 0,
-							Position: existingPopulace.Position,
+							Amount:     0,
+							Position:   existingPopulace.Position,
 							Settlement: existingPopulace.Settlement,
 						})
 					}

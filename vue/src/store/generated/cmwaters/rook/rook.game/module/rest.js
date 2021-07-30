@@ -156,7 +156,7 @@ export class HttpClient {
     }
 }
 /**
- * @title rook/game/config.proto
+ * @title rook/game/game.proto
  * @version version not set
  */
 export class Api extends HttpClient {
@@ -167,7 +167,6 @@ export class Api extends HttpClient {
          *
          * @tags Query
          * @name QueryGame
-         * @summary Queries a game state by id.
          * @request GET:/rook/game/{id}
          */
         this.queryGame = (id, params = {}) => this.request({
@@ -180,11 +179,25 @@ export class Api extends HttpClient {
          * No description
          *
          * @tags Query
-         * @name QueryParams
-         * @request GET:/rook/params
+         * @name QueryGameState
+         * @summary Queries a game state by id.
+         * @request GET:/rook/game_state/{id}
          */
-        this.queryParams = (params = {}) => this.request({
-            path: `/rook/params`,
+        this.queryGameState = (id, params = {}) => this.request({
+            path: `/rook/game_state/${id}`,
+            method: "GET",
+            format: "json",
+            ...params,
+        });
+        /**
+         * No description
+         *
+         * @tags Query
+         * @name QueryParams
+         * @request GET:/rook/params/{version}
+         */
+        this.queryParams = (version, params = {}) => this.request({
+            path: `/rook/params/${version}`,
             method: "GET",
             format: "json",
             ...params,

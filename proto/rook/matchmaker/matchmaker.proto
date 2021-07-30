@@ -9,30 +9,57 @@ import "rook/game/game.proto";
 option go_package = "github.com/cmwaters/rook/x/matchmaker/types";
 
 message Room {
-  // the config to be used for the game. Either this or the mode need to be set
-  // Using this should only be done for custom games
+  // the config to be used for the game
   rook.game.Config config = 1;
 
-  // the game mode to be played
-  Mode mode = 2;
-
   // the current players in the room
-  repeated string players = 3;
+  repeated string players = 2;
 
   // pending invitations for players that can join (like a whitelist)
-  repeated string pending = 4;
+  repeated string pending = 3;
 
   // anyone can join
-  bool public = 5;
+  bool public = 4;
 
   // the minimum amount of players needed to start a game
-  uint32 quorum = 6;
+  uint32 quorum = 5;
 
   // the max amount of players that can join the room
-  uint32 capacity = 7;
+  uint32 capacity = 6;
 
   // when the room was created. Rooms get garbage collected after a while
-  google.protobuf.Timestamp created = 8 [
+  google.protobuf.Timestamp created = 7 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false
+  ];
+
+  // when quorum is reached and we are locked in to starting the game.
+  // The prestart_wait_period gives a bufer for more people to join if they
+  // want.
+  google.protobuf.Timestamp ready = 8 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false
+  ];
+}
+
+// CommonRoom is an open room that matchmaker will automatically manage
+message CommonRoom {
+  // the game mode to be played
+  uint32 mode_id = 1;
+
+  // the current players in the room
+  repeated string players = 2;
+
+  // when the room was created. Rooms get garbage collected after a while
+  google.protobuf.Timestamp created = 3 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false
+  ];
+
+  // when quorum is reached and we are locked in to starting the game.
+  // The prestart_wait_period gives a bufer for more people to join if they
+  // want.
+  google.protobuf.Timestamp ready = 4 [
     (gogoproto.stdtime) = true,
     (gogoproto.nullable) = false
   ];
@@ -42,12 +69,21 @@ message Room {
 message Mode {
   uint32 id = 1;
   rook.game.Config config = 2;
+  uint32 quorum = 3;
+  uint32 capacity = 4;
 }
 
 message Params {
   // the maximum duration a room can last for before it is closed and all
   // players are kicked
   google.protobuf.Duration room_lifespan = 1 [
+    (gogoproto.stdduration) = true,
+    (gogoproto.nullable) = false
+  ];
+
+  // the period betwee a quorum of players readying up and the start of the
+  // game. This allows a few more players to join
+  google.protobuf.Duration prestart_wait_period = 2 [
     (gogoproto.stdduration) = true,
     (gogoproto.nullable) = false
   ];

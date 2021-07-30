@@ -1,10 +1,12 @@
-import { Params } from '../../rook/game/config';
 import { Writer, Reader } from 'protobufjs/minimal';
+import { Params } from '../../rook/game/game';
 export declare const protobufPackage = "rook.game";
 /** GenesisState defines the rook module's genesis state. */
 export interface GenesisState {
     /** the global configuration of all rook games */
     params: Params | undefined;
+    paramsVersion: number;
+    nextGameId: number;
 }
 export declare const GenesisState: {
     encode(message: GenesisState, writer?: Writer): Writer;

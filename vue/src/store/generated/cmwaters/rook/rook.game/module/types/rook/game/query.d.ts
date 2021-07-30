@@ -1,19 +1,40 @@
 import { Reader, Writer } from 'protobufjs/minimal';
-import { Game } from '../../rook/game/state';
-import { Params } from '../../rook/game/config';
+import { State, Overview, Params } from '../../rook/game/game';
 export declare const protobufPackage = "rook.game";
 /** this line is used by starport scaffolding # 3 */
+export interface QueryGetGameStateRequest {
+    id: number;
+}
+export interface QueryGetGameStateResponse {
+    gameState: State | undefined;
+}
 export interface QueryGetGameRequest {
     id: number;
 }
 export interface QueryGetGameResponse {
-    game: Game | undefined;
+    players: string[];
+    overview: Overview | undefined;
 }
 export interface QueryGetParamsRequest {
+    version: number;
 }
 export interface QueryGetParamsResponse {
     params: Params | undefined;
 }
+export declare const QueryGetGameStateRequest: {
+    encode(message: QueryGetGameStateRequest, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): QueryGetGameStateRequest;
+    fromJSON(object: any): QueryGetGameStateRequest;
+    toJSON(message: QueryGetGameStateRequest): unknown;
+    fromPartial(object: DeepPartial<QueryGetGameStateRequest>): QueryGetGameStateRequest;
+};
+export declare const QueryGetGameStateResponse: {
+    encode(message: QueryGetGameStateResponse, writer?: Writer): Writer;
+    decode(input: Reader | Uint8Array, length?: number): QueryGetGameStateResponse;
+    fromJSON(object: any): QueryGetGameStateResponse;
+    toJSON(message: QueryGetGameStateResponse): unknown;
+    fromPartial(object: DeepPartial<QueryGetGameStateResponse>): QueryGetGameStateResponse;
+};
 export declare const QueryGetGameRequest: {
     encode(message: QueryGetGameRequest, writer?: Writer): Writer;
     decode(input: Reader | Uint8Array, length?: number): QueryGetGameRequest;
@@ -29,11 +50,11 @@ export declare const QueryGetGameResponse: {
     fromPartial(object: DeepPartial<QueryGetGameResponse>): QueryGetGameResponse;
 };
 export declare const QueryGetParamsRequest: {
-    encode(_: QueryGetParamsRequest, writer?: Writer): Writer;
+    encode(message: QueryGetParamsRequest, writer?: Writer): Writer;
     decode(input: Reader | Uint8Array, length?: number): QueryGetParamsRequest;
-    fromJSON(_: any): QueryGetParamsRequest;
-    toJSON(_: QueryGetParamsRequest): unknown;
-    fromPartial(_: DeepPartial<QueryGetParamsRequest>): QueryGetParamsRequest;
+    fromJSON(object: any): QueryGetParamsRequest;
+    toJSON(message: QueryGetParamsRequest): unknown;
+    fromPartial(object: DeepPartial<QueryGetParamsRequest>): QueryGetParamsRequest;
 };
 export declare const QueryGetParamsResponse: {
     encode(message: QueryGetParamsResponse, writer?: Writer): Writer;
@@ -45,12 +66,14 @@ export declare const QueryGetParamsResponse: {
 /** Query defines the gRPC querier service. */
 export interface Query {
     /** Queries a game state by id. */
+    GameState(request: QueryGetGameStateRequest): Promise<QueryGetGameStateResponse>;
     Game(request: QueryGetGameRequest): Promise<QueryGetGameResponse>;
     Params(request: QueryGetParamsRequest): Promise<QueryGetParamsResponse>;
 }
 export declare class QueryClientImpl implements Query {
     private readonly rpc;
     constructor(rpc: Rpc);
+    GameState(request: QueryGetGameStateRequest): Promise<QueryGetGameStateResponse>;
     Game(request: QueryGetGameRequest): Promise<QueryGetGameResponse>;
     Params(request: QueryGetParamsRequest): Promise<QueryGetParamsResponse>;
 }

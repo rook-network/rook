@@ -1,3 +1,7 @@
+export interface GameConfig {
+    initial?: GameInitializationConfig;
+    map?: GameMapConfig;
+}
 export declare enum GameDirection {
     LEFT = "LEFT",
     RIGHT = "RIGHT",
@@ -5,20 +9,9 @@ export declare enum GameDirection {
     DOWN = "DOWN"
 }
 export interface GameFaction {
+    player?: string;
     resources?: GameResourceSet;
-    population?: Record<string, number>;
-    settlements?: Record<string, GameSettlement>;
-}
-export interface GameGame {
-    players?: Record<string, GameFaction>;
-    config?: GameGameConfig;
-    /** @format uint64 */
-    step?: string;
-    map?: GameMap;
-}
-export interface GameGameConfig {
-    initial?: GameInitializationConfig;
-    map?: GameMapConfig;
+    population?: GamePopulace[];
 }
 export interface GameInitializationConfig {
     /** @format int64 */
@@ -33,7 +26,7 @@ export declare enum GameLandscape {
     LAKE = "LAKE"
 }
 export interface GameMap {
-    tiles?: GameTile[];
+    tiles?: GameLandscape[];
     /** @format int64 */
     width?: number;
 }
@@ -54,14 +47,29 @@ export interface GameMapConfig {
     plainsDensity?: number;
 }
 export declare type GameMsgBuildResponse = object;
+export interface GameMsgChangeParamsResponse {
+    /** @format int64 */
+    version?: number;
+}
 export interface GameMsgCreateResponse {
     /** @format uint64 */
     gameId?: string;
 }
 export declare type GameMsgMoveResponse = object;
+export interface GameOverview {
+    map?: GameMap;
+    /** @format int64 */
+    paramVersion?: number;
+}
 export interface GameParams {
-    productionRate?: Record<string, GameResourceSet>;
-    constructionCost?: Record<string, GameResourceSet>;
+    productionRate?: GameResourceSet[];
+    constructionCost?: GameResourceSet[];
+}
+export interface GamePopulace {
+    /** @format int64 */
+    amount?: number;
+    position?: GamePosition;
+    settlement?: GameSettlement;
 }
 export interface GamePosition {
     /** @format int64 */
@@ -70,7 +78,11 @@ export interface GamePosition {
     y?: number;
 }
 export interface GameQueryGetGameResponse {
-    game?: GameGame;
+    players?: string[];
+    overview?: GameOverview;
+}
+export interface GameQueryGetGameStateResponse {
+    gameState?: GameState;
 }
 export interface GameQueryGetParamsResponse {
     params?: GameParams;
@@ -95,9 +107,11 @@ export declare enum GameSettlement {
     FARM = "FARM",
     ROOK = "ROOK"
 }
-export interface GameTile {
-    landscape?: GameLandscape;
-    faction?: string;
+export interface GameState {
+    players?: GameFaction[];
+    gaia?: GamePopulace[];
+    /** @format uint64 */
+    step?: string;
 }
 export interface ProtobufAny {
     typeUrl?: string;
@@ -164,7 +178,7 @@ export declare class HttpClient<SecurityDataType = unknown> {
     request: <T = any, E = any>({ body, secure, path, type, query, format, baseUrl, cancelToken, ...params }: FullRequestParams) => Promise<HttpResponse<T, E>>;
 }
 /**
- * @title rook/game/config.proto
+ * @title rook/game/game.proto
  * @version version not set
  */
 export declare class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
@@ -173,7 +187,6 @@ export declare class Api<SecurityDataType extends unknown> extends HttpClient<Se
      *
      * @tags Query
      * @name QueryGame
-     * @summary Queries a game state by id.
      * @request GET:/rook/game/{id}
      */
     queryGame: (id: string, params?: RequestParams) => Promise<HttpResponse<GameQueryGetGameResponse, RpcStatus>>;
@@ -181,9 +194,18 @@ export declare class Api<SecurityDataType extends unknown> extends HttpClient<Se
      * No description
      *
      * @tags Query
-     * @name QueryParams
-     * @request GET:/rook/params
+     * @name QueryGameState
+     * @summary Queries a game state by id.
+     * @request GET:/rook/game_state/{id}
      */
-    queryParams: (params?: RequestParams) => Promise<HttpResponse<GameQueryGetParamsResponse, RpcStatus>>;
+    queryGameState: (id: string, params?: RequestParams) => Promise<HttpResponse<GameQueryGetGameStateResponse, RpcStatus>>;
+    /**
+     * No description
+     *
+     * @tags Query
+     * @name QueryParams
+     * @request GET:/rook/params/{version}
+     */
+    queryParams: (version: number, params?: RequestParams) => Promise<HttpResponse<GameQueryGetParamsResponse, RpcStatus>>;
 }
 export {};

@@ -4,15 +4,15 @@ import { StdFee } from "@cosmjs/launchpad";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Registry, OfflineSigner, EncodeObject, DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { Api } from "./rest";
-import { MsgCreate } from "./types/rook/game/tx";
 import { MsgMove } from "./types/rook/game/tx";
 import { MsgBuild } from "./types/rook/game/tx";
+import { MsgCreate } from "./types/rook/game/tx";
 
 
 const types = [
-  ["/rook.game.MsgCreate", MsgCreate],
   ["/rook.game.MsgMove", MsgMove],
   ["/rook.game.MsgBuild", MsgBuild],
+  ["/rook.game.MsgCreate", MsgCreate],
   
 ];
 export const MissingWalletError = new Error("wallet is required");
@@ -41,9 +41,9 @@ const txClient = async (wallet: OfflineSigner, { addr: addr }: TxClientOptions =
 
   return {
     signAndBroadcast: (msgs: EncodeObject[], { fee, memo }: SignAndBroadcastOptions = {fee: defaultFee, memo: ""}) => client.signAndBroadcast(address, msgs, fee,memo),
-    msgCreate: (data: MsgCreate): EncodeObject => ({ typeUrl: "/rook.game.MsgCreate", value: data }),
     msgMove: (data: MsgMove): EncodeObject => ({ typeUrl: "/rook.game.MsgMove", value: data }),
     msgBuild: (data: MsgBuild): EncodeObject => ({ typeUrl: "/rook.game.MsgBuild", value: data }),
+    msgCreate: (data: MsgCreate): EncodeObject => ({ typeUrl: "/rook.game.MsgCreate", value: data }),
     
   };
 };

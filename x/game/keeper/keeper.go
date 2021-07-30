@@ -15,7 +15,7 @@ import (
 
 type (
 	Keeper struct {
-		cdc      codec.Marshaler
+		cdc      codec.Codec
 		storeKey sdk.StoreKey
 		// we save all the state transitions throughout the game in memory and
 		// then persist the game state to disk during the end blocker so that
@@ -27,7 +27,7 @@ type (
 )
 
 func NewKeeper(
-	cdc codec.Marshaler,
+	cdc codec.Codec,
 	storeKey sdk.StoreKey,
 	paramSpace paramtypes.Subspace,
 ) *Keeper {
@@ -48,13 +48,13 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 func (k Keeper) FlushGameState(ctx sdk.Context) {
 	store := ctx.KVStore(k.storeKey)
 	for id, game := range k.games {
-		store.Set(types.GameStateKey(id), k.cdc.MustMarshalBinaryBare(game.State()))
+		store.Set(types.GameStateKey(id), k.cdc.MustMarshal(game.State()))
 	}
 }
 
 func (k Keeper) SaveGameOverview(ctx sdk.Context, gameID uint64, gameOverview *types.Overview) {
 	store := ctx.KVStore(k.storeKey)
-	overviewBytes := k.cdc.MustMarshalBinaryBare(gameOverview)
+	overviewBytes := k.cdc.MustMarshal(gameOverview)
 	store.Set(types.GameOverviewKey(gameID), overviewBytes)
 }
 
@@ -135,7 +135,7 @@ func (k Keeper) GetParams(ctx sdk.Context, version uint32) *types.Params {
 
 func (k *Keeper) SetParams(ctx sdk.Context, params *types.Params) {
 	store := ctx.KVStore(k.storeKey)
-	paramBz := k.cdc.MustMarshalBinaryBare(params)
+	paramBz := k.cdc.MustMarshal(params)
 	store.Set(types.ParamsKey(k.latestVersion+1), paramBz)
 	// increment the latest version label
 	store.Set(types.LatestParamsVersionKey, types.ParamsKey(k.latestVersion+1))
@@ -171,7 +171,7 @@ func (k Keeper) loadAllGameOverviews(ctx sdk.Context) map[uint64]*types.Overview
 	for ; iter.Valid(); iter.Next() {
 		bz := iter.Value()
 		setup := &types.Overview{}
-		k.cdc.MustUnmarshalBinaryBare(bz, setup)
+		k.cdc.MustUnmarshal(bz, setup)
 		gameID := types.GameIDFromBytes(iter.Key())
 		overviews[gameID] = setup
 	}
@@ -188,7 +188,7 @@ func (k Keeper) loadAllGameStates(ctx sdk.Context) map[uint64]*types.State {
 	for ; iter.Valid(); iter.Next() {
 		bz := iter.Value()
 		state := &types.State{}
-		k.cdc.MustUnmarshalBinaryBare(bz, state)
+		k.cdc.MustUnmarshal(bz, state)
 		gameID := types.GameIDFromBytes(iter.Key())
 		states[gameID] = state
 	}
@@ -205,7 +205,7 @@ func (k Keeper) loadAllParams(ctx sdk.Context) map[uint32]*types.Params {
 	for ; iter.Valid(); iter.Next() {
 		bz := iter.Value()
 		param := &types.Params{}
-		k.cdc.MustUnmarshalBinaryBare(bz, param)
+		k.cdc.MustUnmarshal(bz, param)
 		version := types.ParamsVersionFromKey(iter.Key())
 		params[version] = param
 	}

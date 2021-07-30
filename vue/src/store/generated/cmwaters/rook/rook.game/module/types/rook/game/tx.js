@@ -1,10 +1,9 @@
 /* eslint-disable */
-import { Position, directionFromJSON, directionToJSON, settlementFromJSON, settlementToJSON } from '../../rook/game/types';
+import { Config, Params, directionFromJSON, directionToJSON, settlementFromJSON, settlementToJSON } from '../../rook/game/game';
 import { Reader, util, configure, Writer } from 'protobufjs/minimal';
 import * as Long from 'long';
-import { GameConfig } from '../../rook/game/config';
 export const protobufPackage = 'rook.game';
-const baseMsgMove = { creator: '', gameId: 0, direction: 0, population: 0 };
+const baseMsgMove = { creator: '', gameId: 0, populace: 0, direction: 0, population: 0 };
 export const MsgMove = {
     encode(message, writer = Writer.create()) {
         if (message.creator !== '') {
@@ -13,8 +12,8 @@ export const MsgMove = {
         if (message.gameId !== 0) {
             writer.uint32(16).uint64(message.gameId);
         }
-        if (message.position !== undefined) {
-            Position.encode(message.position, writer.uint32(26).fork()).ldelim();
+        if (message.populace !== 0) {
+            writer.uint32(24).uint32(message.populace);
         }
         if (message.direction !== 0) {
             writer.uint32(32).int32(message.direction);
@@ -38,7 +37,7 @@ export const MsgMove = {
                     message.gameId = longToNumber(reader.uint64());
                     break;
                 case 3:
-                    message.position = Position.decode(reader, reader.uint32());
+                    message.populace = reader.uint32();
                     break;
                 case 4:
                     message.direction = reader.int32();
@@ -67,11 +66,11 @@ export const MsgMove = {
         else {
             message.gameId = 0;
         }
-        if (object.position !== undefined && object.position !== null) {
-            message.position = Position.fromJSON(object.position);
+        if (object.populace !== undefined && object.populace !== null) {
+            message.populace = Number(object.populace);
         }
         else {
-            message.position = undefined;
+            message.populace = 0;
         }
         if (object.direction !== undefined && object.direction !== null) {
             message.direction = directionFromJSON(object.direction);
@@ -91,7 +90,7 @@ export const MsgMove = {
         const obj = {};
         message.creator !== undefined && (obj.creator = message.creator);
         message.gameId !== undefined && (obj.gameId = message.gameId);
-        message.position !== undefined && (obj.position = message.position ? Position.toJSON(message.position) : undefined);
+        message.populace !== undefined && (obj.populace = message.populace);
         message.direction !== undefined && (obj.direction = directionToJSON(message.direction));
         message.population !== undefined && (obj.population = message.population);
         return obj;
@@ -110,11 +109,11 @@ export const MsgMove = {
         else {
             message.gameId = 0;
         }
-        if (object.position !== undefined && object.position !== null) {
-            message.position = Position.fromPartial(object.position);
+        if (object.populace !== undefined && object.populace !== null) {
+            message.populace = object.populace;
         }
         else {
-            message.position = undefined;
+            message.populace = 0;
         }
         if (object.direction !== undefined && object.direction !== null) {
             message.direction = object.direction;
@@ -163,7 +162,7 @@ export const MsgMoveResponse = {
         return message;
     }
 };
-const baseMsgBuild = { creator: '', gameId: 0, settlement: 0 };
+const baseMsgBuild = { creator: '', gameId: 0, populace: 0, settlement: 0 };
 export const MsgBuild = {
     encode(message, writer = Writer.create()) {
         if (message.creator !== '') {
@@ -172,11 +171,11 @@ export const MsgBuild = {
         if (message.gameId !== 0) {
             writer.uint32(16).uint64(message.gameId);
         }
-        if (message.settlement !== 0) {
-            writer.uint32(24).int32(message.settlement);
+        if (message.populace !== 0) {
+            writer.uint32(24).uint32(message.populace);
         }
-        if (message.position !== undefined) {
-            Position.encode(message.position, writer.uint32(34).fork()).ldelim();
+        if (message.settlement !== 0) {
+            writer.uint32(32).int32(message.settlement);
         }
         return writer;
     },
@@ -194,10 +193,10 @@ export const MsgBuild = {
                     message.gameId = longToNumber(reader.uint64());
                     break;
                 case 3:
-                    message.settlement = reader.int32();
+                    message.populace = reader.uint32();
                     break;
                 case 4:
-                    message.position = Position.decode(reader, reader.uint32());
+                    message.settlement = reader.int32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -220,17 +219,17 @@ export const MsgBuild = {
         else {
             message.gameId = 0;
         }
+        if (object.populace !== undefined && object.populace !== null) {
+            message.populace = Number(object.populace);
+        }
+        else {
+            message.populace = 0;
+        }
         if (object.settlement !== undefined && object.settlement !== null) {
             message.settlement = settlementFromJSON(object.settlement);
         }
         else {
             message.settlement = 0;
-        }
-        if (object.position !== undefined && object.position !== null) {
-            message.position = Position.fromJSON(object.position);
-        }
-        else {
-            message.position = undefined;
         }
         return message;
     },
@@ -238,8 +237,8 @@ export const MsgBuild = {
         const obj = {};
         message.creator !== undefined && (obj.creator = message.creator);
         message.gameId !== undefined && (obj.gameId = message.gameId);
+        message.populace !== undefined && (obj.populace = message.populace);
         message.settlement !== undefined && (obj.settlement = settlementToJSON(message.settlement));
-        message.position !== undefined && (obj.position = message.position ? Position.toJSON(message.position) : undefined);
         return obj;
     },
     fromPartial(object) {
@@ -256,17 +255,17 @@ export const MsgBuild = {
         else {
             message.gameId = 0;
         }
+        if (object.populace !== undefined && object.populace !== null) {
+            message.populace = object.populace;
+        }
+        else {
+            message.populace = 0;
+        }
         if (object.settlement !== undefined && object.settlement !== null) {
             message.settlement = object.settlement;
         }
         else {
             message.settlement = 0;
-        }
-        if (object.position !== undefined && object.position !== null) {
-            message.position = Position.fromPartial(object.position);
-        }
-        else {
-            message.position = undefined;
         }
         return message;
     }
@@ -310,7 +309,7 @@ export const MsgCreate = {
             writer.uint32(18).string(v);
         }
         if (message.config !== undefined) {
-            GameConfig.encode(message.config, writer.uint32(26).fork()).ldelim();
+            Config.encode(message.config, writer.uint32(26).fork()).ldelim();
         }
         return writer;
     },
@@ -326,7 +325,7 @@ export const MsgCreate = {
                     message.players.push(reader.string());
                     break;
                 case 3:
-                    message.config = GameConfig.decode(reader, reader.uint32());
+                    message.config = Config.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -344,7 +343,7 @@ export const MsgCreate = {
             }
         }
         if (object.config !== undefined && object.config !== null) {
-            message.config = GameConfig.fromJSON(object.config);
+            message.config = Config.fromJSON(object.config);
         }
         else {
             message.config = undefined;
@@ -359,7 +358,7 @@ export const MsgCreate = {
         else {
             obj.players = [];
         }
-        message.config !== undefined && (obj.config = message.config ? GameConfig.toJSON(message.config) : undefined);
+        message.config !== undefined && (obj.config = message.config ? Config.toJSON(message.config) : undefined);
         return obj;
     },
     fromPartial(object) {
@@ -371,7 +370,7 @@ export const MsgCreate = {
             }
         }
         if (object.config !== undefined && object.config !== null) {
-            message.config = GameConfig.fromPartial(object.config);
+            message.config = Config.fromPartial(object.config);
         }
         else {
             message.config = undefined;
@@ -430,6 +429,108 @@ export const MsgCreateResponse = {
         return message;
     }
 };
+const baseMsgChangeParams = {};
+export const MsgChangeParams = {
+    encode(message, writer = Writer.create()) {
+        if (message.params !== undefined) {
+            Params.encode(message.params, writer.uint32(10).fork()).ldelim();
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof Uint8Array ? new Reader(input) : input;
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseMsgChangeParams };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.params = Params.decode(reader, reader.uint32());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseMsgChangeParams };
+        if (object.params !== undefined && object.params !== null) {
+            message.params = Params.fromJSON(object.params);
+        }
+        else {
+            message.params = undefined;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseMsgChangeParams };
+        if (object.params !== undefined && object.params !== null) {
+            message.params = Params.fromPartial(object.params);
+        }
+        else {
+            message.params = undefined;
+        }
+        return message;
+    }
+};
+const baseMsgChangeParamsResponse = { version: 0 };
+export const MsgChangeParamsResponse = {
+    encode(message, writer = Writer.create()) {
+        if (message.version !== 0) {
+            writer.uint32(8).uint32(message.version);
+        }
+        return writer;
+    },
+    decode(input, length) {
+        const reader = input instanceof Uint8Array ? new Reader(input) : input;
+        let end = length === undefined ? reader.len : reader.pos + length;
+        const message = { ...baseMsgChangeParamsResponse };
+        while (reader.pos < end) {
+            const tag = reader.uint32();
+            switch (tag >>> 3) {
+                case 1:
+                    message.version = reader.uint32();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    },
+    fromJSON(object) {
+        const message = { ...baseMsgChangeParamsResponse };
+        if (object.version !== undefined && object.version !== null) {
+            message.version = Number(object.version);
+        }
+        else {
+            message.version = 0;
+        }
+        return message;
+    },
+    toJSON(message) {
+        const obj = {};
+        message.version !== undefined && (obj.version = message.version);
+        return obj;
+    },
+    fromPartial(object) {
+        const message = { ...baseMsgChangeParamsResponse };
+        if (object.version !== undefined && object.version !== null) {
+            message.version = object.version;
+        }
+        else {
+            message.version = 0;
+        }
+        return message;
+    }
+};
 export class MsgClientImpl {
     constructor(rpc) {
         this.rpc = rpc;
@@ -448,6 +549,11 @@ export class MsgClientImpl {
         const data = MsgCreate.encode(request).finish();
         const promise = this.rpc.request('rook.game.Msg', 'Create', data);
         return promise.then((data) => MsgCreateResponse.decode(new Reader(data)));
+    }
+    ChangeParams(request) {
+        const data = MsgChangeParams.encode(request).finish();
+        const promise = this.rpc.request('rook.game.Msg', 'ChangeParams', data);
+        return promise.then((data) => MsgChangeParamsResponse.decode(new Reader(data)));
     }
 }
 var globalThis = (() => {

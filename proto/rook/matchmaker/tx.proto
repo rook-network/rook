@@ -1,7 +1,7 @@
 syntax = "proto3";
 package rook.matchaker;
 
-// this line is used by starport scaffolding # proto/tx/import
+import "rook/game/game.proto";
 
 option go_package = "github.com/cmwaters/rook/x/matchmaker/types";
 
@@ -18,7 +18,7 @@ service Msg {
 message MsgHost {
     string creator = 1;
     repeated string invitees = 2;
-    bytes config = 3;
+    rook.game.Config config = 3;
     bool public = 4;
     uint32 quorum = 5;
     uint32 capacity = 6;
@@ -42,6 +42,7 @@ message MsgFind {
 }
 
 message MsgFindResponse {
+    uint64 room_id = 1;
 }
 
 message MsgReady {
