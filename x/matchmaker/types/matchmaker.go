@@ -78,13 +78,13 @@ func NewCommonRoom(modeID uint32, created time.Time) CommonRoom {
 	}
 }
 
-func (r *CommonRoom) ToRoom(config *game.Config, quorum, capacity uint32) *Room {
-	return &Room{
-		Config:   config,
+func (r *CommonRoom) ToRoom(mode Mode) Room {
+	return Room{
+		Config:   mode.Config,
 		Players:  r.Players,
 		Pending:  []string{},
-		Quorum:   quorum,
-		Capacity: capacity,
+		Quorum:   mode.Quorum,
+		Capacity: mode.Capacity,
 		Created:  r.Created,
 		Ready:    r.Ready,
 	}

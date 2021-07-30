@@ -298,7 +298,6 @@ func (m *MsgFind) GetMode() uint32 {
 }
 
 type MsgFindResponse struct {
-	RoomId uint64 `protobuf:"varint,1,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
 }
 
 func (m *MsgFindResponse) Reset()         { *m = MsgFindResponse{} }
@@ -334,101 +333,6 @@ func (m *MsgFindResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgFindResponse proto.InternalMessageInfo
 
-func (m *MsgFindResponse) GetRoomId() uint64 {
-	if m != nil {
-		return m.RoomId
-	}
-	return 0
-}
-
-type MsgReady struct {
-	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	RoomId  uint64 `protobuf:"varint,2,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
-}
-
-func (m *MsgReady) Reset()         { *m = MsgReady{} }
-func (m *MsgReady) String() string { return proto.CompactTextString(m) }
-func (*MsgReady) ProtoMessage()    {}
-func (*MsgReady) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2a341be17b67dd1e, []int{6}
-}
-func (m *MsgReady) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgReady) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgReady.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgReady) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgReady.Merge(m, src)
-}
-func (m *MsgReady) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgReady) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgReady.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgReady proto.InternalMessageInfo
-
-func (m *MsgReady) GetCreator() string {
-	if m != nil {
-		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgReady) GetRoomId() uint64 {
-	if m != nil {
-		return m.RoomId
-	}
-	return 0
-}
-
-type MsgReadyResponse struct {
-}
-
-func (m *MsgReadyResponse) Reset()         { *m = MsgReadyResponse{} }
-func (m *MsgReadyResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgReadyResponse) ProtoMessage()    {}
-func (*MsgReadyResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_2a341be17b67dd1e, []int{7}
-}
-func (m *MsgReadyResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgReadyResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgReadyResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgReadyResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgReadyResponse.Merge(m, src)
-}
-func (m *MsgReadyResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgReadyResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgReadyResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgReadyResponse proto.InternalMessageInfo
-
 func init() {
 	proto.RegisterType((*MsgHost)(nil), "rook.matchaker.MsgHost")
 	proto.RegisterType((*MsgHostResponse)(nil), "rook.matchaker.MsgHostResponse")
@@ -436,42 +340,37 @@ func init() {
 	proto.RegisterType((*MsgJoinResponse)(nil), "rook.matchaker.MsgJoinResponse")
 	proto.RegisterType((*MsgFind)(nil), "rook.matchaker.MsgFind")
 	proto.RegisterType((*MsgFindResponse)(nil), "rook.matchaker.MsgFindResponse")
-	proto.RegisterType((*MsgReady)(nil), "rook.matchaker.MsgReady")
-	proto.RegisterType((*MsgReadyResponse)(nil), "rook.matchaker.MsgReadyResponse")
 }
 
 func init() { proto.RegisterFile("rook/matchmaker/tx.proto", fileDescriptor_2a341be17b67dd1e) }
 
 var fileDescriptor_2a341be17b67dd1e = []byte{
-	// 433 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x53, 0x41, 0x6f, 0xd3, 0x30,
-	0x18, 0xad, 0xdb, 0x2c, 0xed, 0x8c, 0x06, 0xcc, 0x42, 0xcc, 0xea, 0x21, 0x44, 0x3d, 0x05, 0x90,
-	0x52, 0x69, 0x1c, 0xb8, 0x80, 0x34, 0x31, 0x81, 0x00, 0xa9, 0x17, 0x1f, 0xb9, 0x20, 0xd7, 0x31,
-	0x99, 0x35, 0x1c, 0x07, 0xdb, 0x85, 0xf5, 0x5f, 0xec, 0xd7, 0xf0, 0x1b, 0x38, 0xee, 0xc8, 0x11,
-	0xb5, 0x7f, 0x04, 0xf9, 0x23, 0xa9, 0x16, 0x29, 0x1b, 0xd2, 0x2e, 0x55, 0x5f, 0xde, 0xf7, 0xbd,
-	0xf7, 0xfc, 0x12, 0x63, 0x6a, 0x8d, 0x39, 0x9f, 0x6b, 0xee, 0xc5, 0x99, 0xe6, 0xe7, 0xd2, 0xce,
-	0xfd, 0x45, 0x5e, 0x5b, 0xe3, 0x0d, 0xb9, 0x1f, 0x98, 0x1c, 0x98, 0x40, 0x4c, 0x1f, 0xc1, 0x64,
-	0xc9, 0xb5, 0x84, 0x9f, 0x7f, 0x53, 0xb3, 0x9f, 0x08, 0x8f, 0x17, 0xae, 0x7c, 0x6f, 0x9c, 0x27,
-	0x14, 0x8f, 0x85, 0x95, 0xdc, 0x1b, 0x4b, 0x51, 0x8a, 0xb2, 0x7d, 0xd6, 0x42, 0x32, 0xc5, 0x13,
-	0x55, 0x7d, 0x57, 0x5e, 0x4a, 0x47, 0x87, 0xe9, 0x28, 0xdb, 0x67, 0x3b, 0x4c, 0x9e, 0xe2, 0x58,
-	0x98, 0xea, 0x8b, 0x2a, 0xe9, 0x28, 0x45, 0xd9, 0xbd, 0xe3, 0xc3, 0x1c, 0x8c, 0xc1, 0xe3, 0x14,
-	0x08, 0xd6, 0x0c, 0x90, 0xc7, 0x38, 0xae, 0x57, 0xcb, 0xaf, 0x4a, 0xd0, 0x28, 0x45, 0xd9, 0x84,
-	0x35, 0x28, 0x3c, 0xff, 0xb6, 0x32, 0x76, 0xa5, 0xe9, 0x5e, 0x8a, 0xb2, 0x03, 0xd6, 0xa0, 0x60,
-	0x2b, 0x78, 0xcd, 0x85, 0xf2, 0x6b, 0x1a, 0x03, 0xb3, 0xc3, 0xb3, 0x67, 0xf8, 0x41, 0x93, 0x9b,
-	0x49, 0x57, 0x9b, 0xca, 0x49, 0x72, 0x84, 0xc7, 0xd6, 0x18, 0xfd, 0x59, 0x15, 0x90, 0x3f, 0x62,
-	0x71, 0x80, 0x1f, 0x8a, 0xd9, 0x2b, 0x38, 0xe3, 0x47, 0xa3, 0xaa, 0x5b, 0xce, 0x78, 0x6d, 0x7b,
-	0xd8, 0xd9, 0x3e, 0x04, 0xa7, 0xb0, 0xdd, 0x3a, 0xcd, 0x5e, 0x82, 0xe0, 0x3b, 0x55, 0x15, 0xb7,
-	0x08, 0x12, 0x1c, 0x69, 0x53, 0x48, 0x50, 0x3b, 0x60, 0xf0, 0xbf, 0x49, 0x1d, 0x16, 0xff, 0x9f,
-	0xfa, 0x35, 0x9e, 0x2c, 0x5c, 0xc9, 0x24, 0x2f, 0xd6, 0x77, 0x89, 0x4d, 0xf0, 0xc3, 0x76, 0xbd,
-	0xf5, 0x3a, 0xbe, 0x1c, 0xe2, 0xd1, 0xc2, 0x95, 0xe4, 0x04, 0x47, 0xf0, 0xc6, 0x8f, 0xf2, 0xee,
-	0x47, 0x92, 0x37, 0x95, 0x4e, 0x9f, 0xdc, 0x40, 0xec, 0x52, 0x9f, 0xe0, 0x08, 0xfa, 0xec, 0x53,
-	0x08, 0x44, 0xaf, 0xc2, 0xf5, 0x0e, 0x83, 0x02, 0x14, 0xd8, 0xa7, 0x10, 0x88, 0x5e, 0x85, 0x4e,
-	0x73, 0xa7, 0x78, 0xaf, 0x69, 0xa7, 0x67, 0x12, 0x98, 0x69, 0x7a, 0x13, 0xd3, 0x8a, 0xbc, 0x79,
-	0xfb, 0x6b, 0x93, 0xa0, 0xab, 0x4d, 0x82, 0xfe, 0x6c, 0x12, 0x74, 0xb9, 0x4d, 0x06, 0x57, 0xdb,
-	0x64, 0xf0, 0x7b, 0x9b, 0x0c, 0x3e, 0x3d, 0x2f, 0x95, 0x3f, 0x5b, 0x2d, 0x73, 0x61, 0xf4, 0x5c,
-	0xe8, 0x1f, 0xdc, 0x4b, 0xeb, 0xe6, 0x70, 0x89, 0x2e, 0x3a, 0x17, 0x6e, 0x5d, 0x4b, 0xb7, 0x8c,
-	0xe1, 0x3a, 0xbd, 0xf8, 0x1b, 0x00, 0x00, 0xff, 0xff, 0xc9, 0xbe, 0x48, 0x7c, 0x90, 0x03, 0x00,
-	0x00,
+	// 398 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x92, 0xb1, 0xae, 0xd3, 0x30,
+	0x14, 0x86, 0xeb, 0xdb, 0x90, 0xde, 0x6b, 0x74, 0x41, 0xd7, 0x42, 0x5c, 0xab, 0x43, 0x88, 0x32,
+	0x05, 0x90, 0x12, 0xa9, 0x0c, 0x2c, 0x0c, 0x15, 0x08, 0x04, 0x48, 0x5d, 0x3c, 0xb2, 0xa0, 0xd4,
+	0x31, 0xa9, 0x55, 0x1c, 0x07, 0xdb, 0x81, 0xf6, 0x2d, 0x78, 0x1a, 0x9e, 0x01, 0x89, 0xa5, 0x23,
+	0x23, 0x6a, 0x5f, 0x04, 0xf9, 0x90, 0x56, 0xad, 0x14, 0xba, 0x44, 0xf9, 0xfd, 0x9f, 0xf3, 0x1d,
+	0xff, 0xf2, 0xc1, 0xd4, 0x68, 0xbd, 0xcc, 0x55, 0xe1, 0xf8, 0x42, 0x15, 0x4b, 0x61, 0x72, 0xb7,
+	0xca, 0x1a, 0xa3, 0x9d, 0x26, 0xf7, 0xbc, 0x93, 0x81, 0xe3, 0x8d, 0xf1, 0x03, 0xa8, 0xac, 0x0a,
+	0x25, 0xe0, 0xf3, 0xaf, 0x2a, 0xf9, 0x81, 0xf0, 0x68, 0x66, 0xab, 0xb7, 0xda, 0x3a, 0x42, 0xf1,
+	0x88, 0x1b, 0x51, 0x38, 0x6d, 0x28, 0x8a, 0x51, 0x7a, 0xc5, 0xf6, 0x92, 0x8c, 0xf1, 0xa5, 0xac,
+	0xbf, 0x4a, 0x27, 0x84, 0xa5, 0x17, 0xf1, 0x30, 0xbd, 0x62, 0x07, 0x4d, 0x1e, 0xe3, 0x90, 0xeb,
+	0xfa, 0x93, 0xac, 0xe8, 0x30, 0x46, 0xe9, 0xdd, 0xc9, 0x4d, 0x06, 0x83, 0x61, 0xc6, 0x2b, 0x30,
+	0x58, 0x57, 0x40, 0x1e, 0xe2, 0xb0, 0x69, 0xe7, 0x9f, 0x25, 0xa7, 0x41, 0x8c, 0xd2, 0x4b, 0xd6,
+	0x29, 0x7f, 0xfe, 0xa5, 0xd5, 0xa6, 0x55, 0xf4, 0x4e, 0x8c, 0xd2, 0x6b, 0xd6, 0x29, 0x3f, 0x96,
+	0x17, 0x4d, 0xc1, 0xa5, 0x5b, 0xd3, 0x10, 0x9c, 0x83, 0x4e, 0x9e, 0xe0, 0xfb, 0xdd, 0xbd, 0x99,
+	0xb0, 0x8d, 0xae, 0xad, 0x20, 0xb7, 0x78, 0x64, 0xb4, 0x56, 0x1f, 0x65, 0x09, 0xf7, 0x0f, 0x58,
+	0xe8, 0xe5, 0xbb, 0x32, 0x79, 0x01, 0x19, 0xdf, 0x6b, 0x59, 0x9f, 0xc9, 0x78, 0xd4, 0x7d, 0x71,
+	0xd2, 0x7d, 0x03, 0x93, 0x7c, 0xf7, 0x7e, 0x52, 0xf2, 0x1c, 0x80, 0x6f, 0x64, 0x5d, 0x9e, 0x01,
+	0x12, 0x1c, 0x28, 0x5d, 0x0a, 0xa0, 0x5d, 0x33, 0xf8, 0xef, 0x58, 0xbe, 0x71, 0xcf, 0x9a, 0xfc,
+	0x42, 0x78, 0x38, 0xb3, 0x15, 0x99, 0xe2, 0x00, 0x5e, 0xe1, 0x36, 0x3b, 0x7d, 0xb8, 0xac, 0x8b,
+	0x39, 0x7e, 0xf4, 0x1f, 0xe3, 0x90, 0x7f, 0x8a, 0x03, 0xc8, 0xd8, 0x47, 0xf0, 0x46, 0x2f, 0xe1,
+	0x38, 0x97, 0x27, 0x40, 0xa8, 0x3e, 0x82, 0x37, 0x7a, 0x09, 0xc7, 0x69, 0x5e, 0xbe, 0xfe, 0xb9,
+	0x8d, 0xd0, 0x66, 0x1b, 0xa1, 0x3f, 0xdb, 0x08, 0x7d, 0xdf, 0x45, 0x83, 0xcd, 0x2e, 0x1a, 0xfc,
+	0xde, 0x45, 0x83, 0x0f, 0x4f, 0x2b, 0xe9, 0x16, 0xed, 0x3c, 0xe3, 0x5a, 0xe5, 0x5c, 0x7d, 0x2b,
+	0x9c, 0x30, 0x36, 0x87, 0x9d, 0x5c, 0x9d, 0xec, 0xef, 0xba, 0x11, 0x76, 0x1e, 0xc2, 0x76, 0x3e,
+	0xfb, 0x1b, 0x00, 0x00, 0xff, 0xff, 0x89, 0xe6, 0x3c, 0x94, 0xdf, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -490,7 +389,6 @@ type MsgClient interface {
 	Host(ctx context.Context, in *MsgHost, opts ...grpc.CallOption) (*MsgHostResponse, error)
 	Join(ctx context.Context, in *MsgJoin, opts ...grpc.CallOption) (*MsgJoinResponse, error)
 	Find(ctx context.Context, in *MsgFind, opts ...grpc.CallOption) (*MsgFindResponse, error)
-	Ready(ctx context.Context, in *MsgReady, opts ...grpc.CallOption) (*MsgReadyResponse, error)
 }
 
 type msgClient struct {
@@ -528,22 +426,12 @@ func (c *msgClient) Find(ctx context.Context, in *MsgFind, opts ...grpc.CallOpti
 	return out, nil
 }
 
-func (c *msgClient) Ready(ctx context.Context, in *MsgReady, opts ...grpc.CallOption) (*MsgReadyResponse, error) {
-	out := new(MsgReadyResponse)
-	err := c.cc.Invoke(ctx, "/rook.matchaker.Msg/Ready", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// this line is used by starport scaffolding # proto/tx/rpc
 	Host(context.Context, *MsgHost) (*MsgHostResponse, error)
 	Join(context.Context, *MsgJoin) (*MsgJoinResponse, error)
 	Find(context.Context, *MsgFind) (*MsgFindResponse, error)
-	Ready(context.Context, *MsgReady) (*MsgReadyResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -558,9 +446,6 @@ func (*UnimplementedMsgServer) Join(ctx context.Context, req *MsgJoin) (*MsgJoin
 }
 func (*UnimplementedMsgServer) Find(ctx context.Context, req *MsgFind) (*MsgFindResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Find not implemented")
-}
-func (*UnimplementedMsgServer) Ready(ctx context.Context, req *MsgReady) (*MsgReadyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Ready not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -621,24 +506,6 @@ func _Msg_Find_Handler(srv interface{}, ctx context.Context, dec func(interface{
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_Ready_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgReady)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).Ready(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/rook.matchaker.Msg/Ready",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).Ready(ctx, req.(*MsgReady))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "rook.matchaker.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -654,10 +521,6 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Find",
 			Handler:    _Msg_Find_Handler,
-		},
-		{
-			MethodName: "Ready",
-			Handler:    _Msg_Ready_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -876,69 +739,6 @@ func (m *MsgFindResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.RoomId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.RoomId))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgReady) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgReady) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgReady) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.RoomId != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.RoomId))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgReadyResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgReadyResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgReadyResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
 	return len(dAtA) - i, nil
 }
 
@@ -1039,34 +839,6 @@ func (m *MsgFind) Size() (n int) {
 }
 
 func (m *MsgFindResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.RoomId != 0 {
-		n += 1 + sovTx(uint64(m.RoomId))
-	}
-	return n
-}
-
-func (m *MsgReady) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Creator)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if m.RoomId != 0 {
-		n += 1 + sovTx(uint64(m.RoomId))
-	}
-	return n
-}
-
-func (m *MsgReadyResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1637,176 +1409,6 @@ func (m *MsgFindResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgFindResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RoomId", wireType)
-			}
-			m.RoomId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.RoomId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgReady) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgReady: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgReady: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RoomId", wireType)
-			}
-			m.RoomId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.RoomId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgReadyResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgReadyResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgReadyResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

@@ -91,12 +91,12 @@ func (k Keeper) GetCommonRoom(ctx sdk.Context, modeID uint32) (types.CommonRoom,
 	return room, true
 }
 
-func (k Keeper) SetCommonRoom(ctx sdk.Context, roomID uint64, room types.CommonRoom) {
+func (k Keeper) SetCommonRoom(ctx sdk.Context, modeID uint32, room types.CommonRoom) {
 	store := ctx.KVStore(k.storeKey)
 
 	bz := k.cdc.MustMarshal(&room)
 
-	store.Set(types.RoomKey(roomID), bz)
+	store.Set(types.CommonRoomKey(modeID), bz)
 }
 
 // NOTE: This function might not be necessary

@@ -11,7 +11,6 @@ service Msg {
     rpc Host(MsgHost) returns (MsgHostResponse);
     rpc Join(MsgJoin) returns (MsgJoinResponse);
     rpc Find(MsgFind) returns (MsgFindResponse);
-    rpc Ready(MsgReady) returns (MsgReadyResponse);
 }
 
 // this line is used by starport scaffolding # proto/tx/message
@@ -42,13 +41,4 @@ message MsgFind {
 }
 
 message MsgFindResponse {
-    uint64 room_id = 1;
-}
-
-message MsgReady {
-    string creator = 1;
-    uint64 room_id = 2;
-}
-
-message MsgReadyResponse {
 }

@@ -73,16 +73,18 @@ func (m msgServer) Find(goCtx context.Context, msg *types.MsgFind) (*types.MsgFi
 	}
 
 	if full {
-		
+		r := room.ToRoom(mode)
+		err := m.Keeper.CreateGame(ctx, r)
+		if err != nil {
+			return nil, err
+		}
+
+		room = types.NewCommonRoom(msg.Mode, ctx.BlockTime())
+	} else if ready {
+		room.ReadyUp(ctx.BlockTime())
 	}
 
-	if ready {
-
-	}
+	m.Keeper.SetCommonRoom(ctx, msg.Mode, room)
 
 	return &types.MsgFindResponse{}, nil
-}
-
-func (m msgServer) Ready(ctx context.Context, msg *types.MsgReady) (*types.MsgReadyResponse, error) {
-	return &types.MsgReadyResponse{}, nil
 }
