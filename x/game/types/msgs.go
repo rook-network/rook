@@ -7,7 +7,7 @@ import (
 
 var _ sdk.Msg = &MsgCreate{}
 
-func NewMsgCreate(players []string, config *Config) *MsgCreate {
+func NewMsgCreate(players []string, config Config) *MsgCreate {
 	return &MsgCreate{
 		Players: players,
 		Config:  config,
@@ -45,7 +45,16 @@ func (msg *MsgCreate) ValidateBasic() error {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid player address (%s)", err)
 		}
 	}
-	return msg.Config.ValidateBasic(len(msg.Players))
+
+	if err := msg.Config.ValidateBasic(len(msg.Players)); err != nil {
+		return err
+	}
+
+	if !msg.Config.HasSeed() {
+		return ErrSeedNotSet
+	}
+
+	return nil
 }
 
 var _ sdk.Msg = &MsgMove{}
@@ -134,7 +143,7 @@ var _ sdk.Msg = &MsgChangeParams{}
 func NewMsgChangeParams(authority string, params Params) *MsgChangeParams {
 	return &MsgChangeParams{
 		Authority: authority,
-		Params: params,
+		Params:    params,
 	}
 }
 

@@ -147,8 +147,11 @@ func (m msgServer) AddMode(goCtx context.Context, msg *types.MsgAddMode) (*types
 	modeID := m.Keeper.GetNextModeID(ctx)
 
 	m.Keeper.SetMode(ctx, modeID, msg.Mode)
+	m.Keeper.SetRooms(ctx, modeID, types.Rooms{})
 
-	return &types.MsgAddModeResponse{}, nil
+	m.Keeper.IncrementNextModeID(ctx)
+
+	return &types.MsgAddModeResponse{Id: modeID}, nil
 }
 
 // RemoveMode removes an existing mode from the pool

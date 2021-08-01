@@ -84,11 +84,15 @@ func (k Keeper) UpdateRooms(ctx sdk.Context) {
 		var room types.Room
 		k.cdc.MustUnmarshal(roomIter.Value(), &room)
 
-		roomID := types.ParseRoomID(roomIter.Key())
+		roomID := types.ParseRoomKey(roomIter.Key())
 
 		switch t := room.Time.(type) {
 		case *types.Room_Created:
-			if room.HasQuorum() {
+			if room.IsFull() {
+				k.CreateGame(ctx, room)
+				k.DeleteRoom(ctx, roomID)
+				k.RemoveRoomFromModePool(ctx, room.ModeId, roomID)
+			} else if room.HasQuorum() {
 				room.ReadyUp(now)
 			} else if room.HasExpired(now, params.RoomLifespan) {
 				k.DeleteRoom(ctx, roomID)
@@ -206,7 +210,7 @@ func (k Keeper) GetRoomsByMode(ctx sdk.Context, modeID uint32) (types.Rooms, boo
 		return types.Rooms{}, false
 	}
 	k.cdc.MustUnmarshal(bz, &rooms)
-	return rooms, false
+	return rooms, true
 }
 
 func (k Keeper) SetRooms(ctx sdk.Context, modeID uint32, rooms types.Rooms) {

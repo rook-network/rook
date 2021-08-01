@@ -30,11 +30,11 @@ func KeyPrefix(p string) []byte {
 }
 
 var (
-	RoomIDKey             = []byte{0x00}
-	RoomPrefixKey         = []byte{0x01}
-	RoomsByModePrefix     = []byte{0x02}
-	ModeIDKey             = []byte{0x03}
-	ModePrefixKey         = []byte{0x04}
+	RoomIDKey         = []byte{0x00}
+	RoomPrefixKey     = []byte{0x01}
+	RoomsByModePrefix = []byte{0x02}
+	ModeIDKey         = []byte{0x03}
+	ModePrefixKey     = []byte{0x04}
 
 	KeyRoomLifespan       = []byte("RoomLifespan")
 	KeyPrestartWaitPeriod = []byte("PrestartWaitPeriod")
@@ -50,6 +50,13 @@ func RoomsByModeKey(mode uint32) []byte {
 
 func ParseRoomID(key []byte) uint64 {
 	return binary.BigEndian.Uint64(key)
+}
+
+func ParseRoomKey(key []byte) uint64 {
+	if len(key) != 9 {
+		panic("invalid room key length")
+	}
+	return ParseRoomID(key[1:])
 }
 
 func RoomIDBytes(id uint64) []byte {
@@ -70,4 +77,11 @@ func ModeKey(mode uint32) []byte {
 
 func ParseModeID(key []byte) uint32 {
 	return binary.BigEndian.Uint32(key)
+}
+
+func ParseModeKey(key []byte) uint32 {
+	if len(key) != 5 {
+		panic("invalid mode key length")
+	}
+	return ParseModeID(key[1:])
 }

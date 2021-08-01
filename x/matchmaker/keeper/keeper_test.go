@@ -68,3 +68,39 @@ func TestCreateRoom(t *testing.T) {
 	r, exists = keeper.GetRoom(ctx, nextRoomID)
 	require.False(t, exists)
 }
+
+func TestCreateModes(t *testing.T) {
+	keeper, ctx := setupKeeper(t)
+	var roomID uint64 = 1
+
+	mode := types.NewMode(game.DefaultConfig(), 3, 4)
+	require.NoError(t, mode.ValidateBasic())
+
+	modeID := keeper.GetNextModeID(ctx)
+	require.Equal(t, uint32(1), modeID)
+
+	keeper.SetMode(ctx, modeID, mode)
+	keeper.IncrementNextModeID(ctx)
+
+	m1, exists := keeper.GetMode(ctx, modeID)
+	require.True(t, exists)
+	require.Equal(t, mode, m1)
+
+	nextModeID := keeper.GetNextModeID(ctx)
+	require.Equal(t, modeID+1, nextModeID)
+
+	_, exists = keeper.GetMode(ctx, nextModeID)
+	require.False(t, exists)
+
+	rooms, exists := keeper.GetRoomsByMode(ctx, modeID)
+	require.False(t, exists)
+	require.Empty(t, rooms.Ids)
+
+	rooms.Add(roomID)
+
+	keeper.SetRooms(ctx, modeID, rooms)
+	rooms, exists = keeper.GetRoomsByMode(ctx, modeID)
+	require.True(t, exists)
+	require.NotEmpty(t, rooms.Ids)
+
+}

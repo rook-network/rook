@@ -10,8 +10,8 @@ const (
 	MinTilesPerPlayer = 25
 )
 
-func DefaultConfig() *Config {
-	return &Config{
+func DefaultConfig() Config {
+	return Config{
 		Initial: DefaultInitializationConfig(), // all on all
 		Map:     DefaultMapConfig(),
 	}
@@ -31,8 +31,13 @@ func (cfg *Config) ValidateBasic(players int) error {
 	return nil
 }
 
-func (c *Config) AddSeed(seed int64) {
+func (c *Config) WithSeed(seed int64) *Config {
 	c.Map.Seed = seed
+	return c
+}
+
+func (c *Config) HasSeed() bool {
+	return c.Map.Seed != 0
 }
 
 func DefaultInitializationConfig() *InitializationConfig {
@@ -69,10 +74,6 @@ func (cfg MapConfig) ValidateBasic() error {
 
 	if cfg.Height > MaxMapSize {
 		return sdkerrors.Wrapf(ErrInvalidMapSize, "height %d is greater than maximum %d", cfg.Height, MaxMapSize)
-	}
-
-	if cfg.Seed == 0 {
-		return ErrSeedNotSet
 	}
 
 	return nil

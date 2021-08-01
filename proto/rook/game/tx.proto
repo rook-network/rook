@@ -36,8 +36,8 @@ message MsgBuildResponse {
 }
 
 message MsgCreate {
-  repeated string players = 2; // all players must be signers
-  Config config = 3;
+  repeated string players = 1; // all players must be signers
+  Config config = 2 [(gogoproto.nullable) = false];
 }
 
 message MsgCreateResponse {

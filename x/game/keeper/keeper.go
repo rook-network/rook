@@ -36,6 +36,7 @@ func NewKeeper(
 		storeKey: storeKey,
 		games:    make(map[uint64]*types.Game),
 		params:   make(map[uint32]*types.Params),
+		latestVersion: 0,
 	}
 }
 
@@ -140,6 +141,7 @@ func (k *Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	// increment the latest version label
 	store.Set(types.LatestParamsVersionKey, types.ParamsKey(k.latestVersion+1))
 	k.latestVersion++
+	k.params[k.latestVersion] = &params
 }
 
 func (k Keeper) DeleteParams(ctx sdk.Context, version uint32) {

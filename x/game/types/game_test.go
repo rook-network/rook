@@ -20,7 +20,7 @@ var (
 
 func TestNewGame(t *testing.T) {
 	config.Map.Seed = 9876
-	game, err := NewGame(players, config, &params)
+	game, err := NewGame(players, &config, &params)
 	require.NoError(t, err)
 
 	require.Equal(t, len(game.Factions), len(game.players))
@@ -126,7 +126,7 @@ func TestGameMove(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			game, err := NewGame(players, config, &params)
+			game, err := NewGame(players, &config, &params)
 			require.NoError(t, err)
 			buildCustomMap(game, []rune{
 				'P', 'M', 'F',
@@ -208,7 +208,7 @@ func TestGameBuild(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			config.Initial.Resources = &ResourceSet{Wood: 10, Food: 10, Stone: 10, Population: 1}
-			game, err := NewGame(players, config, &params)
+			game, err := NewGame(players, &config, &params)
 			require.NoError(t, err)
 			buildCustomMap(game, []rune{
 				'P', 'M', 'F',

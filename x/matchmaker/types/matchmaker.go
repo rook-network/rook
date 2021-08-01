@@ -8,7 +8,7 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-func NewRoom(config *game.Config, players, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
+func NewRoom(config game.Config, players, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
 	return Room{
 		Config:   config,
 		Players:  players,
@@ -20,7 +20,7 @@ func NewRoom(config *game.Config, players, pending []string, public bool, quorum
 	}
 }
 
-func NewScheduledRoom(config *game.Config, players, pending []string, public bool, quorum, capacity uint32, scheduled time.Time) Room {
+func NewScheduledRoom(config game.Config, players, pending []string, public bool, quorum, capacity uint32, scheduled time.Time) Room {
 	return Room{
 		Config:   config,
 		Players:  players,
@@ -110,7 +110,7 @@ func (r *Rooms) Add(id uint64) {
 	r.Ids = append(r.Ids, id)
 }
 
-func NewMode(config *game.Config, quorum, capacity uint32) Mode {
+func NewMode(config game.Config, quorum, capacity uint32) Mode {
 	return Mode{
 		Config:   config,
 		Quorum:   quorum,

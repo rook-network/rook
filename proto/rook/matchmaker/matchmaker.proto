@@ -10,7 +10,7 @@ option go_package = "github.com/cmwaters/rook/x/matchmaker/types";
 
 message Room {
   // the config to be used for the game
-  rook.game.Config config = 1;
+  rook.game.Config config = 1 [(gogoproto.nullable) = false];
 
   // the current players in the room
   repeated string players = 2;
@@ -55,13 +55,13 @@ message Rooms {
 // Modes are a way of accumulating a small set of possible games that people can choose between
 message Mode {
   // the config to be used for the game
-  rook.game.Config config = 2;
+  rook.game.Config config = 1 [(gogoproto.nullable) = false];
 
   // the minimum amount of players needed to start a game
-  uint32 quorum = 3;
+  uint32 quorum = 2;
 
   // the max amount of players that can join the room
-  uint32 capacity = 4;
+  uint32 capacity = 3;
 }
 
 message Params {

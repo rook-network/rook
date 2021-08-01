@@ -34,10 +34,10 @@ func (q Keeper) Modes(goCtx context.Context, req *types.QueryGetModesRequest) (*
 		types.ModeKey(1<<31-1),
 	)
 	for ; iter.Valid(); iter.Next() {
-		modeID := types.ParseModeID(iter.Key())
-		var mode *types.Mode
-		q.cdc.MustUnmarshal(iter.Value(), mode)
-		modes[modeID] = mode
+		modeID := types.ParseModeKey(iter.Key())
+		var mode types.Mode
+		q.cdc.MustUnmarshal(iter.Value(), &mode)
+		modes[modeID] = &mode
 	}
 
 	return &types.QueryGetModesResponse{Modes: modes}, nil

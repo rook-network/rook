@@ -24,3 +24,16 @@ func TestRemoveRoomIDFromRoom(t *testing.T) {
 	require.Len(t, room.Ids, 2)
 	require.Equal(t, []uint64{2, 5}, room.Ids)
 }
+
+func TestKeys(t *testing.T) {
+	var (
+		roomID uint64 = 12
+		modeID uint32 = 345
+	)
+
+	roomBytes := RoomKey(roomID)
+	require.Equal(t, roomID, ParseRoomKey(roomBytes))
+
+	modeBytes := ModeKey(modeID)
+	require.Equal(t, modeID, ParseModeKey(modeBytes))
+}

@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cmwaters/rook/x/game/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -24,10 +25,13 @@ func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 
 	params, ok := m.Keeper.params[m.Keeper.latestVersion]
 	if !ok {
+		if len(m.Keeper.params) != 0 {
+			panic(fmt.Sprintf("we have some params but it's not the last: %v, last %d", m.Keeper.params, m.Keeper.latestVersion))
+		}
 		panic("unable to find latest params")
 	}
 
-	game, err := types.NewGame(msg.Players, msg.Config, params)
+	game, err := types.NewGame(msg.Players, &msg.Config, params)
 	if err != nil {
 		return nil, err
 	}
