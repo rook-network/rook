@@ -1,26 +1,43 @@
 syntax = "proto3";
-package rook.matchaker;
+package rook.matchmaker;
 
-import "rook/game/game.proto";
+import "rook/matchmaker/matchmaker.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/cmwaters/rook/x/matchmaker/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
     rpc Host(MsgHost) returns (MsgHostResponse);
     rpc Join(MsgJoin) returns (MsgJoinResponse);
     rpc Find(MsgFind) returns (MsgFindResponse);
+    rpc Leave(MsgLeave) returns (MsgLeaveResponse);
+
+    rpc AddMode(MsgAddMode) returns (MsgAddModeResponse);
+    rpc RemoveMode(MsgRemoveMode) returns (MsgRemoveModeResponse);
 }
 
-// this line is used by starport scaffolding # proto/tx/message
 message MsgHost {
+    // The host of the room
     string creator = 1;
-    repeated string invitees = 2;
-    rook.game.Config config = 3;
-    bool public = 4;
-    uint32 quorum = 5;
-    uint32 capacity = 6;
+
+    oneof game {
+        // Mode defines the game config, the quorum and capacity of players
+        Mode mode = 2;
+        // Or you can use a predefined mode
+        uint32 mode_id = 3;
+    }
+
+    // the list of players that are invited to join the room
+    repeated string invitees = 4;
+
+    // public defines whether the room is open for all players to join
+    bool public = 5;
+
+    // For scheduled games (like tournaments). Participants have until
+    // then to join. The game only starts if the quorum is met.
+    google.protobuf.Timestamp scheduled = 6 [(gogoproto.stdtime) = true];
 }
 
 message MsgHostResponse {
@@ -32,8 +49,7 @@ message MsgJoin {
     uint64 room_id = 2;
 }
 
-message MsgJoinResponse {
-}
+message MsgJoinResponse {}
 
 message MsgFind {
     string creator = 1;
@@ -41,4 +57,28 @@ message MsgFind {
 }
 
 message MsgFindResponse {
+    uint64 room_id = 1;
 }
+
+message MsgLeave {
+    string creator = 1;
+    uint64 room_id = 2;
+}
+
+message MsgLeaveResponse {}
+
+message MsgAddMode {
+    string authority = 1;
+    Mode mode = 2 [(gogoproto.nullable) = false];
+}
+
+message MsgAddModeResponse {
+    uint32 id = 1;
+}
+
+message MsgRemoveMode {
+    string authority = 1;
+    uint32 id = 2;
+}
+
+message MsgRemoveModeResponse{}

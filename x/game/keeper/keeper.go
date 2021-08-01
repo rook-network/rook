@@ -133,9 +133,9 @@ func (k Keeper) GetParams(ctx sdk.Context, version uint32) *types.Params {
 	return params
 }
 
-func (k *Keeper) SetParams(ctx sdk.Context, params *types.Params) {
+func (k *Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	store := ctx.KVStore(k.storeKey)
-	paramBz := k.cdc.MustMarshal(params)
+	paramBz := k.cdc.MustMarshal(&params)
 	store.Set(types.ParamsKey(k.latestVersion+1), paramBz)
 	// increment the latest version label
 	store.Set(types.LatestParamsVersionKey, types.ParamsKey(k.latestVersion+1))

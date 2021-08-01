@@ -1,5 +1,5 @@
 syntax = "proto3";
-package rook.matchaker;
+package rook.matchmaker;
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
@@ -27,49 +27,40 @@ message Room {
   // the max amount of players that can join the room
   uint32 capacity = 6;
 
-  // when the room was created. Rooms get garbage collected after a while
-  google.protobuf.Timestamp created = 7 [
-    (gogoproto.stdtime) = true,
-    (gogoproto.nullable) = false
-  ];
+  // if this is part of the standard mode pools it will have a corresponding
+  // mode id
+  uint32 mode_id = 7;
 
-  // when quorum is reached and we are locked in to starting the game.
-  // The prestart_wait_period gives a bufer for more people to join if they
-  // want.
-  google.protobuf.Timestamp ready = 8 [
-    (gogoproto.stdtime) = true,
-    (gogoproto.nullable) = false
-  ];
+  oneof time {
+    // when the room was created. Rooms get garbage collected after a while
+    google.protobuf.Timestamp created = 8 [(gogoproto.stdtime) = true];
+
+    // when quorum is reached and we are locked in to starting the game.
+    // The prestart_wait_period gives a bufer for more people to join if they
+    // want.
+    google.protobuf.Timestamp ready = 9 [(gogoproto.stdtime) = true];
+
+    // the time that the game is scheduled to start. Participants have until
+    // then to join. The game only starts if the quorum is met. This is good
+    // for tournament games
+    google.protobuf.Timestamp scheduled = 10 [(gogoproto.stdtime) = true];
+  }
 }
 
-// CommonRoom is an open room that matchmaker will automatically manage
-message CommonRoom {
-  // the game mode to be played
-  uint32 mode_id = 1;
-
-  // the current players in the room
-  repeated string players = 2;
-
-  // when the room was created. Rooms get garbage collected after a while
-  google.protobuf.Timestamp created = 3 [
-    (gogoproto.stdtime) = true,
-    (gogoproto.nullable) = false
-  ];
-
-  // when quorum is reached and we are locked in to starting the game.
-  // The prestart_wait_period gives a bufer for more people to join if they
-  // want.
-  google.protobuf.Timestamp ready = 4 [
-    (gogoproto.stdtime) = true,
-    (gogoproto.nullable) = false
-  ];
+// Rooms represents a set of rooms by id
+message Rooms {
+  repeated uint64 ids = 1;
 }
 
 // Modes are a way of accumulating a small set of possible games that people can choose between
 message Mode {
-  uint32 id = 1;
+  // the config to be used for the game
   rook.game.Config config = 2;
+
+  // the minimum amount of players needed to start a game
   uint32 quorum = 3;
+
+  // the max amount of players that can join the room
   uint32 capacity = 4;
 }
 

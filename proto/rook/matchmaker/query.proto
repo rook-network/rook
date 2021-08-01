@@ -1,5 +1,5 @@
 syntax = "proto3";
-package rook.matchaker;
+package rook.matchmaker;
 
 import "google/api/annotations.proto";
 import "rook/matchmaker/matchmaker.proto";
@@ -10,23 +10,22 @@ option go_package = "github.com/cmwaters/rook/x/matchmaker/types";
 
 // Query defines the gRPC querier service.
 service Query {
-    // this line is used by starport scaffolding # 2
+    // Room returns the current state of a specific room
     rpc Room(QueryGetRoomRequest) returns (QueryGetRoomResponse) {
         option (google.api.http).get = "/matchmaker/room/{id}";
     }
 
-    rpc Pending(QueryGetPendingRequest) returns (QueryGetPendingResponse) {
-        option (google.api.http).get = "/matchmaker/pending/{player}";
-    }
-
+    // Invitations lists all the rooms that a player is invited to
     rpc Invitations(QueryGetInvitationsRequest) returns (QueryGetInvitationsResponse) {
         option (google.api.http).get = "/matchmaker/invitations/{player}";
     }
 
+    // Modes lists all the public available modes
     rpc Modes(QueryGetModesRequest) returns (QueryGetModesResponse) {
         option (google.api.http).get = "/matchmaker/modes";
     }
 
+    // Params lists the current matchmaker params
     rpc Params(QueryGetParamsRequest) returns (QueryGetParamsResponse) {
         option (google.api.http).get = "/matchmaker/params";
     }
@@ -40,26 +39,18 @@ message QueryGetRoomResponse {
     Room room = 1;
 }
 
-message QueryGetPendingRequest {
-    string player = 1;
-}
-
-message QueryGetPendingResponse {
-    repeated Room rooms = 1;
-}
-
 message QueryGetInvitationsRequest {
     string player = 1;
 }
 
 message QueryGetInvitationsResponse {
-    repeated Room rooms = 1;
+    map<uint64, Room> rooms = 1;
 }
 
 message QueryGetModesRequest {}
 
 message QueryGetModesResponse {
-    repeated Mode modes = 1;
+    map<uint32, Mode> modes = 1;
 }
 
 message QueryGetParamsRequest {}

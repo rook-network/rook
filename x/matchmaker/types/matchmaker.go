@@ -1,31 +1,45 @@
 package types
 
 import (
+	"fmt"
 	"time"
 
 	game "github.com/cmwaters/rook/x/game/types"
+	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-func NewRoom(config *game.Config, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
+func NewRoom(config *game.Config, players, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
 	return Room{
 		Config:   config,
-		Players:  []string{},
+		Players:  players,
 		Pending:  pending,
 		Public:   public,
 		Quorum:   quorum,
 		Capacity: capacity,
-		Created:  created,
+		Time:     &Room_Created{Created: &created},
 	}
 }
 
-func (r *Room) TryAddPlayer(player string) (bool, error) {
+func NewScheduledRoom(config *game.Config, players, pending []string, public bool, quorum, capacity uint32, scheduled time.Time) Room {
+	return Room{
+		Config:   config,
+		Players:  players,
+		Pending:  pending,
+		Public:   public,
+		Quorum:   quorum,
+		Capacity: capacity,
+		Time:     &Room_Scheduled{Scheduled: &scheduled},
+	}
+}
+
+func (r *Room) TryAddPlayer(player string) error {
 	if r.IsFull() {
-		return false, ErrRoomIsFull
+		return ErrRoomIsFull
 	}
 
 	for _, p := range r.Players {
 		if p == player {
-			return false, ErrPlayerAlreadyInRoom
+			return ErrPlayerAlreadyInRoom
 		}
 	}
 
@@ -40,7 +54,7 @@ func (r *Room) TryAddPlayer(player string) (bool, error) {
 			}
 		}
 		if !exists {
-			return false, ErrPlayerNotInvited
+			return ErrPlayerNotInvited
 		}
 
 		r.Pending = append(r.Pending[:pendingIdx], r.Pending[pendingIdx+1:]...)
@@ -48,63 +62,118 @@ func (r *Room) TryAddPlayer(player string) (bool, error) {
 
 	r.Players = append(r.Players, player)
 
-	return r.IsReady(), nil
+	return nil
 }
 
 func (r Room) IsFull() bool {
 	return len(r.Players) == int(r.Capacity)
 }
 
-func (r Room) IsReady() bool {
+func (r Room) HasQuorum() bool {
 	return len(r.Players) >= int(r.Quorum)
 }
 
 func (r *Room) ReadyUp(time time.Time) {
-	r.Ready = time
+	r.Time = &Room_Ready{Ready: &time}
+}
+
+func (r Room) HasExpired(now time.Time, lifespan time.Duration) bool {
+	time, ok := r.Time.(*Room_Created)
+	return ok && time.Created.Add(lifespan).After(now)
 }
 
 func (r Room) MsgCreate() *game.MsgCreate {
 	return &game.MsgCreate{
 		Players: r.Players,
-		Config: r.Config,
+		Config:  r.Config,
 	}
 }
 
-func NewCommonRoom(modeID uint32, created time.Time) CommonRoom {
-	return CommonRoom{
-		ModeId:  modeID,
-		Players: []string{},
-		Created: created,
-	}
+func NewRoomSet(ids []uint64) Rooms {
+	return Rooms{Ids: ids}
 }
 
-func (r *CommonRoom) ToRoom(mode Mode) Room {
-	return Room{
-		Config:   mode.Config,
-		Players:  r.Players,
-		Pending:  []string{},
-		Quorum:   mode.Quorum,
-		Capacity: mode.Capacity,
-		Created:  r.Created,
-		Ready:    r.Ready,
-	}
-}
-
-func (r *CommonRoom) TryAddPlayer(player string, mode Mode) (bool, bool, error) {
-	if len(r.Players) == int(mode.Capacity) {
-		return true, false, ErrRoomIsFull
-	}
-
-	for _, p := range r.Players {
-		if p == player {
-			return false, false, ErrPlayerAlreadyInRoom
+func (r *Rooms) Remove(id uint64) {
+	removeIdx := -1
+	for idx, roomID := range r.Ids {
+		if roomID == id {
+			removeIdx = idx
+			break
 		}
 	}
-
-	r.Players = append(r.Players, player)
-	return len(r.Players) == int(mode.Capacity), len(r.Players) >= int(mode.Quorum), nil
+	if removeIdx >= 0 {
+		r.Ids = append(r.Ids[:removeIdx], r.Ids[removeIdx+1:]...)
+	}
 }
 
-func (r *CommonRoom) ReadyUp(time time.Time) {
-	r.Ready = time
-} 
+func (r *Rooms) Add(id uint64) {
+	r.Ids = append(r.Ids, id)
+}
+
+func NewMode(config *game.Config, quorum, capacity uint32) Mode {
+	return Mode{
+		Config:   config,
+		Quorum:   quorum,
+		Capacity: capacity,
+	}
+}
+
+func (m Mode) ValidateBasic() error {
+	if err := m.Config.ValidateBasic(int(m.Capacity)); err != nil {
+		return err
+	}
+
+	if m.Capacity < 2 {
+		return fmt.Errorf("capacity must be at least two got %d", m.Capacity)
+	}
+
+	if m.Quorum < 2 {
+		return fmt.Errorf("quorum must be at least two got %d", m.Quorum)
+	}
+
+	if m.Quorum > m.Capacity {
+		return fmt.Errorf("quorum (%d) must be less than equat to capacity (%d)", m.Quorum, m.Capacity)
+	}
+
+	return nil
+}
+
+func NewParams(PreStartWaitPeriod, RoomLifespan time.Duration) Params {
+	return Params{
+		PreStartWaitPeriod,
+		RoomLifespan,
+	}
+}
+
+func DefaultParams() Params {
+	return NewParams(10*time.Second, 1*time.Hour)
+}
+
+func (p Params) ValidateBasic() error {
+	if p.RoomLifespan <= p.PrestartWaitPeriod {
+		return fmt.Errorf("room lifespan (%v) is less than the prestart wait period (%v)",
+			p.RoomLifespan, p.PrestartWaitPeriod,
+		)
+	}
+	return nil
+}
+
+func (p Params) ParamSetPairs() paramtypes.ParamSetPairs {
+	return paramtypes.ParamSetPairs{
+		paramtypes.NewParamSetPair(KeyRoomLifespan, &p.RoomLifespan, validateDuration),
+		paramtypes.NewParamSetPair(KeyPrestartWaitPeriod, &p.PrestartWaitPeriod, validateDuration),
+	}
+}
+
+// ParamKeyTable for matchmaker module.
+func ParamKeyTable() paramtypes.KeyTable {
+	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
+}
+
+func validateDuration(i interface{}) error {
+	_, ok := i.(time.Duration)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return nil
+}

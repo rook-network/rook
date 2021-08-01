@@ -128,3 +128,41 @@ func (msg *MsgBuild) ValidateBasic() error {
 	}
 	return nil
 }
+
+var _ sdk.Msg = &MsgChangeParams{}
+
+func NewMsgChangeParams(authority string, params Params) *MsgChangeParams {
+	return &MsgChangeParams{
+		Authority: authority,
+		Params: params,
+	}
+}
+
+func (msg *MsgChangeParams) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgChangeParams) Type() string {
+	return "Build"
+}
+
+func (msg *MsgChangeParams) GetSigners() []sdk.AccAddress {
+	authority, err := sdk.AccAddressFromBech32(msg.Authority)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{authority}
+}
+
+func (msg *MsgChangeParams) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgChangeParams) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Authority)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+	return msg.Params.ValidateBasic()
+}

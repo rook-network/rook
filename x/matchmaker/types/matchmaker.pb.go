@@ -42,12 +42,14 @@ type Room struct {
 	Quorum uint32 `protobuf:"varint,5,opt,name=quorum,proto3" json:"quorum,omitempty"`
 	// the max amount of players that can join the room
 	Capacity uint32 `protobuf:"varint,6,opt,name=capacity,proto3" json:"capacity,omitempty"`
-	// when the room was created. Rooms get garbage collected after a while
-	Created time.Time `protobuf:"bytes,7,opt,name=created,proto3,stdtime" json:"created"`
-	// when quorum is reached and we are locked in to starting the game.
-	// The prestart_wait_period gives a bufer for more people to join if they
-	// want.
-	Ready time.Time `protobuf:"bytes,8,opt,name=ready,proto3,stdtime" json:"ready"`
+	// if this is part of the standard mode pools it will have a corresponding
+	// mode id
+	ModeId uint32 `protobuf:"varint,7,opt,name=mode_id,json=modeId,proto3" json:"mode_id,omitempty"`
+	// Types that are valid to be assigned to Time:
+	//	*Room_Created
+	//	*Room_Ready
+	//	*Room_Scheduled
+	Time isRoom_Time `protobuf_oneof:"time"`
 }
 
 func (m *Room) Reset()         { *m = Room{} }
@@ -82,6 +84,33 @@ func (m *Room) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_Room proto.InternalMessageInfo
+
+type isRoom_Time interface {
+	isRoom_Time()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type Room_Created struct {
+	Created *time.Time `protobuf:"bytes,8,opt,name=created,proto3,oneof,stdtime" json:"created,omitempty"`
+}
+type Room_Ready struct {
+	Ready *time.Time `protobuf:"bytes,9,opt,name=ready,proto3,oneof,stdtime" json:"ready,omitempty"`
+}
+type Room_Scheduled struct {
+	Scheduled *time.Time `protobuf:"bytes,10,opt,name=scheduled,proto3,oneof,stdtime" json:"scheduled,omitempty"`
+}
+
+func (*Room_Created) isRoom_Time()   {}
+func (*Room_Ready) isRoom_Time()     {}
+func (*Room_Scheduled) isRoom_Time() {}
+
+func (m *Room) GetTime() isRoom_Time {
+	if m != nil {
+		return m.Time
+	}
+	return nil
+}
 
 func (m *Room) GetConfig() *types.Config {
 	if m != nil {
@@ -125,46 +154,60 @@ func (m *Room) GetCapacity() uint32 {
 	return 0
 }
 
-func (m *Room) GetCreated() time.Time {
+func (m *Room) GetModeId() uint32 {
 	if m != nil {
-		return m.Created
+		return m.ModeId
 	}
-	return time.Time{}
+	return 0
 }
 
-func (m *Room) GetReady() time.Time {
-	if m != nil {
-		return m.Ready
+func (m *Room) GetCreated() *time.Time {
+	if x, ok := m.GetTime().(*Room_Created); ok {
+		return x.Created
 	}
-	return time.Time{}
+	return nil
 }
 
-// CommonRoom is an open room that matchmaker will automatically manage
-type CommonRoom struct {
-	// the game mode to be played
-	ModeId uint32 `protobuf:"varint,1,opt,name=mode_id,json=modeId,proto3" json:"mode_id,omitempty"`
-	// the current players in the room
-	Players []string `protobuf:"bytes,2,rep,name=players,proto3" json:"players,omitempty"`
-	// when the room was created. Rooms get garbage collected after a while
-	Created time.Time `protobuf:"bytes,3,opt,name=created,proto3,stdtime" json:"created"`
-	// when quorum is reached and we are locked in to starting the game.
-	// The prestart_wait_period gives a bufer for more people to join if they
-	// want.
-	Ready time.Time `protobuf:"bytes,4,opt,name=ready,proto3,stdtime" json:"ready"`
+func (m *Room) GetReady() *time.Time {
+	if x, ok := m.GetTime().(*Room_Ready); ok {
+		return x.Ready
+	}
+	return nil
 }
 
-func (m *CommonRoom) Reset()         { *m = CommonRoom{} }
-func (m *CommonRoom) String() string { return proto.CompactTextString(m) }
-func (*CommonRoom) ProtoMessage()    {}
-func (*CommonRoom) Descriptor() ([]byte, []int) {
+func (m *Room) GetScheduled() *time.Time {
+	if x, ok := m.GetTime().(*Room_Scheduled); ok {
+		return x.Scheduled
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Room) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*Room_Created)(nil),
+		(*Room_Ready)(nil),
+		(*Room_Scheduled)(nil),
+	}
+}
+
+// Rooms represents a set of rooms by id
+type Rooms struct {
+	Ids []uint64 `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
+}
+
+func (m *Rooms) Reset()         { *m = Rooms{} }
+func (m *Rooms) String() string { return proto.CompactTextString(m) }
+func (*Rooms) ProtoMessage()    {}
+func (*Rooms) Descriptor() ([]byte, []int) {
 	return fileDescriptor_d29eb5cfff5372ca, []int{1}
 }
-func (m *CommonRoom) XXX_Unmarshal(b []byte) error {
+func (m *Rooms) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *CommonRoom) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *Rooms) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_CommonRoom.Marshal(b, m, deterministic)
+		return xxx_messageInfo_Rooms.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -174,52 +217,33 @@ func (m *CommonRoom) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-func (m *CommonRoom) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CommonRoom.Merge(m, src)
+func (m *Rooms) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Rooms.Merge(m, src)
 }
-func (m *CommonRoom) XXX_Size() int {
+func (m *Rooms) XXX_Size() int {
 	return m.Size()
 }
-func (m *CommonRoom) XXX_DiscardUnknown() {
-	xxx_messageInfo_CommonRoom.DiscardUnknown(m)
+func (m *Rooms) XXX_DiscardUnknown() {
+	xxx_messageInfo_Rooms.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_CommonRoom proto.InternalMessageInfo
+var xxx_messageInfo_Rooms proto.InternalMessageInfo
 
-func (m *CommonRoom) GetModeId() uint32 {
+func (m *Rooms) GetIds() []uint64 {
 	if m != nil {
-		return m.ModeId
-	}
-	return 0
-}
-
-func (m *CommonRoom) GetPlayers() []string {
-	if m != nil {
-		return m.Players
+		return m.Ids
 	}
 	return nil
 }
 
-func (m *CommonRoom) GetCreated() time.Time {
-	if m != nil {
-		return m.Created
-	}
-	return time.Time{}
-}
-
-func (m *CommonRoom) GetReady() time.Time {
-	if m != nil {
-		return m.Ready
-	}
-	return time.Time{}
-}
-
 // Modes are a way of accumulating a small set of possible games that people can choose between
 type Mode struct {
-	Id       uint32        `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Config   *types.Config `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
-	Quorum   uint32        `protobuf:"varint,3,opt,name=quorum,proto3" json:"quorum,omitempty"`
-	Capacity uint32        `protobuf:"varint,4,opt,name=capacity,proto3" json:"capacity,omitempty"`
+	// the config to be used for the game
+	Config *types.Config `protobuf:"bytes,2,opt,name=config,proto3" json:"config,omitempty"`
+	// the minimum amount of players needed to start a game
+	Quorum uint32 `protobuf:"varint,3,opt,name=quorum,proto3" json:"quorum,omitempty"`
+	// the max amount of players that can join the room
+	Capacity uint32 `protobuf:"varint,4,opt,name=capacity,proto3" json:"capacity,omitempty"`
 }
 
 func (m *Mode) Reset()         { *m = Mode{} }
@@ -254,13 +278,6 @@ func (m *Mode) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_Mode proto.InternalMessageInfo
-
-func (m *Mode) GetId() uint32 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
 
 func (m *Mode) GetConfig() *types.Config {
 	if m != nil {
@@ -340,48 +357,48 @@ func (m *Params) GetPrestartWaitPeriod() time.Duration {
 }
 
 func init() {
-	proto.RegisterType((*Room)(nil), "rook.matchaker.Room")
-	proto.RegisterType((*CommonRoom)(nil), "rook.matchaker.CommonRoom")
-	proto.RegisterType((*Mode)(nil), "rook.matchaker.Mode")
-	proto.RegisterType((*Params)(nil), "rook.matchaker.Params")
+	proto.RegisterType((*Room)(nil), "rook.matchmaker.Room")
+	proto.RegisterType((*Rooms)(nil), "rook.matchmaker.Rooms")
+	proto.RegisterType((*Mode)(nil), "rook.matchmaker.Mode")
+	proto.RegisterType((*Params)(nil), "rook.matchmaker.Params")
 }
 
 func init() { proto.RegisterFile("rook/matchmaker/matchmaker.proto", fileDescriptor_d29eb5cfff5372ca) }
 
 var fileDescriptor_d29eb5cfff5372ca = []byte{
-	// 501 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x53, 0x4d, 0x8e, 0xd3, 0x30,
-	0x18, 0xad, 0xd3, 0x4c, 0x5a, 0x0c, 0x1d, 0x09, 0xab, 0x82, 0xd0, 0x45, 0x1a, 0x75, 0x55, 0x84,
-	0x94, 0x48, 0xb0, 0x63, 0xc1, 0x62, 0x06, 0x24, 0x90, 0x40, 0x1a, 0x45, 0x20, 0x24, 0x36, 0x95,
-	0x1b, 0xbb, 0x19, 0x6b, 0xea, 0x7c, 0xc1, 0x71, 0x34, 0xf4, 0x16, 0xb3, 0xe4, 0x0a, 0x2c, 0x38,
-	0x01, 0x17, 0x98, 0xe5, 0x2c, 0x59, 0x01, 0x6a, 0x2f, 0x82, 0xe2, 0x38, 0x43, 0x01, 0xf1, 0x53,
-	0xcd, 0x26, 0xf2, 0xfb, 0xde, 0xf7, 0x9c, 0xf7, 0xfc, 0xd9, 0x38, 0x54, 0x00, 0x27, 0xb1, 0xa4,
-	0x3a, 0x3d, 0x96, 0xf4, 0x84, 0xab, 0xad, 0x65, 0x54, 0x28, 0xd0, 0x40, 0xf6, 0xeb, 0x8e, 0xc8,
-	0x94, 0xeb, 0xea, 0x68, 0x98, 0x41, 0x06, 0x86, 0x8a, 0xeb, 0x55, 0xd3, 0x35, 0x0a, 0x32, 0x80,
-	0x6c, 0xc9, 0x63, 0x83, 0xe6, 0xd5, 0x22, 0x66, 0x95, 0xa2, 0x5a, 0x40, 0x6e, 0xf9, 0xf1, 0xaf,
-	0xbc, 0x16, 0x92, 0x97, 0x9a, 0xca, 0xc2, 0x36, 0x0c, 0x8d, 0x91, 0x8c, 0x4a, 0x6e, 0x3e, 0x4d,
-	0x75, 0xf2, 0xd1, 0xc1, 0x6e, 0x02, 0x20, 0xc9, 0x5d, 0xec, 0xa5, 0x90, 0x2f, 0x44, 0xe6, 0xa3,
-	0x10, 0x4d, 0xaf, 0xdf, 0xbf, 0x19, 0x19, 0x5b, 0xa6, 0xf5, 0xd0, 0x10, 0x89, 0x6d, 0x20, 0x3e,
-	0xee, 0x15, 0x4b, 0xba, 0xe2, 0xaa, 0xf4, 0x9d, 0xb0, 0x3b, 0xbd, 0x96, 0xb4, 0xd0, 0x30, 0x3c,
-	0x67, 0x22, 0xcf, 0xfc, 0xae, 0x65, 0x1a, 0x48, 0x6e, 0x61, 0xaf, 0xa8, 0xe6, 0x4b, 0x91, 0xfa,
-	0x6e, 0x88, 0xa6, 0xfd, 0xc4, 0xa2, 0xba, 0xfe, 0xb6, 0x02, 0x55, 0x49, 0x7f, 0x2f, 0x44, 0xd3,
-	0x41, 0x62, 0x11, 0x19, 0xe1, 0x7e, 0x4a, 0x0b, 0x9a, 0x0a, 0xbd, 0xf2, 0x3d, 0xc3, 0x5c, 0x62,
-	0xf2, 0x08, 0xf7, 0x52, 0xc5, 0xa9, 0xe6, 0xcc, 0xef, 0x19, 0xaf, 0xa3, 0xa8, 0x09, 0x1f, 0xb5,
-	0xe1, 0xa3, 0x97, 0x6d, 0xf8, 0x83, 0xfe, 0xf9, 0x97, 0x71, 0xe7, 0xec, 0xeb, 0x18, 0x25, 0xad,
-	0x88, 0x3c, 0xc4, 0x7b, 0x8a, 0x53, 0xb6, 0xf2, 0xfb, 0x3b, 0xa8, 0x1b, 0xc9, 0xe4, 0x13, 0xc2,
-	0xf8, 0x10, 0xa4, 0x84, 0xdc, 0x9c, 0xda, 0x6d, 0xdc, 0x93, 0xc0, 0xf8, 0x4c, 0x30, 0x73, 0x6c,
-	0x83, 0xc4, 0xab, 0xe1, 0x33, 0xf6, 0x97, 0x33, 0xda, 0x72, 0xdf, 0xbd, 0x92, 0x7b, 0x77, 0x77,
-	0xf7, 0x15, 0x76, 0x5f, 0x00, 0xe3, 0x64, 0x1f, 0x3b, 0x97, 0x8e, 0x1d, 0xc1, 0xb6, 0x86, 0xef,
-	0xfc, 0x6b, 0xf8, 0x3f, 0x06, 0xd6, 0xfd, 0xe3, 0xc0, 0xdc, 0x9f, 0x07, 0x36, 0xf9, 0x80, 0xb0,
-	0x77, 0x44, 0x15, 0x95, 0x25, 0x79, 0x8a, 0x07, 0x0a, 0x40, 0xce, 0x96, 0x62, 0xc1, 0xcb, 0x82,
-	0xe6, 0xf6, 0xb6, 0xdd, 0xf9, 0x2d, 0xc5, 0x63, 0x7b, 0xbd, 0x9b, 0x10, 0xef, 0xeb, 0x10, 0x37,
-	0x6a, 0xe5, 0x73, 0x2b, 0x24, 0xaf, 0xf0, 0xb0, 0x50, 0x75, 0x50, 0xa5, 0x67, 0xa7, 0x54, 0xe8,
-	0x59, 0xc1, 0x95, 0x00, 0x66, 0x13, 0xfc, 0xd7, 0x86, 0xa4, 0xdd, 0xe0, 0x35, 0x15, 0xfa, 0xc8,
-	0xc8, 0x0f, 0x9e, 0x9c, 0xaf, 0x03, 0x74, 0xb1, 0x0e, 0xd0, 0xb7, 0x75, 0x80, 0xce, 0x36, 0x41,
-	0xe7, 0x62, 0x13, 0x74, 0x3e, 0x6f, 0x82, 0xce, 0x9b, 0x7b, 0x99, 0xd0, 0xc7, 0xd5, 0x3c, 0x4a,
-	0x41, 0xc6, 0xa9, 0x3c, 0xa5, 0x9a, 0xab, 0x32, 0x36, 0x8f, 0xea, 0xdd, 0xf6, 0xfb, 0xd6, 0xab,
-	0x82, 0x97, 0x73, 0xcf, 0xfc, 0xf7, 0xc1, 0xf7, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0xe4, 0x5a,
-	0x35, 0xff, 0x03, 0x00, 0x00,
+	// 510 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x53, 0xc1, 0x8e, 0xd3, 0x3c,
+	0x18, 0xac, 0x37, 0x69, 0xda, 0xfa, 0xff, 0x57, 0x80, 0x55, 0x81, 0xb7, 0x87, 0x34, 0xea, 0xa9,
+	0x08, 0x29, 0x91, 0xe0, 0xc2, 0x81, 0x03, 0x2a, 0x20, 0x2d, 0x12, 0x48, 0xab, 0x08, 0x84, 0xc4,
+	0xa5, 0x72, 0x63, 0x37, 0xb5, 0x36, 0x8e, 0x83, 0xe3, 0x68, 0xe9, 0x3b, 0x70, 0xd8, 0x23, 0xaf,
+	0xc0, 0x9b, 0xec, 0x71, 0x8f, 0x9c, 0x58, 0xd4, 0xbe, 0x08, 0x8a, 0xe3, 0xd0, 0x02, 0x42, 0xf4,
+	0x12, 0x79, 0xbe, 0x99, 0x71, 0xfc, 0xcd, 0x67, 0xc3, 0x40, 0x49, 0x79, 0x1e, 0x09, 0xa2, 0x93,
+	0x95, 0x20, 0xe7, 0x4c, 0xed, 0x2d, 0xc3, 0x42, 0x49, 0x2d, 0xd1, 0xad, 0x5a, 0x11, 0xee, 0xca,
+	0xa3, 0x61, 0x2a, 0x53, 0x69, 0xb8, 0xa8, 0x5e, 0x35, 0xb2, 0x91, 0x9f, 0x4a, 0x99, 0x66, 0x2c,
+	0x32, 0x68, 0x51, 0x2d, 0x23, 0x5a, 0x29, 0xa2, 0xb9, 0xcc, 0x2d, 0x3f, 0xfe, 0x9d, 0xd7, 0x5c,
+	0xb0, 0x52, 0x13, 0x51, 0x58, 0xc1, 0xd0, 0x9c, 0x24, 0x25, 0x82, 0x99, 0x4f, 0x53, 0x9d, 0x7c,
+	0x72, 0xa0, 0x1b, 0x4b, 0x29, 0xd0, 0x7d, 0xe8, 0x25, 0x32, 0x5f, 0xf2, 0x14, 0x83, 0x00, 0x4c,
+	0xff, 0x7b, 0x78, 0x27, 0x34, 0xe7, 0x32, 0xd2, 0x67, 0x86, 0x88, 0xad, 0x00, 0x61, 0xd8, 0x2b,
+	0x32, 0xb2, 0x66, 0xaa, 0xc4, 0x47, 0x81, 0x33, 0x1d, 0xc4, 0x2d, 0x34, 0x0c, 0xcb, 0x29, 0xcf,
+	0x53, 0xec, 0x58, 0xa6, 0x81, 0xe8, 0x2e, 0xf4, 0x8a, 0x6a, 0x91, 0xf1, 0x04, 0xbb, 0x01, 0x98,
+	0xf6, 0x63, 0x8b, 0xea, 0xfa, 0x87, 0x4a, 0xaa, 0x4a, 0xe0, 0x6e, 0x00, 0xa6, 0xc7, 0xb1, 0x45,
+	0x68, 0x04, 0xfb, 0x09, 0x29, 0x48, 0xc2, 0xf5, 0x1a, 0x7b, 0x86, 0xf9, 0x89, 0xd1, 0x3d, 0xd8,
+	0x13, 0x92, 0xb2, 0x39, 0xa7, 0xb8, 0xd7, 0x98, 0x6a, 0xf8, 0x92, 0xa2, 0x27, 0xb0, 0x97, 0x28,
+	0x46, 0x34, 0xa3, 0xb8, 0x6f, 0x9a, 0x18, 0x85, 0x4d, 0x2a, 0x61, 0x9b, 0x4a, 0xf8, 0xa6, 0x4d,
+	0x65, 0xe6, 0x5e, 0xde, 0x8c, 0xc1, 0x69, 0x27, 0x6e, 0x2d, 0xe8, 0x31, 0xec, 0x2a, 0x46, 0xe8,
+	0x1a, 0x0f, 0x0e, 0xf6, 0x36, 0x06, 0xf4, 0x14, 0x0e, 0xca, 0x64, 0xc5, 0x68, 0x95, 0x31, 0x8a,
+	0xe1, 0xc1, 0xee, 0x9d, 0x69, 0xe6, 0x41, 0xb7, 0x9e, 0xd7, 0xe4, 0x04, 0x76, 0xeb, 0x69, 0x94,
+	0xe8, 0x36, 0x74, 0x38, 0x2d, 0x31, 0x08, 0x9c, 0xa9, 0x1b, 0xd7, 0xcb, 0x09, 0x83, 0xee, 0x6b,
+	0x49, 0xd9, 0xde, 0xa0, 0x8e, 0xfe, 0x35, 0xa8, 0x5d, 0xb8, 0xce, 0x5f, 0xc3, 0x75, 0x7f, 0x0d,
+	0x77, 0xf2, 0x05, 0x40, 0xef, 0x8c, 0x28, 0x22, 0x4a, 0x74, 0x0a, 0x8f, 0x95, 0x94, 0x62, 0x9e,
+	0xf1, 0x25, 0x2b, 0x0b, 0x92, 0xdb, 0x9b, 0x71, 0xf2, 0x47, 0x6b, 0xcf, 0xed, 0x55, 0x9c, 0xf5,
+	0xaf, 0xbe, 0x8d, 0x3b, 0x9f, 0x6f, 0xc6, 0x20, 0xfe, 0xbf, 0x76, 0xbe, 0xb2, 0x46, 0xf4, 0x16,
+	0x0e, 0x0b, 0x55, 0x77, 0xaf, 0xf4, 0xfc, 0x82, 0x70, 0x3d, 0x2f, 0x98, 0xe2, 0x92, 0xda, 0x0e,
+	0x0e, 0xda, 0x10, 0xb5, 0x1b, 0xbc, 0x23, 0x5c, 0x9f, 0x19, 0xfb, 0xec, 0xc5, 0xd5, 0xc6, 0x07,
+	0xd7, 0x1b, 0x1f, 0x7c, 0xdf, 0xf8, 0xe0, 0x72, 0xeb, 0x77, 0xae, 0xb7, 0x7e, 0xe7, 0xeb, 0xd6,
+	0xef, 0xbc, 0x7f, 0x90, 0x72, 0xbd, 0xaa, 0x16, 0x61, 0x22, 0x45, 0x94, 0x88, 0x0b, 0xa2, 0x99,
+	0x2a, 0x23, 0xf3, 0x00, 0x3e, 0xee, 0x3f, 0x46, 0xbd, 0x2e, 0x58, 0xb9, 0xf0, 0xcc, 0x7f, 0x1f,
+	0xfd, 0x08, 0x00, 0x00, 0xff, 0xff, 0xcb, 0xf7, 0xfb, 0xac, 0xac, 0x03, 0x00, 0x00,
 }
 
 func (m *Room) Marshal() (dAtA []byte, err error) {
@@ -404,22 +421,20 @@ func (m *Room) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	n1, err1 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Ready, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.Ready):])
-	if err1 != nil {
-		return 0, err1
+	if m.Time != nil {
+		{
+			size := m.Time.Size()
+			i -= size
+			if _, err := m.Time.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
 	}
-	i -= n1
-	i = encodeVarintMatchmaker(dAtA, i, uint64(n1))
-	i--
-	dAtA[i] = 0x42
-	n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Created, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.Created):])
-	if err2 != nil {
-		return 0, err2
+	if m.ModeId != 0 {
+		i = encodeVarintMatchmaker(dAtA, i, uint64(m.ModeId))
+		i--
+		dAtA[i] = 0x38
 	}
-	i -= n2
-	i = encodeVarintMatchmaker(dAtA, i, uint64(n2))
-	i--
-	dAtA[i] = 0x3a
 	if m.Capacity != 0 {
 		i = encodeVarintMatchmaker(dAtA, i, uint64(m.Capacity))
 		i--
@@ -473,7 +488,64 @@ func (m *Room) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *CommonRoom) Marshal() (dAtA []byte, err error) {
+func (m *Room_Created) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Room_Created) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Created != nil {
+		n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Created, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.Created):])
+		if err2 != nil {
+			return 0, err2
+		}
+		i -= n2
+		i = encodeVarintMatchmaker(dAtA, i, uint64(n2))
+		i--
+		dAtA[i] = 0x42
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Room_Ready) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Room_Ready) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Ready != nil {
+		n3, err3 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Ready, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.Ready):])
+		if err3 != nil {
+			return 0, err3
+		}
+		i -= n3
+		i = encodeVarintMatchmaker(dAtA, i, uint64(n3))
+		i--
+		dAtA[i] = 0x4a
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Room_Scheduled) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Room_Scheduled) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	if m.Scheduled != nil {
+		n4, err4 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Scheduled, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.Scheduled):])
+		if err4 != nil {
+			return 0, err4
+		}
+		i -= n4
+		i = encodeVarintMatchmaker(dAtA, i, uint64(n4))
+		i--
+		dAtA[i] = 0x52
+	}
+	return len(dAtA) - i, nil
+}
+func (m *Rooms) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -483,45 +555,33 @@ func (m *CommonRoom) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *CommonRoom) MarshalTo(dAtA []byte) (int, error) {
+func (m *Rooms) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *CommonRoom) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *Rooms) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	n4, err4 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Ready, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.Ready):])
-	if err4 != nil {
-		return 0, err4
-	}
-	i -= n4
-	i = encodeVarintMatchmaker(dAtA, i, uint64(n4))
-	i--
-	dAtA[i] = 0x22
-	n5, err5 := github_com_gogo_protobuf_types.StdTimeMarshalTo(m.Created, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(m.Created):])
-	if err5 != nil {
-		return 0, err5
-	}
-	i -= n5
-	i = encodeVarintMatchmaker(dAtA, i, uint64(n5))
-	i--
-	dAtA[i] = 0x1a
-	if len(m.Players) > 0 {
-		for iNdEx := len(m.Players) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.Players[iNdEx])
-			copy(dAtA[i:], m.Players[iNdEx])
-			i = encodeVarintMatchmaker(dAtA, i, uint64(len(m.Players[iNdEx])))
-			i--
-			dAtA[i] = 0x12
+	if len(m.Ids) > 0 {
+		dAtA6 := make([]byte, len(m.Ids)*10)
+		var j5 int
+		for _, num := range m.Ids {
+			for num >= 1<<7 {
+				dAtA6[j5] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j5++
+			}
+			dAtA6[j5] = uint8(num)
+			j5++
 		}
-	}
-	if m.ModeId != 0 {
-		i = encodeVarintMatchmaker(dAtA, i, uint64(m.ModeId))
+		i -= j5
+		copy(dAtA[i:], dAtA6[:j5])
+		i = encodeVarintMatchmaker(dAtA, i, uint64(j5))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -568,11 +628,6 @@ func (m *Mode) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if m.Id != 0 {
-		i = encodeVarintMatchmaker(dAtA, i, uint64(m.Id))
-		i--
-		dAtA[i] = 0x8
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -596,20 +651,20 @@ func (m *Params) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	n7, err7 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.PrestartWaitPeriod, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.PrestartWaitPeriod):])
-	if err7 != nil {
-		return 0, err7
-	}
-	i -= n7
-	i = encodeVarintMatchmaker(dAtA, i, uint64(n7))
-	i--
-	dAtA[i] = 0x12
-	n8, err8 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.RoomLifespan, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.RoomLifespan):])
+	n8, err8 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.PrestartWaitPeriod, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.PrestartWaitPeriod):])
 	if err8 != nil {
 		return 0, err8
 	}
 	i -= n8
 	i = encodeVarintMatchmaker(dAtA, i, uint64(n8))
+	i--
+	dAtA[i] = 0x12
+	n9, err9 := github_com_gogo_protobuf_types.StdDurationMarshalTo(m.RoomLifespan, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdDuration(m.RoomLifespan):])
+	if err9 != nil {
+		return 0, err9
+	}
+	i -= n9
+	i = encodeVarintMatchmaker(dAtA, i, uint64(n9))
 	i--
 	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
@@ -657,32 +712,64 @@ func (m *Room) Size() (n int) {
 	if m.Capacity != 0 {
 		n += 1 + sovMatchmaker(uint64(m.Capacity))
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Created)
-	n += 1 + l + sovMatchmaker(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Ready)
-	n += 1 + l + sovMatchmaker(uint64(l))
+	if m.ModeId != 0 {
+		n += 1 + sovMatchmaker(uint64(m.ModeId))
+	}
+	if m.Time != nil {
+		n += m.Time.Size()
+	}
 	return n
 }
 
-func (m *CommonRoom) Size() (n int) {
+func (m *Room_Created) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.ModeId != 0 {
-		n += 1 + sovMatchmaker(uint64(m.ModeId))
+	if m.Created != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Created)
+		n += 1 + l + sovMatchmaker(uint64(l))
 	}
-	if len(m.Players) > 0 {
-		for _, s := range m.Players {
-			l = len(s)
-			n += 1 + l + sovMatchmaker(uint64(l))
+	return n
+}
+func (m *Room_Ready) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Ready != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Ready)
+		n += 1 + l + sovMatchmaker(uint64(l))
+	}
+	return n
+}
+func (m *Room_Scheduled) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Scheduled != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Scheduled)
+		n += 1 + l + sovMatchmaker(uint64(l))
+	}
+	return n
+}
+func (m *Rooms) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Ids) > 0 {
+		l = 0
+		for _, e := range m.Ids {
+			l += sovMatchmaker(uint64(e))
 		}
+		n += 1 + sovMatchmaker(uint64(l)) + l
 	}
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Created)
-	n += 1 + l + sovMatchmaker(uint64(l))
-	l = github_com_gogo_protobuf_types.SizeOfStdTime(m.Ready)
-	n += 1 + l + sovMatchmaker(uint64(l))
 	return n
 }
 
@@ -692,9 +779,6 @@ func (m *Mode) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovMatchmaker(uint64(m.Id))
-	}
 	if m.Config != nil {
 		l = m.Config.Size()
 		n += 1 + l + sovMatchmaker(uint64(l))
@@ -915,6 +999,25 @@ func (m *Room) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ModeId", wireType)
+			}
+			m.ModeId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMatchmaker
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ModeId |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 8:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Created", wireType)
 			}
@@ -943,11 +1046,13 @@ func (m *Room) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Created, dAtA[iNdEx:postIndex]); err != nil {
+			v := new(time.Time)
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(v, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			m.Time = &Room_Created{v}
 			iNdEx = postIndex
-		case 8:
+		case 9:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Ready", wireType)
 			}
@@ -976,9 +1081,46 @@ func (m *Room) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Ready, dAtA[iNdEx:postIndex]); err != nil {
+			v := new(time.Time)
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(v, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			m.Time = &Room_Ready{v}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Scheduled", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMatchmaker
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMatchmaker
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMatchmaker
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			v := new(time.Time)
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(v, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			m.Time = &Room_Scheduled{v}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1001,7 +1143,7 @@ func (m *Room) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *CommonRoom) Unmarshal(dAtA []byte) error {
+func (m *Rooms) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1024,129 +1166,88 @@ func (m *CommonRoom) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: CommonRoom: wiretype end group for non-group")
+			return fmt.Errorf("proto: Rooms: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: CommonRoom: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Rooms: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ModeId", wireType)
-			}
-			m.ModeId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMatchmaker
+			if wireType == 0 {
+				var v uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowMatchmaker
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
 				}
-				if iNdEx >= l {
+				m.Ids = append(m.Ids, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowMatchmaker
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthMatchmaker
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthMatchmaker
+				}
+				if postIndex > l {
 					return io.ErrUnexpectedEOF
 				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.ModeId |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
+				var elementCount int
+				var count int
+				for _, integer := range dAtA[iNdEx:postIndex] {
+					if integer < 128 {
+						count++
+					}
 				}
-			}
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Players", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMatchmaker
+				elementCount = count
+				if elementCount != 0 && len(m.Ids) == 0 {
+					m.Ids = make([]uint64, 0, elementCount)
 				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
+				for iNdEx < postIndex {
+					var v uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowMatchmaker
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Ids = append(m.Ids, v)
 				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Ids", wireType)
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMatchmaker
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMatchmaker
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Players = append(m.Players, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Created", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMatchmaker
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthMatchmaker
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthMatchmaker
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Created, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Ready", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMatchmaker
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthMatchmaker
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthMatchmaker
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(&m.Ready, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipMatchmaker(dAtA[iNdEx:])
@@ -1197,25 +1298,6 @@ func (m *Mode) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: Mode: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
-			}
-			m.Id = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMatchmaker
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Id |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Config", wireType)

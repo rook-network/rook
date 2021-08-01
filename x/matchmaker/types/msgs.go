@@ -1,23 +1,29 @@
 package types
 
 import (
-	"fmt"
+	"errors"
 
-	game "github.com/cmwaters/rook/x/game/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 var _ sdk.Msg = &MsgHost{}
 
-func NewMsgHost(creator string, invitees []string, config *game.Config, public bool, quorum, capacity uint32) *MsgHost {
+func NewMsgHost(creator string, invitees []string, mode *Mode, public bool) *MsgHost {
 	return &MsgHost{
 		Creator:  creator,
 		Invitees: invitees,
-		Config:   config,
+		Game:     &MsgHost_Mode{Mode: mode},
 		Public:   public,
-		Quorum:   quorum,
-		Capacity: capacity,
+	}
+}
+
+func NewMsgHostByModeID(creator string, invitees []string, modeID uint32, public bool) *MsgHost {
+	return &MsgHost{
+		Creator:  creator,
+		Invitees: invitees,
+		Game:     &MsgHost_ModeId{ModeId: modeID},
+		Public:   public,
 	}
 }
 
@@ -54,20 +60,17 @@ func (msg *MsgHost) ValidateBasic() error {
 		}
 	}
 
-	if err := msg.Config.ValidateBasic(int(msg.Capacity)); err != nil {
-		return err
-	}
-
-	if msg.Capacity < 2 {
-		return fmt.Errorf("capacity must be at least two got %d", msg.Capacity)
-	}
-
-	if msg.Quorum < 2 {
-		return fmt.Errorf("quorum must be at least two got %d", msg.Quorum)
-	}
-
-	if msg.Quorum > msg.Capacity {
-		return fmt.Errorf("quorum (%d) must be less than equat to capacity (%d)", msg.Quorum, msg.Capacity)
+	switch m := msg.Game.(type) {
+	case *MsgHost_Mode:
+		if err := m.Mode.ValidateBasic(); err != nil {
+			return err
+		}
+	case *MsgHost_ModeId:
+		if m.ModeId == 0 {
+			return errors.New("modeID must be non zero")
+		}
+	default:
+		return errors.New("unknown game type")
 	}
 
 	return nil
@@ -146,6 +149,123 @@ func (msg *MsgFind) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s): %w", msg.Creator, err)
+	}
+
+	return nil
+}
+
+var _ sdk.Msg = &MsgLeave{}
+
+func NewMsgLeave(creator string, roomID uint64) *MsgLeave {
+	return &MsgLeave{
+		Creator: creator,
+		RoomId:  roomID,
+	}
+}
+
+func (msg *MsgLeave) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgLeave) Type() string {
+	return "Leave"
+}
+
+func (msg *MsgLeave) GetSigners() []sdk.AccAddress {
+	signer, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{signer}
+}
+
+func (msg *MsgLeave) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgLeave) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s): %w", msg.Creator, err)
+	}
+
+	return nil
+}
+
+var _ sdk.Msg = &MsgAddMode{}
+
+func NewMsgAddMode(authority string, mode Mode) *MsgAddMode {
+	return &MsgAddMode{
+		Authority: authority,
+		Mode:      mode,
+	}
+}
+
+func (msg *MsgAddMode) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgAddMode) Type() string {
+	return "AddMode"
+}
+
+func (msg *MsgAddMode) GetSigners() []sdk.AccAddress {
+	signer, err := sdk.AccAddressFromBech32(msg.Authority)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{signer}
+}
+
+func (msg *MsgAddMode) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgAddMode) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Authority)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s): %w", msg.Authority, err)
+	}
+
+	return msg.Mode.ValidateBasic()
+}
+
+var _ sdk.Msg = &MsgRemoveMode{}
+
+func NewMsgRemoveMode(authority string, mode uint32) *MsgRemoveMode {
+	return &MsgRemoveMode{
+		Authority: authority,
+		Id:        mode,
+	}
+}
+
+func (msg *MsgRemoveMode) Route() string {
+	return RouterKey
+}
+
+func (msg *MsgRemoveMode) Type() string {
+	return "RemoveMode"
+}
+
+func (msg *MsgRemoveMode) GetSigners() []sdk.AccAddress {
+	signer, err := sdk.AccAddressFromBech32(msg.Authority)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{signer}
+}
+
+func (msg *MsgRemoveMode) GetSignBytes() []byte {
+	bz := ModuleCdc.MustMarshalJSON(msg)
+	return sdk.MustSortJSON(bz)
+}
+
+func (msg *MsgRemoveMode) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Authority)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s): %w", msg.Authority, err)
 	}
 
 	return nil

@@ -116,94 +116,6 @@ func (m *QueryGetRoomResponse) GetRoom() *Room {
 	return nil
 }
 
-type QueryGetPendingRequest struct {
-	Player string `protobuf:"bytes,1,opt,name=player,proto3" json:"player,omitempty"`
-}
-
-func (m *QueryGetPendingRequest) Reset()         { *m = QueryGetPendingRequest{} }
-func (m *QueryGetPendingRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetPendingRequest) ProtoMessage()    {}
-func (*QueryGetPendingRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9f43b8ebf9d04690, []int{2}
-}
-func (m *QueryGetPendingRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryGetPendingRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryGetPendingRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryGetPendingRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetPendingRequest.Merge(m, src)
-}
-func (m *QueryGetPendingRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryGetPendingRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetPendingRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryGetPendingRequest proto.InternalMessageInfo
-
-func (m *QueryGetPendingRequest) GetPlayer() string {
-	if m != nil {
-		return m.Player
-	}
-	return ""
-}
-
-type QueryGetPendingResponse struct {
-	Rooms []*Room `protobuf:"bytes,1,rep,name=rooms,proto3" json:"rooms,omitempty"`
-}
-
-func (m *QueryGetPendingResponse) Reset()         { *m = QueryGetPendingResponse{} }
-func (m *QueryGetPendingResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetPendingResponse) ProtoMessage()    {}
-func (*QueryGetPendingResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9f43b8ebf9d04690, []int{3}
-}
-func (m *QueryGetPendingResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryGetPendingResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryGetPendingResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryGetPendingResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetPendingResponse.Merge(m, src)
-}
-func (m *QueryGetPendingResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryGetPendingResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetPendingResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryGetPendingResponse proto.InternalMessageInfo
-
-func (m *QueryGetPendingResponse) GetRooms() []*Room {
-	if m != nil {
-		return m.Rooms
-	}
-	return nil
-}
-
 type QueryGetInvitationsRequest struct {
 	Player string `protobuf:"bytes,1,opt,name=player,proto3" json:"player,omitempty"`
 }
@@ -212,7 +124,7 @@ func (m *QueryGetInvitationsRequest) Reset()         { *m = QueryGetInvitationsR
 func (m *QueryGetInvitationsRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryGetInvitationsRequest) ProtoMessage()    {}
 func (*QueryGetInvitationsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9f43b8ebf9d04690, []int{4}
+	return fileDescriptor_9f43b8ebf9d04690, []int{2}
 }
 func (m *QueryGetInvitationsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -249,14 +161,14 @@ func (m *QueryGetInvitationsRequest) GetPlayer() string {
 }
 
 type QueryGetInvitationsResponse struct {
-	Rooms []*Room `protobuf:"bytes,1,rep,name=rooms,proto3" json:"rooms,omitempty"`
+	Rooms map[uint64]*Room `protobuf:"bytes,1,rep,name=rooms,proto3" json:"rooms,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (m *QueryGetInvitationsResponse) Reset()         { *m = QueryGetInvitationsResponse{} }
 func (m *QueryGetInvitationsResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryGetInvitationsResponse) ProtoMessage()    {}
 func (*QueryGetInvitationsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9f43b8ebf9d04690, []int{5}
+	return fileDescriptor_9f43b8ebf9d04690, []int{3}
 }
 func (m *QueryGetInvitationsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -285,7 +197,7 @@ func (m *QueryGetInvitationsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryGetInvitationsResponse proto.InternalMessageInfo
 
-func (m *QueryGetInvitationsResponse) GetRooms() []*Room {
+func (m *QueryGetInvitationsResponse) GetRooms() map[uint64]*Room {
 	if m != nil {
 		return m.Rooms
 	}
@@ -299,7 +211,7 @@ func (m *QueryGetModesRequest) Reset()         { *m = QueryGetModesRequest{} }
 func (m *QueryGetModesRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryGetModesRequest) ProtoMessage()    {}
 func (*QueryGetModesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9f43b8ebf9d04690, []int{6}
+	return fileDescriptor_9f43b8ebf9d04690, []int{4}
 }
 func (m *QueryGetModesRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -329,14 +241,14 @@ func (m *QueryGetModesRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_QueryGetModesRequest proto.InternalMessageInfo
 
 type QueryGetModesResponse struct {
-	Modes []*Mode `protobuf:"bytes,1,rep,name=modes,proto3" json:"modes,omitempty"`
+	Modes map[uint32]*Mode `protobuf:"bytes,1,rep,name=modes,proto3" json:"modes,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
 func (m *QueryGetModesResponse) Reset()         { *m = QueryGetModesResponse{} }
 func (m *QueryGetModesResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryGetModesResponse) ProtoMessage()    {}
 func (*QueryGetModesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9f43b8ebf9d04690, []int{7}
+	return fileDescriptor_9f43b8ebf9d04690, []int{5}
 }
 func (m *QueryGetModesResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -365,7 +277,7 @@ func (m *QueryGetModesResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryGetModesResponse proto.InternalMessageInfo
 
-func (m *QueryGetModesResponse) GetModes() []*Mode {
+func (m *QueryGetModesResponse) GetModes() map[uint32]*Mode {
 	if m != nil {
 		return m.Modes
 	}
@@ -379,7 +291,7 @@ func (m *QueryGetParamsRequest) Reset()         { *m = QueryGetParamsRequest{} }
 func (m *QueryGetParamsRequest) String() string { return proto.CompactTextString(m) }
 func (*QueryGetParamsRequest) ProtoMessage()    {}
 func (*QueryGetParamsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9f43b8ebf9d04690, []int{8}
+	return fileDescriptor_9f43b8ebf9d04690, []int{6}
 }
 func (m *QueryGetParamsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -416,7 +328,7 @@ func (m *QueryGetParamsResponse) Reset()         { *m = QueryGetParamsResponse{}
 func (m *QueryGetParamsResponse) String() string { return proto.CompactTextString(m) }
 func (*QueryGetParamsResponse) ProtoMessage()    {}
 func (*QueryGetParamsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9f43b8ebf9d04690, []int{9}
+	return fileDescriptor_9f43b8ebf9d04690, []int{7}
 }
 func (m *QueryGetParamsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -453,55 +365,57 @@ func (m *QueryGetParamsResponse) GetParams() *Params {
 }
 
 func init() {
-	proto.RegisterType((*QueryGetRoomRequest)(nil), "rook.matchaker.QueryGetRoomRequest")
-	proto.RegisterType((*QueryGetRoomResponse)(nil), "rook.matchaker.QueryGetRoomResponse")
-	proto.RegisterType((*QueryGetPendingRequest)(nil), "rook.matchaker.QueryGetPendingRequest")
-	proto.RegisterType((*QueryGetPendingResponse)(nil), "rook.matchaker.QueryGetPendingResponse")
-	proto.RegisterType((*QueryGetInvitationsRequest)(nil), "rook.matchaker.QueryGetInvitationsRequest")
-	proto.RegisterType((*QueryGetInvitationsResponse)(nil), "rook.matchaker.QueryGetInvitationsResponse")
-	proto.RegisterType((*QueryGetModesRequest)(nil), "rook.matchaker.QueryGetModesRequest")
-	proto.RegisterType((*QueryGetModesResponse)(nil), "rook.matchaker.QueryGetModesResponse")
-	proto.RegisterType((*QueryGetParamsRequest)(nil), "rook.matchaker.QueryGetParamsRequest")
-	proto.RegisterType((*QueryGetParamsResponse)(nil), "rook.matchaker.QueryGetParamsResponse")
+	proto.RegisterType((*QueryGetRoomRequest)(nil), "rook.matchmaker.QueryGetRoomRequest")
+	proto.RegisterType((*QueryGetRoomResponse)(nil), "rook.matchmaker.QueryGetRoomResponse")
+	proto.RegisterType((*QueryGetInvitationsRequest)(nil), "rook.matchmaker.QueryGetInvitationsRequest")
+	proto.RegisterType((*QueryGetInvitationsResponse)(nil), "rook.matchmaker.QueryGetInvitationsResponse")
+	proto.RegisterMapType((map[uint64]*Room)(nil), "rook.matchmaker.QueryGetInvitationsResponse.RoomsEntry")
+	proto.RegisterType((*QueryGetModesRequest)(nil), "rook.matchmaker.QueryGetModesRequest")
+	proto.RegisterType((*QueryGetModesResponse)(nil), "rook.matchmaker.QueryGetModesResponse")
+	proto.RegisterMapType((map[uint32]*Mode)(nil), "rook.matchmaker.QueryGetModesResponse.ModesEntry")
+	proto.RegisterType((*QueryGetParamsRequest)(nil), "rook.matchmaker.QueryGetParamsRequest")
+	proto.RegisterType((*QueryGetParamsResponse)(nil), "rook.matchmaker.QueryGetParamsResponse")
 }
 
 func init() { proto.RegisterFile("rook/matchmaker/query.proto", fileDescriptor_9f43b8ebf9d04690) }
 
 var fileDescriptor_9f43b8ebf9d04690 = []byte{
-	// 526 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x94, 0x41, 0x6f, 0xd3, 0x30,
-	0x14, 0xc7, 0x9b, 0xd2, 0x16, 0xf1, 0x26, 0x4d, 0xe2, 0xad, 0x6b, 0x87, 0x37, 0xa2, 0xca, 0x6c,
-	0xa3, 0xda, 0xa4, 0x04, 0x0d, 0x3e, 0x00, 0x02, 0x4d, 0xb0, 0x03, 0xd2, 0xc8, 0x91, 0x9b, 0xd7,
-	0x58, 0x9d, 0xb5, 0x25, 0xce, 0x12, 0x17, 0xa8, 0xa6, 0x49, 0x88, 0x4f, 0x30, 0x89, 0x2f, 0xc5,
-	0x71, 0x12, 0x17, 0x8e, 0xa8, 0xe5, 0x2b, 0x70, 0x47, 0x71, 0x5c, 0x92, 0x74, 0x0d, 0x45, 0xdc,
-	0x5a, 0xfb, 0xe7, 0xdf, 0xff, 0xe5, 0xf9, 0xc9, 0xb0, 0x19, 0x4b, 0x79, 0xe6, 0x06, 0x4c, 0x0d,
-	0x4e, 0x03, 0x76, 0xc6, 0x63, 0xf7, 0x62, 0xc4, 0xe3, 0xb1, 0x13, 0xc5, 0x52, 0x49, 0x5c, 0x4d,
-	0x37, 0x1d, 0xbd, 0x99, 0xee, 0x91, 0xad, 0xa1, 0x94, 0xc3, 0x73, 0xee, 0xb2, 0x48, 0xb8, 0x2c,
-	0x0c, 0xa5, 0x62, 0x4a, 0xc8, 0x30, 0xc9, 0x68, 0xd2, 0x9b, 0x57, 0xe5, 0x3f, 0x33, 0x82, 0xee,
-	0xc0, 0xda, 0xdb, 0x54, 0xff, 0x8a, 0x2b, 0x4f, 0xca, 0xc0, 0xe3, 0x17, 0x23, 0x9e, 0x28, 0x5c,
-	0x85, 0xba, 0xf0, 0x37, 0xac, 0x9e, 0xd5, 0x6f, 0x78, 0x75, 0xe1, 0xd3, 0xe7, 0xd0, 0x2e, 0x63,
-	0x49, 0x24, 0xc3, 0x84, 0x63, 0x1f, 0x1a, 0xb1, 0x94, 0x81, 0x26, 0x57, 0x0e, 0xda, 0x4e, 0xb9,
-	0x3a, 0x47, 0xb3, 0x9a, 0xa0, 0x4f, 0xa0, 0x33, 0x33, 0x1c, 0xf3, 0xd0, 0x17, 0xe1, 0x70, 0x96,
-	0xd5, 0x81, 0x56, 0x74, 0xce, 0xc6, 0x3c, 0xd6, 0x96, 0x7b, 0x9e, 0xf9, 0x47, 0x0f, 0xa1, 0x7b,
-	0xeb, 0x84, 0x89, 0xdd, 0x83, 0x66, 0x2a, 0x4d, 0x36, 0xac, 0xde, 0x9d, 0xca, 0xdc, 0x0c, 0xa1,
-	0xcf, 0x80, 0xcc, 0x34, 0x47, 0xe1, 0x7b, 0x61, 0x1a, 0xb4, 0x2c, 0xfc, 0x08, 0x36, 0x17, 0x9e,
-	0xfa, 0x8f, 0x02, 0x3a, 0x79, 0xef, 0xde, 0x48, 0x9f, 0xcf, 0xa2, 0xe9, 0x4b, 0x58, 0x9f, 0x5b,
-	0xcf, 0xe5, 0x41, 0xba, 0x50, 0x25, 0x4f, 0x69, 0x2f, 0x43, 0x68, 0x37, 0x97, 0x1c, 0xb3, 0x98,
-	0x05, 0x7f, 0xec, 0xaf, 0x0b, 0xfd, 0x36, 0x1b, 0x46, 0xef, 0x40, 0x2b, 0xd2, 0x2b, 0xe6, 0xd6,
-	0x3a, 0xf3, 0x7e, 0xc3, 0x1b, 0xea, 0xe0, 0x57, 0x03, 0x9a, 0x5a, 0x85, 0x11, 0x34, 0xd2, 0x0f,
-	0xc3, 0x47, 0xf3, 0x27, 0x16, 0x8c, 0x10, 0xd9, 0xfe, 0x3b, 0x94, 0x15, 0x43, 0x1f, 0x7e, 0xfe,
-	0xf6, 0xf3, 0x4b, 0xbd, 0x8b, 0xeb, 0xc5, 0x29, 0x4d, 0xfb, 0xe6, 0x5e, 0x0a, 0xff, 0x0a, 0x3f,
-	0x59, 0x70, 0xd7, 0x5c, 0x3e, 0xee, 0x56, 0x09, 0xcb, 0xf3, 0x44, 0x1e, 0x2f, 0xe5, 0x4c, 0xf6,
-	0xb6, 0xce, 0xb6, 0x71, 0xab, 0x98, 0x1d, 0x65, 0x90, 0x7b, 0x99, 0x0d, 0xc2, 0x15, 0x5e, 0x5b,
-	0xb0, 0x52, 0x18, 0x01, 0xdc, 0xab, 0xd2, 0xdf, 0x9e, 0x2e, 0xb2, 0xff, 0x4f, 0xac, 0x29, 0xa7,
-	0xaf, 0xcb, 0xa1, 0xd8, 0x2b, 0x96, 0x23, 0x72, 0x30, 0x2f, 0x49, 0x42, 0x53, 0x4f, 0x0c, 0x56,
-	0xf6, 0xb8, 0x38, 0x68, 0x64, 0x67, 0x09, 0x65, 0xf2, 0x1f, 0xe8, 0xfc, 0x35, 0xbc, 0x5f, 0x7a,
-	0x30, 0x74, 0x4e, 0x02, 0xad, 0x6c, 0x28, 0xb0, 0xd2, 0x55, 0x9a, 0x3e, 0xb2, 0xbb, 0x0c, 0x33,
-	0x99, 0x44, 0x67, 0xb6, 0x11, 0x4b, 0x57, 0xa0, 0x99, 0x17, 0x87, 0x5f, 0x27, 0xb6, 0x75, 0x33,
-	0xb1, 0xad, 0x1f, 0x13, 0xdb, 0xba, 0x9e, 0xda, 0xb5, 0x9b, 0xa9, 0x5d, 0xfb, 0x3e, 0xb5, 0x6b,
-	0xef, 0xf6, 0x87, 0x42, 0x9d, 0x8e, 0x4e, 0x9c, 0x81, 0x0c, 0xdc, 0x41, 0xf0, 0x81, 0x29, 0x1e,
-	0x27, 0xae, 0x7e, 0xea, 0x3e, 0x16, 0x3d, 0x6a, 0x1c, 0xf1, 0xe4, 0xa4, 0xa5, 0x1f, 0xba, 0xa7,
-	0xbf, 0x03, 0x00, 0x00, 0xff, 0xff, 0xfb, 0xa9, 0xfa, 0xbd, 0x57, 0x05, 0x00, 0x00,
+	// 549 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xcb, 0x6e, 0x13, 0x31,
+	0x14, 0xad, 0xf3, 0x92, 0xb8, 0x11, 0x2f, 0xb7, 0x79, 0x30, 0x85, 0x51, 0x64, 0x11, 0x08, 0x0a,
+	0x9a, 0x11, 0x01, 0x09, 0xc4, 0x0e, 0xa4, 0xaa, 0xea, 0xa2, 0x02, 0xb2, 0x64, 0xe7, 0x26, 0x56,
+	0x3a, 0x4a, 0x66, 0x3c, 0xf1, 0x38, 0x85, 0x51, 0xd5, 0x0d, 0x5f, 0x80, 0xe0, 0x4b, 0xf8, 0x00,
+	0xf6, 0x2c, 0x2b, 0xb1, 0x61, 0x89, 0x12, 0xbe, 0x82, 0x15, 0x1a, 0xdb, 0x61, 0x26, 0x29, 0x69,
+	0xc2, 0x6e, 0xc6, 0x3e, 0xf7, 0xdc, 0x73, 0x7c, 0x8f, 0x0d, 0xbb, 0x82, 0xf3, 0xa1, 0xeb, 0x53,
+	0xd9, 0x3b, 0xf6, 0xe9, 0x90, 0x09, 0x77, 0x3c, 0x61, 0x22, 0x76, 0x42, 0xc1, 0x25, 0xc7, 0xd7,
+	0x93, 0x4d, 0x27, 0xdd, 0xb4, 0x6e, 0x0f, 0x38, 0x1f, 0x8c, 0x98, 0x4b, 0x43, 0xcf, 0xa5, 0x41,
+	0xc0, 0x25, 0x95, 0x1e, 0x0f, 0x22, 0x0d, 0xb7, 0x1a, 0xcb, 0x5c, 0xe9, 0xa7, 0x46, 0x90, 0x26,
+	0x6c, 0xbf, 0x49, 0xf8, 0xf7, 0x99, 0xec, 0x72, 0xee, 0x77, 0xd9, 0x78, 0xc2, 0x22, 0x89, 0xaf,
+	0x41, 0xce, 0xeb, 0xd7, 0x51, 0x03, 0xb5, 0x0a, 0xdd, 0x9c, 0xd7, 0x27, 0x2f, 0x60, 0x67, 0x11,
+	0x16, 0x85, 0x3c, 0x88, 0x18, 0x7e, 0x00, 0x05, 0xc1, 0xb9, 0xaf, 0x90, 0xe5, 0x4e, 0xc5, 0x59,
+	0x92, 0xe7, 0x28, 0xb0, 0x82, 0x90, 0x27, 0x60, 0xcd, 0x29, 0x0e, 0x82, 0x13, 0xcf, 0x08, 0x9d,
+	0x37, 0xac, 0x42, 0x29, 0x1c, 0xd1, 0x98, 0x09, 0x45, 0x75, 0xa5, 0x6b, 0xfe, 0xc8, 0x57, 0x04,
+	0xbb, 0xff, 0x2c, 0x33, 0x02, 0x0e, 0xa1, 0x98, 0xb0, 0x47, 0x75, 0xd4, 0xc8, 0xb7, 0xca, 0x9d,
+	0xa7, 0x17, 0x14, 0x5c, 0x52, 0xac, 0xd4, 0x45, 0x7b, 0x81, 0x14, 0x71, 0x57, 0xb3, 0x58, 0xaf,
+	0x00, 0xd2, 0x45, 0x7c, 0x03, 0xf2, 0x43, 0x16, 0x9b, 0x63, 0x48, 0x3e, 0x71, 0x1b, 0x8a, 0x27,
+	0x74, 0x34, 0x61, 0xf5, 0xdc, 0x65, 0x86, 0x35, 0xe6, 0x79, 0xee, 0x19, 0x22, 0xd5, 0xf4, 0xe0,
+	0x0e, 0x79, 0x9f, 0xcd, 0xfd, 0x92, 0x2f, 0x08, 0x2a, 0x4b, 0x1b, 0xc6, 0xd1, 0x3e, 0x14, 0xfd,
+	0x64, 0xc1, 0x38, 0x7a, 0xb4, 0xd2, 0xd1, 0x42, 0x99, 0xa3, 0xfe, 0x8c, 0x17, 0x55, 0x9f, 0x78,
+	0x49, 0x17, 0xb3, 0x5e, 0xae, 0x6e, 0xe8, 0x25, 0xa9, 0xce, 0x7a, 0xa9, 0xa5, 0x92, 0x5f, 0x53,
+	0x41, 0xfd, 0xbf, 0x66, 0x0e, 0xa0, 0xba, 0xbc, 0x61, 0xcc, 0xb8, 0x50, 0x0a, 0xd5, 0x8a, 0x49,
+	0x48, 0xed, 0x42, 0x13, 0x53, 0x60, 0x60, 0x9d, 0xdf, 0x79, 0x28, 0x2a, 0x2e, 0x2c, 0xa0, 0x90,
+	0x1c, 0x26, 0xbe, 0xbb, 0xf2, 0x00, 0x32, 0x81, 0xb5, 0x9a, 0x6b, 0x50, 0x5a, 0x0f, 0xb9, 0xf3,
+	0xe1, 0xfb, 0xaf, 0xcf, 0xb9, 0x1a, 0xae, 0x64, 0x2f, 0x45, 0x32, 0x7a, 0xf7, 0xd4, 0xeb, 0x9f,
+	0xe1, 0x4f, 0x08, 0xca, 0x99, 0xa0, 0xe0, 0xf6, 0x66, 0x71, 0xd2, 0x12, 0x1e, 0xfe, 0x4f, 0xf6,
+	0x48, 0x4b, 0x29, 0x21, 0xb8, 0x91, 0x55, 0xe2, 0xa5, 0x40, 0xf7, 0x54, 0xdf, 0x80, 0x33, 0x3c,
+	0x86, 0xa2, 0x9a, 0x23, 0x6e, 0xae, 0x8b, 0x82, 0xd6, 0x71, 0x6f, 0xb3, 0xc4, 0x90, 0x5b, 0x4a,
+	0xc1, 0x36, 0xbe, 0xb9, 0xf0, 0x40, 0xa8, 0x4e, 0x13, 0x28, 0xe9, 0xb9, 0xe0, 0xd5, 0x64, 0x0b,
+	0x11, 0xb0, 0xee, 0xaf, 0xc5, 0x99, 0xae, 0x96, 0xea, 0xba, 0x83, 0x71, 0xb6, 0xab, 0x1e, 0xfe,
+	0xcb, 0xbd, 0x6f, 0x53, 0x1b, 0x9d, 0x4f, 0x6d, 0xf4, 0x73, 0x6a, 0xa3, 0x8f, 0x33, 0x7b, 0xeb,
+	0x7c, 0x66, 0x6f, 0xfd, 0x98, 0xd9, 0x5b, 0x6f, 0xdb, 0x03, 0x4f, 0x1e, 0x4f, 0x8e, 0x9c, 0x1e,
+	0xf7, 0xdd, 0x9e, 0xff, 0x8e, 0x4a, 0x26, 0x22, 0x57, 0x3d, 0x6e, 0xef, 0xb3, 0x3c, 0x32, 0x0e,
+	0x59, 0x74, 0x54, 0x52, 0x4f, 0xdb, 0xe3, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x28, 0xff, 0x88,
+	0x78, 0x4a, 0x05, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -516,11 +430,13 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
-	// this line is used by starport scaffolding # 2
+	// Room returns the current state of a specific room
 	Room(ctx context.Context, in *QueryGetRoomRequest, opts ...grpc.CallOption) (*QueryGetRoomResponse, error)
-	Pending(ctx context.Context, in *QueryGetPendingRequest, opts ...grpc.CallOption) (*QueryGetPendingResponse, error)
+	// Invitations lists all the rooms that a player is invited to
 	Invitations(ctx context.Context, in *QueryGetInvitationsRequest, opts ...grpc.CallOption) (*QueryGetInvitationsResponse, error)
+	// Modes lists all the public available modes
 	Modes(ctx context.Context, in *QueryGetModesRequest, opts ...grpc.CallOption) (*QueryGetModesResponse, error)
+	// Params lists the current matchmaker params
 	Params(ctx context.Context, in *QueryGetParamsRequest, opts ...grpc.CallOption) (*QueryGetParamsResponse, error)
 }
 
@@ -534,16 +450,7 @@ func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 
 func (c *queryClient) Room(ctx context.Context, in *QueryGetRoomRequest, opts ...grpc.CallOption) (*QueryGetRoomResponse, error) {
 	out := new(QueryGetRoomResponse)
-	err := c.cc.Invoke(ctx, "/rook.matchaker.Query/Room", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *queryClient) Pending(ctx context.Context, in *QueryGetPendingRequest, opts ...grpc.CallOption) (*QueryGetPendingResponse, error) {
-	out := new(QueryGetPendingResponse)
-	err := c.cc.Invoke(ctx, "/rook.matchaker.Query/Pending", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/rook.matchmaker.Query/Room", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -552,7 +459,7 @@ func (c *queryClient) Pending(ctx context.Context, in *QueryGetPendingRequest, o
 
 func (c *queryClient) Invitations(ctx context.Context, in *QueryGetInvitationsRequest, opts ...grpc.CallOption) (*QueryGetInvitationsResponse, error) {
 	out := new(QueryGetInvitationsResponse)
-	err := c.cc.Invoke(ctx, "/rook.matchaker.Query/Invitations", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/rook.matchmaker.Query/Invitations", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -561,7 +468,7 @@ func (c *queryClient) Invitations(ctx context.Context, in *QueryGetInvitationsRe
 
 func (c *queryClient) Modes(ctx context.Context, in *QueryGetModesRequest, opts ...grpc.CallOption) (*QueryGetModesResponse, error) {
 	out := new(QueryGetModesResponse)
-	err := c.cc.Invoke(ctx, "/rook.matchaker.Query/Modes", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/rook.matchmaker.Query/Modes", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -570,7 +477,7 @@ func (c *queryClient) Modes(ctx context.Context, in *QueryGetModesRequest, opts 
 
 func (c *queryClient) Params(ctx context.Context, in *QueryGetParamsRequest, opts ...grpc.CallOption) (*QueryGetParamsResponse, error) {
 	out := new(QueryGetParamsResponse)
-	err := c.cc.Invoke(ctx, "/rook.matchaker.Query/Params", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/rook.matchmaker.Query/Params", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -579,11 +486,13 @@ func (c *queryClient) Params(ctx context.Context, in *QueryGetParamsRequest, opt
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
-	// this line is used by starport scaffolding # 2
+	// Room returns the current state of a specific room
 	Room(context.Context, *QueryGetRoomRequest) (*QueryGetRoomResponse, error)
-	Pending(context.Context, *QueryGetPendingRequest) (*QueryGetPendingResponse, error)
+	// Invitations lists all the rooms that a player is invited to
 	Invitations(context.Context, *QueryGetInvitationsRequest) (*QueryGetInvitationsResponse, error)
+	// Modes lists all the public available modes
 	Modes(context.Context, *QueryGetModesRequest) (*QueryGetModesResponse, error)
+	// Params lists the current matchmaker params
 	Params(context.Context, *QueryGetParamsRequest) (*QueryGetParamsResponse, error)
 }
 
@@ -593,9 +502,6 @@ type UnimplementedQueryServer struct {
 
 func (*UnimplementedQueryServer) Room(ctx context.Context, req *QueryGetRoomRequest) (*QueryGetRoomResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Room not implemented")
-}
-func (*UnimplementedQueryServer) Pending(ctx context.Context, req *QueryGetPendingRequest) (*QueryGetPendingResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Pending not implemented")
 }
 func (*UnimplementedQueryServer) Invitations(ctx context.Context, req *QueryGetInvitationsRequest) (*QueryGetInvitationsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Invitations not implemented")
@@ -621,28 +527,10 @@ func _Query_Room_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/rook.matchaker.Query/Room",
+		FullMethod: "/rook.matchmaker.Query/Room",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).Room(ctx, req.(*QueryGetRoomRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Query_Pending_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetPendingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).Pending(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/rook.matchaker.Query/Pending",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Pending(ctx, req.(*QueryGetPendingRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -657,7 +545,7 @@ func _Query_Invitations_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/rook.matchaker.Query/Invitations",
+		FullMethod: "/rook.matchmaker.Query/Invitations",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).Invitations(ctx, req.(*QueryGetInvitationsRequest))
@@ -675,7 +563,7 @@ func _Query_Modes_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/rook.matchaker.Query/Modes",
+		FullMethod: "/rook.matchmaker.Query/Modes",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).Modes(ctx, req.(*QueryGetModesRequest))
@@ -693,7 +581,7 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/rook.matchaker.Query/Params",
+		FullMethod: "/rook.matchmaker.Query/Params",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(QueryServer).Params(ctx, req.(*QueryGetParamsRequest))
@@ -702,16 +590,12 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 }
 
 var _Query_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "rook.matchaker.Query",
+	ServiceName: "rook.matchmaker.Query",
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Room",
 			Handler:    _Query_Room_Handler,
-		},
-		{
-			MethodName: "Pending",
-			Handler:    _Query_Pending_Handler,
 		},
 		{
 			MethodName: "Invitations",
@@ -793,73 +677,6 @@ func (m *QueryGetRoomResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetPendingRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryGetPendingRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryGetPendingRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Player) > 0 {
-		i -= len(m.Player)
-		copy(dAtA[i:], m.Player)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.Player)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryGetPendingResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryGetPendingResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryGetPendingResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Rooms) > 0 {
-		for iNdEx := len(m.Rooms) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Rooms[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintQuery(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
 func (m *QueryGetInvitationsRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -911,15 +728,25 @@ func (m *QueryGetInvitationsResponse) MarshalToSizedBuffer(dAtA []byte) (int, er
 	var l int
 	_ = l
 	if len(m.Rooms) > 0 {
-		for iNdEx := len(m.Rooms) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Rooms[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
+		for k := range m.Rooms {
+			v := m.Rooms[k]
+			baseI := i
+			if v != nil {
+				{
+					size, err := v.MarshalToSizedBuffer(dAtA[:i])
+					if err != nil {
+						return 0, err
+					}
+					i -= size
+					i = encodeVarintQuery(dAtA, i, uint64(size))
 				}
-				i -= size
-				i = encodeVarintQuery(dAtA, i, uint64(size))
+				i--
+				dAtA[i] = 0x12
 			}
+			i = encodeVarintQuery(dAtA, i, uint64(k))
+			i--
+			dAtA[i] = 0x8
+			i = encodeVarintQuery(dAtA, i, uint64(baseI-i))
 			i--
 			dAtA[i] = 0xa
 		}
@@ -971,15 +798,25 @@ func (m *QueryGetModesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if len(m.Modes) > 0 {
-		for iNdEx := len(m.Modes) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Modes[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
+		for k := range m.Modes {
+			v := m.Modes[k]
+			baseI := i
+			if v != nil {
+				{
+					size, err := v.MarshalToSizedBuffer(dAtA[:i])
+					if err != nil {
+						return 0, err
+					}
+					i -= size
+					i = encodeVarintQuery(dAtA, i, uint64(size))
 				}
-				i -= size
-				i = encodeVarintQuery(dAtA, i, uint64(size))
+				i--
+				dAtA[i] = 0x12
 			}
+			i = encodeVarintQuery(dAtA, i, uint64(k))
+			i--
+			dAtA[i] = 0x8
+			i = encodeVarintQuery(dAtA, i, uint64(baseI-i))
 			i--
 			dAtA[i] = 0xa
 		}
@@ -1081,34 +918,6 @@ func (m *QueryGetRoomResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetPendingRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Player)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
-	return n
-}
-
-func (m *QueryGetPendingResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Rooms) > 0 {
-		for _, e := range m.Rooms {
-			l = e.Size()
-			n += 1 + l + sovQuery(uint64(l))
-		}
-	}
-	return n
-}
-
 func (m *QueryGetInvitationsRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -1129,9 +938,16 @@ func (m *QueryGetInvitationsResponse) Size() (n int) {
 	var l int
 	_ = l
 	if len(m.Rooms) > 0 {
-		for _, e := range m.Rooms {
-			l = e.Size()
-			n += 1 + l + sovQuery(uint64(l))
+		for k, v := range m.Rooms {
+			_ = k
+			_ = v
+			l = 0
+			if v != nil {
+				l = v.Size()
+				l += 1 + sovQuery(uint64(l))
+			}
+			mapEntrySize := 1 + sovQuery(uint64(k)) + l
+			n += mapEntrySize + 1 + sovQuery(uint64(mapEntrySize))
 		}
 	}
 	return n
@@ -1153,9 +969,16 @@ func (m *QueryGetModesResponse) Size() (n int) {
 	var l int
 	_ = l
 	if len(m.Modes) > 0 {
-		for _, e := range m.Modes {
-			l = e.Size()
-			n += 1 + l + sovQuery(uint64(l))
+		for k, v := range m.Modes {
+			_ = k
+			_ = v
+			l = 0
+			if v != nil {
+				l = v.Size()
+				l += 1 + sovQuery(uint64(l))
+			}
+			mapEntrySize := 1 + sovQuery(uint64(k)) + l
+			n += mapEntrySize + 1 + sovQuery(uint64(mapEntrySize))
 		}
 	}
 	return n
@@ -1344,172 +1167,6 @@ func (m *QueryGetRoomResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetPendingRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetPendingRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetPendingRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Player", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Player = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryGetPendingResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetPendingResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetPendingResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Rooms", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Rooms = append(m.Rooms, &Room{})
-			if err := m.Rooms[len(m.Rooms)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func (m *QueryGetInvitationsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1650,10 +1307,91 @@ func (m *QueryGetInvitationsResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Rooms = append(m.Rooms, &Room{})
-			if err := m.Rooms[len(m.Rooms)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			if m.Rooms == nil {
+				m.Rooms = make(map[uint64]*Room)
 			}
+			var mapkey uint64
+			var mapvalue *Room
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowQuery
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowQuery
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+				} else if fieldNum == 2 {
+					var mapmsglen int
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowQuery
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapmsglen |= int(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					if mapmsglen < 0 {
+						return ErrInvalidLengthQuery
+					}
+					postmsgIndex := iNdEx + mapmsglen
+					if postmsgIndex < 0 {
+						return ErrInvalidLengthQuery
+					}
+					if postmsgIndex > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = &Room{}
+					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
+						return err
+					}
+					iNdEx = postmsgIndex
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipQuery(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthQuery
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Rooms[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1784,10 +1522,91 @@ func (m *QueryGetModesResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Modes = append(m.Modes, &Mode{})
-			if err := m.Modes[len(m.Modes)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
+			if m.Modes == nil {
+				m.Modes = make(map[uint32]*Mode)
 			}
+			var mapkey uint32
+			var mapvalue *Mode
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowQuery
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowQuery
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapkey |= uint32(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+				} else if fieldNum == 2 {
+					var mapmsglen int
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowQuery
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapmsglen |= int(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					if mapmsglen < 0 {
+						return ErrInvalidLengthQuery
+					}
+					postmsgIndex := iNdEx + mapmsglen
+					if postmsgIndex < 0 {
+						return ErrInvalidLengthQuery
+					}
+					if postmsgIndex > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = &Mode{}
+					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
+						return err
+					}
+					iNdEx = postmsgIndex
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipQuery(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthQuery
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Modes[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

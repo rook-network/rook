@@ -1,13 +1,14 @@
 syntax = "proto3";
-package rook.matchaker;
+package rook.matchmaker;
 
-// this line is used by starport scaffolding # genesis/proto/import
+import "gogoproto/gogo.proto";
+import "rook/matchmaker/matchmaker.proto";
 
 option go_package = "github.com/cmwaters/rook/x/matchmaker/types";
 
-import "rook/matchmaker/matchmaker.proto";
-
 // GenesisState defines the matchmaker module's genesis state.
 message GenesisState {
-    Params params = 1;
+    Params params = 1 [(gogoproto.nullable) = false];
+    uint32 next_mode_id = 2;
+    uint64 next_room_id = 3;
 }

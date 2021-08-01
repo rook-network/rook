@@ -1,14 +1,13 @@
 syntax = "proto3";
 package rook.game;
 
-// this line is used by starport scaffolding # proto/tx/import
 import "rook/game/game.proto";
+import "gogoproto/gogo.proto";
 
 option go_package = "github.com/cmwaters/rook/x/game/types";
 
 // Msg defines the Msg service.
 service Msg {
-  // this line is used by starport scaffolding # proto/tx/rpc
   rpc Move(MsgMove) returns (MsgMoveResponse);
   rpc Build(MsgBuild) returns (MsgBuildResponse);
   rpc Create(MsgCreate) returns (MsgCreateResponse);
@@ -46,7 +45,8 @@ message MsgCreateResponse {
 }
 
 message MsgChangeParams {
-  Params params = 1;
+  string authority = 1;
+  Params params = 2 [(gogoproto.nullable) = false];
 }
 
 message MsgChangeParamsResponse {

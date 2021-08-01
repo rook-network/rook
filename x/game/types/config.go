@@ -92,8 +92,8 @@ func (cfg MapConfig) Area() int {
 
 // Params
 
-func DefaultParams() *Params {
-	return &Params{
+func DefaultParams() Params {
+	return Params{
 		ProductionRate: []*ResourceSet{
 			{}, // 0 is NONE
 			{Wood: 0, Food: 0, Stone: 0, Population: 1}, // TOWN

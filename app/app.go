@@ -16,7 +16,7 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-		transfer "github.com/cosmos/ibc-go/modules/apps/transfer"
+	transfer "github.com/cosmos/ibc-go/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/modules/apps/transfer/types"
 	ibc "github.com/cosmos/ibc-go/modules/core"
@@ -213,7 +213,7 @@ type App struct {
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 	MatchmakerKeeper matchmakerkeeper.Keeper
-	gamekeeper       gamekeeper.Keeper
+	GameKeeper       gamekeeper.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -344,17 +344,17 @@ func New(
 	app.MatchmakerKeeper = *matchmakerkeeper.NewKeeper(
 		appCodec,
 		keys[matchmakertypes.StoreKey],
-		memKeys[matchmakertypes.MemStoreKey],
+		app.GetSubspace(matchmakertypes.ModuleName),
 		app.BaseApp.MsgServiceRouter(),
 	)
 	matchmakerModule := matchmaker.NewAppModule(appCodec, app.MatchmakerKeeper)
 
-	app.gamekeeper = *gamekeeper.NewKeeper(
+	app.GameKeeper = *gamekeeper.NewKeeper(
 		appCodec,
 		keys[gametypes.StoreKey],
 		app.GetSubspace(gametypes.ModuleName),
 	)
-	gameModule := game.NewAppModule(appCodec, app.gamekeeper)
+	gameModule := game.NewAppModule(appCodec, app.GameKeeper)
 
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
