@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cmwaters/rook/x/game/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -23,15 +22,9 @@ var _ types.MsgServer = msgServer{}
 func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.MsgCreateResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	params, ok := m.Keeper.params[m.Keeper.latestVersion]
-	if !ok {
-		if len(m.Keeper.params) != 0 {
-			panic(fmt.Sprintf("we have some params but it's not the last: %v, last %d", m.Keeper.params, m.Keeper.latestVersion))
-		}
-		panic("unable to find latest params")
-	}
+	params := m.Keeper.GetLatestParamsVersion(ctx)
 
-	game, err := types.NewGame(msg.Players, &msg.Config, params)
+	overview, state, err := types.SetupGame(msg.Players, &msg.Config, params)
 	if err != nil {
 		return nil, err
 	}
@@ -42,35 +35,45 @@ func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 	}
 
 	// persist the game overview. We will save game state in the end block
-	m.Keeper.SaveGameOverview(ctx, gameID, game.Overview())
+	m.Keeper.SetGameOverview(ctx, gameID, overview)
+	m.Keeper.SetGameState(ctx, gameID, state)
 
-	m.Keeper.games[gameID] = game
 	return &types.MsgCreateResponse{GameId: gameID}, nil
 }
 
-func (m msgServer) Build(_ context.Context, msg *types.MsgBuild) (*types.MsgBuildResponse, error) {
+func (m msgServer) Build(goCtx context.Context, msg *types.MsgBuild) (*types.MsgBuildResponse, error) {
 	resp := &types.MsgBuildResponse{}
+	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	game, err := m.Keeper.GetGame(msg.GameId)
+	game, err := m.Keeper.GetGame(ctx, msg.GameId)
 	if err != nil {
 		return resp, err
 	}
 
 	err = game.Build(msg.Creator, msg.Populace, msg.Settlement)
+	if err != nil {
+		return resp, err
+	}
 
-	return resp, err
+	m.Keeper.SetGameState(ctx, msg.GameId, game.State())
+	return resp, nil
 }
 
-func (m msgServer) Move(_ context.Context, msg *types.MsgMove) (*types.MsgMoveResponse, error) {
+func (m msgServer) Move(goCtx context.Context, msg *types.MsgMove) (*types.MsgMoveResponse, error) {
 	resp := &types.MsgMoveResponse{}
+	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	game, err := m.Keeper.GetGame(msg.GameId)
+	game, err := m.Keeper.GetGame(ctx, msg.GameId)
 	if err != nil {
 		return resp, err
 	}
 
 	err = game.Move(msg.Creator, msg.Populace, msg.Direction, msg.Population)
+	if err != nil {
+		return resp, err
+	}
 
+	m.Keeper.SetGameState(ctx, msg.GameId, game.State())
 	return resp, err
 }
 
@@ -82,7 +85,7 @@ func (m msgServer) ChangeParams(goCtx context.Context, msg *types.MsgChangeParam
 		return &types.MsgChangeParamsResponse{}, err
 	}
 
-	m.Keeper.SetParams(ctx, msg.Params)
+	version := m.Keeper.SetParams(ctx, msg.Params)
 
-	return &types.MsgChangeParamsResponse{Version: m.Keeper.LatestParamsVersion()}, nil
+	return &types.MsgChangeParamsResponse{Version: version}, nil
 }

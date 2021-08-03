@@ -251,7 +251,7 @@ func New(
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(
-		capabilitytypes.MemStoreKey,
+		capabilitytypes.MemStoreKey, gametypes.MemStoreKey,
 	)
 
 	app := &App{
@@ -352,7 +352,7 @@ func New(
 	app.GameKeeper = *gamekeeper.NewKeeper(
 		appCodec,
 		keys[gametypes.StoreKey],
-		app.GetSubspace(gametypes.ModuleName),
+		memKeys[gametypes.MemStoreKey],
 	)
 	gameModule := game.NewAppModule(appCodec, app.GameKeeper)
 
@@ -481,6 +481,10 @@ func New(
 		// `loadLatest` is set to true.
 		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
 		app.CapabilityKeeper.InitializeAndSeal(ctx)
+
+		// Initialize the game keeper on start up by transferring any games
+		// persisted to the in memory store
+		app.GameKeeper.LoadInMemory(ctx)
 	}
 
 	app.ScopedIBCKeeper = scopedIBCKeeper

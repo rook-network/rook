@@ -20,8 +20,10 @@ var (
 
 func TestNewGame(t *testing.T) {
 	config.Map.Seed = 9876
-	game, err := NewGame(players, &config, &params)
+	overview, state, err := SetupGame(players, &config, 1)
 	require.NoError(t, err)
+
+	game := NewGame(overview, state, &params)
 
 	require.Equal(t, len(game.Factions), len(game.players))
 	require.Equal(t, len(game.Gaia), 0)
@@ -44,9 +46,9 @@ func TestNewGame(t *testing.T) {
 
 	require.NotNil(t, game.used)
 
-	state := game.State()
-	require.Equal(t, uint64(0), state.Step)
-	require.Len(t, state.Players, len(players))
+	s := game.State()
+	require.Equal(t, uint64(0), s.Step)
+	require.Len(t, s.Players, len(players))
 }
 
 func TestGameMove(t *testing.T) {
@@ -126,8 +128,10 @@ func TestGameMove(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			game, err := NewGame(players, &config, &params)
+			overview, state, err := SetupGame(players, &config, 1)
 			require.NoError(t, err)
+
+			game := NewGame(overview, state, &params)
 			buildCustomMap(game, []rune{
 				'P', 'M', 'F',
 				'P', 'P', 'P',
@@ -208,8 +212,10 @@ func TestGameBuild(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			config.Initial.Resources = &ResourceSet{Wood: 10, Food: 10, Stone: 10, Population: 1}
-			game, err := NewGame(players, &config, &params)
+			overview, state, err := SetupGame(players, &config, 1)
 			require.NoError(t, err)
+
+			game := NewGame(overview, state, &params)
 			buildCustomMap(game, []rune{
 				'P', 'M', 'F',
 				'P', 'P', 'P',

@@ -10,33 +10,26 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
 type (
 	Keeper struct {
 		cdc      codec.Codec
 		storeKey sdk.StoreKey
-		// we save all the state transitions throughout the game in memory and
-		// then persist the game state to disk during the end blocker so that
-		// all the moves in a step appear atomic
-		games         map[uint64]*types.Game
-		params        map[uint32]*types.Params
-		latestVersion uint32
+		memKey   sdk.StoreKey
 	}
 )
 
 func NewKeeper(
 	cdc codec.Codec,
-	storeKey sdk.StoreKey,
-	paramSpace paramtypes.Subspace,
+	storeKey,
+	memKey sdk.StoreKey,
 ) *Keeper {
+	fmt.Println("creating game keeper")
 	return &Keeper{
 		cdc:      cdc,
 		storeKey: storeKey,
-		games:    make(map[uint64]*types.Game),
-		params:   make(map[uint32]*types.Params),
-		latestVersion: 0,
+		memKey:   memKey,
 	}
 }
 
@@ -44,86 +37,116 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
+// LoadInMemory loads all the games persisted to disk in to memory. This should
+// only be done once on startup
+func (k *Keeper) LoadInMemory(ctx sdk.Context) {
+	store := ctx.KVStore(k.storeKey)
+	memStore := ctx.KVStore(k.memKey)
+
+	iter := store.Iterator(nil, nil)
+	for ; iter.Valid(); iter.Next() {
+		memStore.Set(iter.Key(), iter.Value())
+	}
+}
+
 // FlushGameState writes all current game states to disk. This is done in EndBlock
 // and is used to calculate the state hash
-func (k Keeper) FlushGameState(ctx sdk.Context) {
+func (k Keeper) FlushGameStates(ctx sdk.Context) {
 	store := ctx.KVStore(k.storeKey)
-	for id, game := range k.games {
-		store.Set(types.GameStateKey(id), k.cdc.MustMarshal(game.State()))
+	memStore := ctx.KVStore(k.memKey)
+
+	iter := memStore.Iterator(
+		types.GameStateKey(0),
+		types.GameStateKey(1<<63-1),
+	)
+	for ; iter.Valid(); iter.Next() {
+		store.Set(iter.Key(), iter.Value())
 	}
 }
 
-func (k Keeper) SaveGameOverview(ctx sdk.Context, gameID uint64, gameOverview *types.Overview) {
+func (k Keeper) SetGameOverview(ctx sdk.Context, gameID uint64, gameOverview *types.Overview) {
 	store := ctx.KVStore(k.storeKey)
+	memStore := ctx.KVStore(k.memKey)
 	overviewBytes := k.cdc.MustMarshal(gameOverview)
 	store.Set(types.GameOverviewKey(gameID), overviewBytes)
+	memStore.Set(types.GameOverviewKey(gameID), overviewBytes)
 }
 
-func (k Keeper) GetGame(gameID uint64) (*types.Game, error) {
-	game, ok := k.games[gameID]
-	if !ok {
+func (k Keeper) SetGameState(ctx sdk.Context, gameID uint64, state *types.State) {
+	memStore := ctx.KVStore(k.memKey)
+	memStore.Set(types.GameStateKey(gameID), k.cdc.MustMarshal(state))
+}
+
+func (k Keeper) GetGame(ctx sdk.Context, gameID uint64) (*types.Game, error) {
+	var (
+		overview *types.Overview
+		state    *types.State
+		params   *types.Params
+	)
+	memStore := ctx.KVStore(k.memKey)
+	o := memStore.Get(types.GameOverviewKey(gameID))
+	if o == nil {
 		return nil, types.ErrGameNotFound
 	}
-	return game, nil
-}
-
-// LoadGames tries to loads all the games persisted to disk.
-func (k *Keeper) LoadGames(ctx sdk.Context) {
-	// if we've already loaded games before then skip
-	if len(k.games) != 0 && len(k.params) != 0 {
-		return
+	s := memStore.Get(types.GameStateKey(gameID))
+	k.cdc.MustUnmarshal(o, overview)
+	p := memStore.Get(types.ParamsKey(overview.ParamVersion))
+	if p == nil {
+		return nil, types.ErrParamsNotFound
 	}
+	k.cdc.MustUnmarshal(s, state)
+	k.cdc.MustUnmarshal(p, params)
 
-	overviews := k.loadAllGameOverviews(ctx)
-	states := k.loadAllGameStates(ctx)
-	params := k.loadAllParams(ctx)
-
-	for id, overview := range overviews {
-		param, ok := params[overview.ParamVersion]
-		if !ok {
-			continue
-		}
-		state, ok := states[id]
-		if !ok {
-			continue
-		}
-		k.games[id] = types.LoadGame(state, overview, param)
-	}
-
-	k.params = params
-
-	// load the latest params version
-	store := ctx.KVStore(k.storeKey)
-	k.latestVersion = types.ParamsVersionFromKey(store.Get(types.LatestParamsVersionKey))
+	return types.NewGame(overview, state, params), nil
 }
 
 func (k Keeper) UpdateGames(ctx sdk.Context) {
-	for _, game := range k.games {
+	memStore := ctx.KVStore(k.memKey)
+
+	params := k.GetAllParams(ctx)
+
+	iter := memStore.Iterator(
+		types.GameOverviewKey(0),
+		types.GameOverviewKey(1<<63-1),
+	)
+	for ; iter.Valid(); iter.Next() {
+		var (
+			overview *types.Overview
+			state    *types.State
+		)
+		k.cdc.MustUnmarshal(iter.Value(), overview)
+		k.cdc.MustUnmarshal(memStore.Get(iter.Key()), state)
+		p, ok := params[overview.ParamVersion]
+		if !ok {
+			panic("param version for game missing")
+		}
+		game := types.NewGame(overview, state, p)
 		game.Update()
+		memStore.Set(iter.Key(), k.cdc.MustMarshal(game.State()))
 	}
 }
 
 func (k Keeper) SetGameID(ctx sdk.Context, gameID uint64) {
-	store := ctx.KVStore(k.storeKey)
-	store.Set(types.LatestGameIDKey, types.GameIDBytes(gameID))
+	memStore := ctx.KVStore(k.memKey)
+	memStore.Set(types.GameIDKey, types.GameIDBytes(gameID))
 }
 
 func (k Keeper) GetLatestParams(ctx sdk.Context) *types.Params {
-	store := ctx.KVStore(k.storeKey)
+	memStore := ctx.KVStore(k.memKey)
 	var params *types.Params
-	paramBytes := store.Get(types.ParamsKey(k.latestVersion))
+	paramBytes := memStore.Get(types.ParamsKey(k.GetLatestParamsVersion(ctx)))
 	k.cdc.MustUnmarshalJSON(paramBytes, params)
 	return params
 }
 
-func (k Keeper) LatestParamsVersion() uint32 {
-	return k.latestVersion
+func (k Keeper) GetLatestParamsVersion(ctx sdk.Context) uint32 {
+	memStore := ctx.KVStore(k.memKey)
+	return types.ParseParamsVersion(memStore.Get(types.ParamsVersionKey))
 }
 
-func (k *Keeper) SetLatestParamVersion(ctx sdk.Context, version uint32) {
-	store := ctx.KVStore(k.storeKey)
-	store.Set(types.LatestParamsVersionKey, types.ParamsKey(version))
-	k.latestVersion = version
+func (k *Keeper) SetParamsVersion(ctx sdk.Context, version uint32) {
+	memStore := ctx.KVStore(k.memKey)
+	memStore.Set(types.ParamsVersionKey, types.ParamsKey(version))
 }
 
 func (k Keeper) GetParams(ctx sdk.Context, version uint32) *types.Params {
@@ -134,14 +157,13 @@ func (k Keeper) GetParams(ctx sdk.Context, version uint32) *types.Params {
 	return params
 }
 
-func (k *Keeper) SetParams(ctx sdk.Context, params types.Params) {
-	store := ctx.KVStore(k.storeKey)
+func (k *Keeper) SetParams(ctx sdk.Context, params types.Params) uint32 {
+	memStore := ctx.KVStore(k.memKey)
 	paramBz := k.cdc.MustMarshal(&params)
-	store.Set(types.ParamsKey(k.latestVersion+1), paramBz)
-	// increment the latest version label
-	store.Set(types.LatestParamsVersionKey, types.ParamsKey(k.latestVersion+1))
-	k.latestVersion++
-	k.params[k.latestVersion] = &params
+	version := k.GetLatestParamsVersion(ctx)
+	memStore.Set(types.ParamsKey(version+1), paramBz)
+	memStore.Set(types.ParamsVersionKey, types.ParamsKey(version+1))
+	return version + 1
 }
 
 func (k Keeper) DeleteParams(ctx sdk.Context, version uint32) {
@@ -152,55 +174,21 @@ func (k Keeper) DeleteParams(ctx sdk.Context, version uint32) {
 // GetNextGameID gets the ID to be used for the next game
 func (k Keeper) GetNextGameID(ctx sdk.Context) (uint64, error) {
 	store := ctx.KVStore(k.storeKey)
-	bz := store.Get(types.LatestGameIDKey)
+	bz := store.Get(types.GameIDKey)
 	if bz == nil {
 		return 0, sdkerrors.Wrap(types.ErrGameCountNotSet, "initial proposal ID hasn't been set")
 	}
 	gameID := binary.BigEndian.Uint64(bz)
 	nextGameID := gameID + 1
 	// increment the key number
-	store.Set(types.LatestGameIDKey, types.GameIDBytes(nextGameID))
+	store.Set(types.GameIDKey, types.GameIDBytes(nextGameID))
 	return gameID, nil
 }
 
-func (k Keeper) loadAllGameOverviews(ctx sdk.Context) map[uint64]*types.Overview {
-	overviews := make(map[uint64]*types.Overview)
-	store := ctx.KVStore(k.storeKey)
-	iter := store.Iterator(
-		types.GameOverviewKey(0),
-		types.GameOverviewKey(1<<63-1),
-	)
-	for ; iter.Valid(); iter.Next() {
-		bz := iter.Value()
-		setup := &types.Overview{}
-		k.cdc.MustUnmarshal(bz, setup)
-		gameID := types.GameIDFromBytes(iter.Key())
-		overviews[gameID] = setup
-	}
-	return overviews
-}
-
-func (k Keeper) loadAllGameStates(ctx sdk.Context) map[uint64]*types.State {
-	states := make(map[uint64]*types.State)
-	store := ctx.KVStore(k.storeKey)
-	iter := store.Iterator(
-		types.GameStateKey(0),
-		types.GameStateKey(1<<63-1),
-	)
-	for ; iter.Valid(); iter.Next() {
-		bz := iter.Value()
-		state := &types.State{}
-		k.cdc.MustUnmarshal(bz, state)
-		gameID := types.GameIDFromBytes(iter.Key())
-		states[gameID] = state
-	}
-	return states
-}
-
-func (k Keeper) loadAllParams(ctx sdk.Context) map[uint32]*types.Params {
+func (k Keeper) GetAllParams(ctx sdk.Context) map[uint32]*types.Params {
 	params := make(map[uint32]*types.Params)
-	store := ctx.KVStore(k.storeKey)
-	iter := store.Iterator(
+	memStore := ctx.KVStore(k.memKey)
+	iter := memStore.Iterator(
 		types.ParamsKey(0),
 		types.ParamsKey(1<<31-1),
 	)
@@ -208,7 +196,7 @@ func (k Keeper) loadAllParams(ctx sdk.Context) map[uint32]*types.Params {
 		bz := iter.Value()
 		param := &types.Params{}
 		k.cdc.MustUnmarshal(bz, param)
-		version := types.ParamsVersionFromKey(iter.Key())
+		version := types.ParseParamsVersion(iter.Key())
 		params[version] = param
 	}
 	return params

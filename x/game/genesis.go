@@ -9,7 +9,7 @@ import (
 // InitGenesis initializes the capability module's state from a provided genesis
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	k.SetLatestParamVersion(ctx, genState.ParamsVersion)
+	k.SetParamsVersion(ctx, genState.ParamsVersion)
 
 	k.SetGameID(ctx, genState.NextGameId)
 

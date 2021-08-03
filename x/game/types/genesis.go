@@ -10,8 +10,9 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Params:     DefaultParams(),
-		NextGameId: 1,
+		Params:        DefaultParams(),
+		ParamsVersion: 1,
+		NextGameId:    1,
 	}
 }
 

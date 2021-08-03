@@ -27,34 +27,25 @@ type Game struct {
 }
 
 // CONSTRUCTORS
-func NewGame(players []string, config *Config, params *Params) (*Game, error) {
+func SetupGame(players []string, config *Config, paramVersion uint32) (*Overview, *State, error) {
 	gameMap := GenerateMap(config.Map)
-	factions := make(map[string]*Faction, len(players))
+	factions := make([]*Faction, len(players))
 
 	startingPositions, err := gameMap.RandomStartingPoints(rand.New(rand.NewSource(config.Map.Seed)), len(players))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	for idx, player := range players {
-		factions[player] = NewFaction(player, config.Initial.Resources, startingPositions[idx])
+		factions[idx] = NewFaction(player, config.Initial.Resources, startingPositions[idx])
 	}
-	g := &Game{
-		Factions:  factions,
-		Map:       gameMap,
-		Gaia:      make([]*Populace, 0),
-		Step:      0,
-		params:    params,
-		players:   players,
-		territory: make(map[int]territory),
-		used:      make(map[string]map[uint32]struct{}),
-	}
-	g.initializeUsedMap()
-	g.calculateTerritory()
-	return g, nil
+
+	overview := NewGameOverview(gameMap, paramVersion) 
+	state := NewGameState(factions, []*Populace{}, 0)
+	return &overview, &state, nil
 }
 
-func LoadGame(state *State, overview *Overview, params *Params) *Game {
+func NewGame(overview *Overview, state *State, params *Params) *Game {
 	factions := make(map[string]*Faction, len(state.Players))
 	players := make([]string, len(state.Players))
 	for idx, faction := range state.Players {
@@ -380,5 +371,20 @@ func newTerritory(faction, populace int) territory {
 	return territory{
 		Faction:  faction,
 		Populace: populace,
+	}
+}
+
+func NewGameOverview(gameMap *Map, paramVersion uint32) Overview {
+	return Overview{
+		Map: gameMap,
+		ParamVersion: paramVersion,
+	}
+}
+
+func NewGameState(players []*Faction, gaia []*Populace, step uint64) State {
+	return State{
+		Players: players,
+		Gaia: gaia,
+		Step: step,
 	}
 }
