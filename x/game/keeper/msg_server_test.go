@@ -23,12 +23,22 @@ func TestGame(t *testing.T) {
 	config.Map.Seed = 123
 
 	server := keeper.NewMsgServerImpl(app.GameKeeper)
+	querier := app.GameKeeper
 
-	// querier := app.GameKeeper
+	latestParamsRequest := &types.QueryGetParamsRequest{Version: 0} 
+	paramsResp, err := querier.Params(goCtx, latestParamsRequest)
+	require.NoError(t, err)
+	require.Equal(t, uint32(1), paramsResp.Version)
+
 
 	msgCreate := types.NewMsgCreate([]string{alice, bob, charles}, config)
 	createResp, err := server.Create(goCtx, msgCreate)
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), createResp.GameId)
+
+	gameRequest := &types.QueryGetGameRequest{Id: uint64(1)}
+	getGameResp, err := querier.Game(goCtx, gameRequest)
+	require.NoError(t, err)
+	require.Equal(t, uint32(1), getGameResp.Overview.ParamVersion)
 
 }

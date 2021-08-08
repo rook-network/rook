@@ -72,9 +72,31 @@ func (k Keeper) SetGameOverview(ctx sdk.Context, gameID uint64, gameOverview *ty
 	memStore.Set(types.GameOverviewKey(gameID), overviewBytes)
 }
 
+func (k Keeper) GetGameOverview(ctx sdk.Context, gameID uint64) (*types.Overview, error) {
+	memStore := ctx.KVStore(k.memKey)
+	var overview *types.Overview
+	o := memStore.Get(types.GameOverviewKey(gameID))
+	if o == nil {
+		return nil, types.ErrGameNotFound
+	}
+	k.cdc.MustUnmarshal(o, overview)
+	return overview, nil
+}
+
 func (k Keeper) SetGameState(ctx sdk.Context, gameID uint64, state *types.State) {
 	memStore := ctx.KVStore(k.memKey)
 	memStore.Set(types.GameStateKey(gameID), k.cdc.MustMarshal(state))
+}
+
+func (k Keeper) GetGameState(ctx sdk.Context, gameID uint64) (*types.State, error) {
+	memStore := ctx.KVStore(k.memKey)
+	var state *types.State
+	s := memStore.Get(types.GameStateKey(gameID))
+	if s == nil {
+		return nil, types.ErrGameNotFound
+	}
+	k.cdc.MustUnmarshal(s, state)
+	return state, nil
 }
 
 func (k Keeper) GetGame(ctx sdk.Context, gameID uint64) (*types.Game, error) {
@@ -127,7 +149,7 @@ func (k Keeper) UpdateGames(ctx sdk.Context) {
 }
 
 func (k Keeper) SetGameID(ctx sdk.Context, gameID uint64) {
-	memStore := ctx.KVStore(k.memKey)
+	memStore := ctx.KVStore(k.storeKey)
 	memStore.Set(types.GameIDKey, types.GameIDBytes(gameID))
 }
 
@@ -149,39 +171,45 @@ func (k *Keeper) SetParamsVersion(ctx sdk.Context, version uint32) {
 	memStore.Set(types.ParamsVersionKey, types.ParamsKey(version))
 }
 
-func (k Keeper) GetParams(ctx sdk.Context, version uint32) *types.Params {
-	store := ctx.KVStore(k.storeKey)
+func (k Keeper) GetParams(ctx sdk.Context, version uint32) (*types.Params, error) {
+	store := ctx.KVStore(k.memKey)
 	var params *types.Params
 	paramBytes := store.Get(types.ParamsKey(version))
+	if paramBytes == nil {
+		return nil, types.ErrParamsNotFound
+	}
 	k.cdc.MustUnmarshalJSON(paramBytes, params)
-	return params
+	return params, nil
 }
 
+// SetParams persists params both to memory and disk
 func (k *Keeper) SetParams(ctx sdk.Context, params types.Params) uint32 {
 	memStore := ctx.KVStore(k.memKey)
+	store := ctx.KVStore(k.storeKey)
 	paramBz := k.cdc.MustMarshal(&params)
 	version := k.GetLatestParamsVersion(ctx)
 	memStore.Set(types.ParamsKey(version+1), paramBz)
 	memStore.Set(types.ParamsVersionKey, types.ParamsKey(version+1))
+	store.Set(types.ParamsKey(version+1), paramBz)
+	store.Set(types.ParamsVersionKey, types.ParamsKey(version+1))
 	return version + 1
 }
 
 func (k Keeper) DeleteParams(ctx sdk.Context, version uint32) {
+	memStore := ctx.KVStore(k.memKey)
 	store := ctx.KVStore(k.storeKey)
+	memStore.Delete(types.ParamsKey(version))
 	store.Delete(types.ParamsKey(version))
 }
 
 // GetNextGameID gets the ID to be used for the next game
-func (k Keeper) GetNextGameID(ctx sdk.Context) (uint64, error) {
+func (k Keeper) GetGameID(ctx sdk.Context) (uint64, error) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GameIDKey)
 	if bz == nil {
 		return 0, sdkerrors.Wrap(types.ErrGameCountNotSet, "initial proposal ID hasn't been set")
 	}
 	gameID := binary.BigEndian.Uint64(bz)
-	nextGameID := gameID + 1
-	// increment the key number
-	store.Set(types.GameIDKey, types.GameIDBytes(nextGameID))
 	return gameID, nil
 }
 

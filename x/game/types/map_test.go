@@ -49,8 +49,8 @@ func TestGetPosition(t *testing.T) {
 func TestFindPos(t *testing.T) {
 	mock := MockMap(3, 3, Landscape_PLAINS)
 
-	require.Equal(t, Position{X: 1, Y: 2}, mock.GetPosition(7))
-	require.Equal(t, Position{X: 0, Y: 0}, mock.GetPosition(0))
+	require.Equal(t, &Position{X: 1, Y: 2}, mock.GetPosition(7))
+	require.Equal(t, &Position{X: 0, Y: 0}, mock.GetPosition(0))
 }
 
 func TestCalculateScore(t *testing.T) {

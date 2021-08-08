@@ -31,7 +31,7 @@ message QueryGetGameStateRequest {
 }
 
 message QueryGetGameStateResponse {
-	State game_state = 1;
+	State state = 1;
 }
 
 message QueryGetGameRequest {
@@ -39,8 +39,8 @@ message QueryGetGameRequest {
 }
 
 message QueryGetGameResponse {
-	repeated string players = 1;
-	Overview overview = 2;
+	Overview overview = 1;
+	uint64 id = 2; 
 }
 
 message QueryGetParamsRequest {
@@ -49,5 +49,6 @@ message QueryGetParamsRequest {
 
 message QueryGetParamsResponse {
 	Params params = 1;
+	uint32 version = 2;
 }
 

@@ -29,10 +29,12 @@ func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 		return nil, err
 	}
 
-	gameID, err := m.Keeper.GetNextGameID(ctx)
+	gameID, err := m.Keeper.GetGameID(ctx)
 	if err != nil {
 		return nil, err
 	}
+	// save the next game ID
+	m.Keeper.SetGameID(ctx, gameID + 1)
 
 	// persist the game overview. We will save game state in the end block
 	m.Keeper.SetGameOverview(ctx, gameID, overview)
