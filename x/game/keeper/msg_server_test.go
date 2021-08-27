@@ -30,7 +30,6 @@ func TestGame(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, uint32(1), paramsResp.Version)
 
-
 	msgCreate := types.NewMsgCreate([]string{alice, bob, charles}, config)
 	createResp, err := server.Create(goCtx, msgCreate)
 	require.NoError(t, err)

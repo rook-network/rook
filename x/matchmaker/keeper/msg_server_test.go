@@ -76,7 +76,7 @@ func TestMatchmaker(t *testing.T) {
 
 	_, err = server.Join(goCtx, msgJoin2)
 	require.Error(t, err)
-	require.Contains(t, types.ErrPlayerAlreadyInRoom.Error(), err.Error())
+	require.Contains(t, err.Error(), types.ErrPlayerAlreadyInRoom.Error())
 
 	msgFind := types.NewMsgFind(emma, addModeResp.Id)
 	findResp, err := server.Find(goCtx, msgFind)
@@ -86,5 +86,10 @@ func TestMatchmaker(t *testing.T) {
 	querier.UpdateRooms(ctx)
 
 	queryRoomResp, err = querier.Room(goCtx, queryRoom)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), types.ErrRoomNotFound.Error())
+
+	queryParamsResp, err := querier.Params(goCtx, &types.QueryGetParamsRequest{})
 	require.NoError(t, err)
+	require.Equal(t, types.DefaultParams(), *queryParamsResp.Params)
 }
