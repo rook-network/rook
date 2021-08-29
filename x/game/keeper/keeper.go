@@ -101,9 +101,9 @@ func (k Keeper) GetGameState(ctx sdk.Context, gameID uint64) (types.State, error
 
 func (k Keeper) GetGame(ctx sdk.Context, gameID uint64) (*types.Game, error) {
 	var (
-		overview *types.Overview
-		state    *types.State
-		params   *types.Params
+		overview types.Overview
+		state    types.State
+		params   types.Params
 	)
 	memStore := ctx.KVStore(k.memKey)
 	o := memStore.Get(types.GameOverviewKey(gameID))
@@ -111,15 +111,15 @@ func (k Keeper) GetGame(ctx sdk.Context, gameID uint64) (*types.Game, error) {
 		return nil, types.ErrGameNotFound
 	}
 	s := memStore.Get(types.GameStateKey(gameID))
-	k.cdc.MustUnmarshal(o, overview)
+	k.cdc.MustUnmarshal(o, &overview)
 	p := memStore.Get(types.ParamsKey(overview.ParamVersion))
 	if p == nil {
 		return nil, types.ErrParamsNotFound
 	}
-	k.cdc.MustUnmarshal(s, state)
-	k.cdc.MustUnmarshal(p, params)
+	k.cdc.MustUnmarshal(s, &state)
+	k.cdc.MustUnmarshal(p, &params)
 
-	return types.NewGame(overview, state, params), nil
+	return types.NewGame(&overview, &state, &params), nil
 }
 
 func (k Keeper) UpdateGames(ctx sdk.Context) {
@@ -133,18 +133,19 @@ func (k Keeper) UpdateGames(ctx sdk.Context) {
 	)
 	for ; iter.Valid(); iter.Next() {
 		var (
-			overview *types.Overview
-			state    *types.State
+			overview types.Overview
+			state    types.State
 		)
-		k.cdc.MustUnmarshal(iter.Value(), overview)
-		k.cdc.MustUnmarshal(memStore.Get(iter.Key()), state)
+		k.cdc.MustUnmarshal(iter.Value(), &overview)
+		id := types.ParseGameID(iter.Key())
+		k.cdc.MustUnmarshal(memStore.Get(types.GameStateKey(id)), &state)
 		p, ok := params[overview.ParamVersion]
 		if !ok {
 			panic("param version for game missing")
 		}
-		game := types.NewGame(overview, state, p)
+		game := types.NewGame(&overview, &state, p)
 		game.Update()
-		memStore.Set(iter.Key(), k.cdc.MustMarshal(game.State()))
+		memStore.Set(types.GameStateKey(id), k.cdc.MustMarshal(game.State()))
 	}
 }
 

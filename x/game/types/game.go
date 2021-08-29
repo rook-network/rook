@@ -317,9 +317,9 @@ func (g Game) Overview() *Overview {
 
 // Update loops through all factions and calculates how many resources were reaped
 // in that step, updates the population and performs any other passive actions
-func (g Game) Update() {
+func (g *Game) Update() {
 	for _, faction := range g.Factions {
-		faction.Reap()
+		faction.Reap(g.params)
 	}
 	g.Step++
 }

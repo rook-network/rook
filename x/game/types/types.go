@@ -14,6 +14,15 @@ func (p Position) Equals(pos *Position) bool {
 
 // Resources
 
+func NewResources(food, stone, wood, population uint32) *ResourceSet {
+	return &ResourceSet{
+		Food: food,
+		Wood: wood,
+		Stone: stone,
+		Population: population,
+	}
+}
+
 func (r ResourceSet) CanAfford(res *ResourceSet) bool {
 	return res == nil || r.Wood >= res.Wood && r.Food >= res.Food && r.Stone >= res.Stone
 }
@@ -22,7 +31,17 @@ func (r *ResourceSet) Pay(res *ResourceSet) {
 	if res == nil {
 		return
 	}
-	r.Wood -= res.Wood
 	r.Food -= res.Food
 	r.Stone -= res.Stone
+	r.Wood -= res.Wood
+}
+
+func (r *ResourceSet) Add(res *ResourceSet) {
+	if res == nil {
+		return
+	}
+	r.Food += res.Food
+	r.Stone += res.Stone
+	r.Wood += res.Wood
+	r.Population += res.Population
 }
