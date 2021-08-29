@@ -34,7 +34,7 @@ func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 		return nil, err
 	}
 	// save the next game ID
-	m.Keeper.SetGameID(ctx, gameID + 1)
+	m.Keeper.SetGameID(ctx, gameID+1)
 
 	// persist the game overview. We will save game state in the end block
 	m.Keeper.SetGameOverview(ctx, gameID, overview)

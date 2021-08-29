@@ -16,9 +16,9 @@ func (p Position) Equals(pos *Position) bool {
 
 func NewResources(food, stone, wood, population uint32) *ResourceSet {
 	return &ResourceSet{
-		Food: food,
-		Wood: wood,
-		Stone: stone,
+		Food:       food,
+		Wood:       wood,
+		Stone:      stone,
 		Population: population,
 	}
 }

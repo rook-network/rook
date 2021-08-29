@@ -6,8 +6,8 @@ func NewFaction(player string, resources *ResourceSet, startingPosition *Positio
 		Resources: resources,
 		Population: []*Populace{
 			{
-				Amount:   resources.Population,
-				Position: startingPosition,
+				Amount:     resources.Population,
+				Position:   startingPosition,
 				Settlement: Settlement_CAPITAL,
 			},
 		},
@@ -37,10 +37,10 @@ func (f *Faction) Capitals() int {
 	return count
 }
 
-func NewPopulace(amount uint32, pos *Position, settlement Settlement) *Populace{
+func NewPopulace(amount uint32, pos *Position, settlement Settlement) *Populace {
 	return &Populace{
-		Amount: amount,
-		Position: pos,
+		Amount:     amount,
+		Position:   pos,
 		Settlement: settlement,
 	}
 }

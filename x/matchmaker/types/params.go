@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	DefaultRoomLifespan = time.Hour
+	DefaultRoomLifespan       = time.Hour
 	DefaultPrestartWaitPeriod = 10 * time.Second
 )
 
@@ -28,7 +28,7 @@ func ParamKeyTable() paramtypes.KeyTable {
 
 func NewParams(PreStartWaitPeriod, RoomLifespan time.Duration) Params {
 	return Params{
-		RoomLifespan: RoomLifespan,
+		RoomLifespan:       RoomLifespan,
 		PrestartWaitPeriod: PreStartWaitPeriod,
 	}
 }

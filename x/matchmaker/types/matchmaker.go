@@ -136,4 +136,3 @@ func (m Mode) ValidateBasic() error {
 
 	return nil
 }
-

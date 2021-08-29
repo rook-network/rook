@@ -40,7 +40,7 @@ func SetupGame(players []string, config *Config, paramVersion uint32) (*Overview
 		factions[idx] = NewFaction(player, config.Initial.Resources, startingPositions[idx])
 	}
 
-	overview := NewGameOverview(gameMap, paramVersion) 
+	overview := NewGameOverview(gameMap, paramVersion)
 	state := NewGameState(factions, []*Populace{}, 0)
 	return &overview, &state, nil
 }
@@ -376,7 +376,7 @@ func newTerritory(faction, populace int) territory {
 
 func NewGameOverview(gameMap *Map, paramVersion uint32) Overview {
 	return Overview{
-		Map: gameMap,
+		Map:          gameMap,
 		ParamVersion: paramVersion,
 	}
 }
@@ -384,7 +384,7 @@ func NewGameOverview(gameMap *Map, paramVersion uint32) Overview {
 func NewGameState(players []*Faction, gaia []*Populace, step uint64) State {
 	return State{
 		Players: players,
-		Gaia: gaia,
-		Step: step,
+		Gaia:    gaia,
+		Step:    step,
 	}
 }

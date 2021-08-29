@@ -28,7 +28,7 @@ func TestGame(t *testing.T) {
 	server := keeper.NewMsgServerImpl(app.GameKeeper)
 	querier := app.GameKeeper
 
-	latestParamsRequest := &types.QueryGetParamsRequest{Version: 0} 
+	latestParamsRequest := &types.QueryGetParamsRequest{Version: 0}
 	paramsResp, err := querier.Params(goCtx, latestParamsRequest)
 	require.NoError(t, err)
 	require.Equal(t, uint32(1), paramsResp.Version)
@@ -54,7 +54,7 @@ func TestGame(t *testing.T) {
 	for idx, faction := range getStateResponse.State.Players {
 		require.Equal(t, addrs[idx].String(), faction.Player)
 	}
-	
+
 	moveRequest := types.NewMsgMove(alice, id, 0, types.Direction_LEFT, 3)
 	_, err = server.Move(goCtx, moveRequest)
 	require.NoError(t, err)
