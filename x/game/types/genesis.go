@@ -11,7 +11,7 @@ const DefaultIndex uint64 = 1
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		Params:        DefaultParams(),
-		ParamsVersion: 1,
+		ParamsVersion: 0,
 		NextGameId:    1,
 	}
 }

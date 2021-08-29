@@ -38,6 +38,7 @@ func TestGame(t *testing.T) {
 	gameRequest := &types.QueryGetGameRequest{Id: uint64(1)}
 	getGameResp, err := querier.Game(goCtx, gameRequest)
 	require.NoError(t, err)
+	require.Equal(t, uint64(1), getGameResp.Id)
 	require.Equal(t, uint32(1), getGameResp.Overview.ParamVersion)
 
 }

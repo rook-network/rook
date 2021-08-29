@@ -102,5 +102,20 @@ func TestCreateModes(t *testing.T) {
 	rooms, exists = keeper.GetRoomsByMode(ctx, modeID)
 	require.True(t, exists)
 	require.NotEmpty(t, rooms.Ids)
+}
+
+func TestParams(t *testing.T) {
+	keeper, ctx := setupKeeper(t)
+
+	// params := keeper.GetParams(ctx)
+	// require.Equal(t, types.DefaultParams(), params)
+
+	newParams := types.DefaultParams()
+	newParams.PrestartWaitPeriod = time.Duration(5 * time.Second)
+	newParams.RoomLifespan = time.Duration(2 * time.Hour)
+	keeper.SetParams(ctx, newParams)
+
+	gotParams := keeper.GetParams(ctx)
+	require.Equal(t, newParams, gotParams)
 
 }

@@ -37,7 +37,20 @@ func TestParams(t *testing.T) {
 	keeper.SetParamsVersion(ctx, 0)
 
 	params := types.DefaultParams()
-	keeper.SetParams(ctx, params)
+	version := keeper.SetParams(ctx, params)
 
-	require.Equal(t, uint32(1), keeper.GetLatestParamsVersion(ctx))
+	require.Equal(t, version, keeper.GetLatestParamsVersion(ctx))
+
+	gotParams, err := keeper.GetParams(ctx, version)
+	require.NoError(t, err)
+	require.Equal(t, params, gotParams)
+
+	nextParams := types.DefaultParams()
+	nextParams.ConstructionCost[1] = &types.ResourceSet{8, 10, 5, 0}
+	nextVersion := keeper.SetParams(ctx, nextParams)
+	require.Equal(t, version + 1, nextVersion)
+
+	require.Equal(t, nextVersion, keeper.GetLatestParamsVersion(ctx))
+	gotParams = keeper.GetLatestParams(ctx)
+	require.Equal(t, nextParams, gotParams)
 }

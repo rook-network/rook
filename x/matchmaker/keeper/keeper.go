@@ -230,7 +230,7 @@ func (k Keeper) RemoveRoomFromModePool(ctx sdk.Context, modeID uint32, roomID ui
 }
 
 func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
-	k.params.SetParamSet(ctx, params)
+	k.params.SetParamSet(ctx, &params)
 }
 
 func (k Keeper) GetParams(ctx sdk.Context) types.Params {

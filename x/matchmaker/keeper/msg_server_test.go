@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"testing"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
@@ -20,6 +21,9 @@ func TestMatchmaker(t *testing.T) {
 	goCtx := sdk.WrapSDKContext(ctx)
 	addrs := simapp.AddTestAddrsIncremental(app, ctx, 5, sdk.NewInt(30000000))
 	alice, bob, charles, david, emma := addrs[0].String(), addrs[1].String(), addrs[2].String(), addrs[3].String(), addrs[4].String()
+
+	p2 := app.MatchmakerKeeper.GetParams(ctx)
+	require.Equal(t, types.DefaultParams(), p2)
 
 	server := keeper.NewMsgServerImpl(app.MatchmakerKeeper)
 	querier := app.MatchmakerKeeper
@@ -89,7 +93,11 @@ func TestMatchmaker(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), types.ErrRoomNotFound.Error())
 
+	newParams := types.DefaultParams()
+	newParams.PrestartWaitPeriod = time.Duration(5 * time.Second)
+	app.MatchmakerKeeper.SetParams(ctx, newParams)
+
 	queryParamsResp, err := querier.Params(goCtx, &types.QueryGetParamsRequest{})
 	require.NoError(t, err)
-	require.Equal(t, types.DefaultParams(), *queryParamsResp.Params)
+	require.Equal(t, newParams, *queryParamsResp.Params)
 }

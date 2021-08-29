@@ -35,9 +35,6 @@ var (
 	RoomsByModePrefix = []byte{0x02}
 	ModeIDKey         = []byte{0x03}
 	ModePrefixKey     = []byte{0x04}
-
-	KeyRoomLifespan       = []byte("RoomLifespan")
-	KeyPrestartWaitPeriod = []byte("PrestartWaitPeriod")
 )
 
 func RoomKey(id uint64) []byte {

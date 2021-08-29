@@ -72,14 +72,14 @@ func (k Keeper) SetGameOverview(ctx sdk.Context, gameID uint64, gameOverview *ty
 	memStore.Set(types.GameOverviewKey(gameID), overviewBytes)
 }
 
-func (k Keeper) GetGameOverview(ctx sdk.Context, gameID uint64) (*types.Overview, error) {
+func (k Keeper) GetGameOverview(ctx sdk.Context, gameID uint64) (types.Overview, error) {
 	memStore := ctx.KVStore(k.memKey)
-	var overview *types.Overview
+	var overview types.Overview
 	o := memStore.Get(types.GameOverviewKey(gameID))
 	if o == nil {
-		return nil, types.ErrGameNotFound
+		return types.Overview{}, types.ErrGameNotFound
 	}
-	k.cdc.MustUnmarshal(o, overview)
+	k.cdc.MustUnmarshal(o, &overview)
 	return overview, nil
 }
 
@@ -88,14 +88,14 @@ func (k Keeper) SetGameState(ctx sdk.Context, gameID uint64, state *types.State)
 	memStore.Set(types.GameStateKey(gameID), k.cdc.MustMarshal(state))
 }
 
-func (k Keeper) GetGameState(ctx sdk.Context, gameID uint64) (*types.State, error) {
+func (k Keeper) GetGameState(ctx sdk.Context, gameID uint64) (types.State, error) {
 	memStore := ctx.KVStore(k.memKey)
-	var state *types.State
+	var state types.State
 	s := memStore.Get(types.GameStateKey(gameID))
 	if s == nil {
-		return nil, types.ErrGameNotFound
+		return types.State{}, types.ErrGameNotFound
 	}
-	k.cdc.MustUnmarshal(s, state)
+	k.cdc.MustUnmarshal(s, &state)
 	return state, nil
 }
 
@@ -153,11 +153,11 @@ func (k Keeper) SetGameID(ctx sdk.Context, gameID uint64) {
 	memStore.Set(types.GameIDKey, types.GameIDBytes(gameID))
 }
 
-func (k Keeper) GetLatestParams(ctx sdk.Context) *types.Params {
+func (k Keeper) GetLatestParams(ctx sdk.Context) types.Params {
 	memStore := ctx.KVStore(k.memKey)
-	var params *types.Params
+	var params types.Params
 	paramBytes := memStore.Get(types.ParamsKey(k.GetLatestParamsVersion(ctx)))
-	k.cdc.MustUnmarshalJSON(paramBytes, params)
+	k.cdc.MustUnmarshal(paramBytes, &params)
 	return params
 }
 
@@ -171,14 +171,14 @@ func (k *Keeper) SetParamsVersion(ctx sdk.Context, version uint32) {
 	memStore.Set(types.ParamsVersionKey, types.ParamsKey(version))
 }
 
-func (k Keeper) GetParams(ctx sdk.Context, version uint32) (*types.Params, error) {
+func (k Keeper) GetParams(ctx sdk.Context, version uint32) (types.Params, error) {
 	store := ctx.KVStore(k.memKey)
-	var params *types.Params
+	var params types.Params
 	paramBytes := store.Get(types.ParamsKey(version))
 	if paramBytes == nil {
-		return nil, types.ErrParamsNotFound
+		return types.Params{}, types.ErrParamsNotFound
 	}
-	k.cdc.MustUnmarshalJSON(paramBytes, params)
+	k.cdc.MustUnmarshal(paramBytes, &params)
 	return params, nil
 }
 
@@ -202,7 +202,7 @@ func (k Keeper) DeleteParams(ctx sdk.Context, version uint32) {
 	store.Delete(types.ParamsKey(version))
 }
 
-// GetNextGameID gets the ID to be used for the next game
+// GetGameID gets the ID to be used for the next game
 func (k Keeper) GetGameID(ctx sdk.Context) (uint64, error) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GameIDKey)
