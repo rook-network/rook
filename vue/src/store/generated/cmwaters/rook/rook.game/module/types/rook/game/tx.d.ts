@@ -27,6 +27,7 @@ export interface MsgCreateResponse {
     gameId: number;
 }
 export interface MsgChangeParams {
+    authority: string;
     params: Params | undefined;
 }
 export interface MsgChangeParamsResponse {
@@ -90,7 +91,6 @@ export declare const MsgChangeParamsResponse: {
 };
 /** Msg defines the Msg service. */
 export interface Msg {
-    /** this line is used by starport scaffolding # proto/tx/rpc */
     Move(request: MsgMove): Promise<MsgMoveResponse>;
     Build(request: MsgBuild): Promise<MsgBuildResponse>;
     Create(request: MsgCreate): Promise<MsgCreateResponse>;

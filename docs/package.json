@@ -1,5 +1,5 @@
 {
-  "name": "plural-docs",
+  "name": "rook-docs",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "name": "",
     "email": ""
   },
-  "repository": "/plural",
+  "repository": "/rook",
   "scripts": {
     "deploy": "gh-pages -d src/.vuepress/dist",
     "dev": "vuepress dev src",

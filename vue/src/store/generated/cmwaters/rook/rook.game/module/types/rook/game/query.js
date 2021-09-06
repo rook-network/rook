@@ -57,8 +57,8 @@ export const QueryGetGameStateRequest = {
 const baseQueryGetGameStateResponse = {};
 export const QueryGetGameStateResponse = {
     encode(message, writer = Writer.create()) {
-        if (message.gameState !== undefined) {
-            State.encode(message.gameState, writer.uint32(10).fork()).ldelim();
+        if (message.state !== undefined) {
+            State.encode(message.state, writer.uint32(10).fork()).ldelim();
         }
         return writer;
     },
@@ -70,7 +70,7 @@ export const QueryGetGameStateResponse = {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.gameState = State.decode(reader, reader.uint32());
+                    message.state = State.decode(reader, reader.uint32());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -81,26 +81,26 @@ export const QueryGetGameStateResponse = {
     },
     fromJSON(object) {
         const message = { ...baseQueryGetGameStateResponse };
-        if (object.gameState !== undefined && object.gameState !== null) {
-            message.gameState = State.fromJSON(object.gameState);
+        if (object.state !== undefined && object.state !== null) {
+            message.state = State.fromJSON(object.state);
         }
         else {
-            message.gameState = undefined;
+            message.state = undefined;
         }
         return message;
     },
     toJSON(message) {
         const obj = {};
-        message.gameState !== undefined && (obj.gameState = message.gameState ? State.toJSON(message.gameState) : undefined);
+        message.state !== undefined && (obj.state = message.state ? State.toJSON(message.state) : undefined);
         return obj;
     },
     fromPartial(object) {
         const message = { ...baseQueryGetGameStateResponse };
-        if (object.gameState !== undefined && object.gameState !== null) {
-            message.gameState = State.fromPartial(object.gameState);
+        if (object.state !== undefined && object.state !== null) {
+            message.state = State.fromPartial(object.state);
         }
         else {
-            message.gameState = undefined;
+            message.state = undefined;
         }
         return message;
     }
@@ -156,14 +156,14 @@ export const QueryGetGameRequest = {
         return message;
     }
 };
-const baseQueryGetGameResponse = { players: '' };
+const baseQueryGetGameResponse = { id: 0 };
 export const QueryGetGameResponse = {
     encode(message, writer = Writer.create()) {
-        for (const v of message.players) {
-            writer.uint32(10).string(v);
-        }
         if (message.overview !== undefined) {
-            Overview.encode(message.overview, writer.uint32(18).fork()).ldelim();
+            Overview.encode(message.overview, writer.uint32(10).fork()).ldelim();
+        }
+        if (message.id !== 0) {
+            writer.uint32(16).uint64(message.id);
         }
         return writer;
     },
@@ -171,15 +171,14 @@ export const QueryGetGameResponse = {
         const reader = input instanceof Uint8Array ? new Reader(input) : input;
         let end = length === undefined ? reader.len : reader.pos + length;
         const message = { ...baseQueryGetGameResponse };
-        message.players = [];
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
-                    message.players.push(reader.string());
+                    message.overview = Overview.decode(reader, reader.uint32());
                     break;
                 case 2:
-                    message.overview = Overview.decode(reader, reader.uint32());
+                    message.id = longToNumber(reader.uint64());
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -190,44 +189,39 @@ export const QueryGetGameResponse = {
     },
     fromJSON(object) {
         const message = { ...baseQueryGetGameResponse };
-        message.players = [];
-        if (object.players !== undefined && object.players !== null) {
-            for (const e of object.players) {
-                message.players.push(String(e));
-            }
-        }
         if (object.overview !== undefined && object.overview !== null) {
             message.overview = Overview.fromJSON(object.overview);
         }
         else {
             message.overview = undefined;
         }
+        if (object.id !== undefined && object.id !== null) {
+            message.id = Number(object.id);
+        }
+        else {
+            message.id = 0;
+        }
         return message;
     },
     toJSON(message) {
         const obj = {};
-        if (message.players) {
-            obj.players = message.players.map((e) => e);
-        }
-        else {
-            obj.players = [];
-        }
         message.overview !== undefined && (obj.overview = message.overview ? Overview.toJSON(message.overview) : undefined);
+        message.id !== undefined && (obj.id = message.id);
         return obj;
     },
     fromPartial(object) {
         const message = { ...baseQueryGetGameResponse };
-        message.players = [];
-        if (object.players !== undefined && object.players !== null) {
-            for (const e of object.players) {
-                message.players.push(e);
-            }
-        }
         if (object.overview !== undefined && object.overview !== null) {
             message.overview = Overview.fromPartial(object.overview);
         }
         else {
             message.overview = undefined;
+        }
+        if (object.id !== undefined && object.id !== null) {
+            message.id = object.id;
+        }
+        else {
+            message.id = 0;
         }
         return message;
     }
@@ -283,11 +277,14 @@ export const QueryGetParamsRequest = {
         return message;
     }
 };
-const baseQueryGetParamsResponse = {};
+const baseQueryGetParamsResponse = { version: 0 };
 export const QueryGetParamsResponse = {
     encode(message, writer = Writer.create()) {
         if (message.params !== undefined) {
             Params.encode(message.params, writer.uint32(10).fork()).ldelim();
+        }
+        if (message.version !== 0) {
+            writer.uint32(16).uint32(message.version);
         }
         return writer;
     },
@@ -300,6 +297,9 @@ export const QueryGetParamsResponse = {
             switch (tag >>> 3) {
                 case 1:
                     message.params = Params.decode(reader, reader.uint32());
+                    break;
+                case 2:
+                    message.version = reader.uint32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -316,11 +316,18 @@ export const QueryGetParamsResponse = {
         else {
             message.params = undefined;
         }
+        if (object.version !== undefined && object.version !== null) {
+            message.version = Number(object.version);
+        }
+        else {
+            message.version = 0;
+        }
         return message;
     },
     toJSON(message) {
         const obj = {};
         message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined);
+        message.version !== undefined && (obj.version = message.version);
         return obj;
     },
     fromPartial(object) {
@@ -330,6 +337,12 @@ export const QueryGetParamsResponse = {
         }
         else {
             message.params = undefined;
+        }
+        if (object.version !== undefined && object.version !== null) {
+            message.version = object.version;
+        }
+        else {
+            message.version = 0;
         }
         return message;
     }

@@ -6,20 +6,21 @@ export interface QueryGetGameStateRequest {
     id: number;
 }
 export interface QueryGetGameStateResponse {
-    gameState: State | undefined;
+    state: State | undefined;
 }
 export interface QueryGetGameRequest {
     id: number;
 }
 export interface QueryGetGameResponse {
-    players: string[];
     overview: Overview | undefined;
+    id: number;
 }
 export interface QueryGetParamsRequest {
     version: number;
 }
 export interface QueryGetParamsResponse {
     params: Params | undefined;
+    version: number;
 }
 export declare const QueryGetGameStateRequest: {
     encode(message: QueryGetGameStateRequest, writer?: Writer): Writer;

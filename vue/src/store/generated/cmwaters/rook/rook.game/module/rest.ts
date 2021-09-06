@@ -113,16 +113,21 @@ export interface GamePosition {
 }
 
 export interface GameQueryGetGameResponse {
-  players?: string[];
   overview?: GameOverview;
+
+  /** @format uint64 */
+  id?: string;
 }
 
 export interface GameQueryGetGameStateResponse {
-  gameState?: GameState;
+  state?: GameState;
 }
 
 export interface GameQueryGetParamsResponse {
   params?: GameParams;
+
+  /** @format int64 */
+  version?: number;
 }
 
 export interface GameResourceSet {

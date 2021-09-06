@@ -35,6 +35,7 @@ export interface MsgCreateResponse {
 }
 
 export interface MsgChangeParams {
+  authority: string
   params: Params | undefined
 }
 
@@ -352,10 +353,10 @@ const baseMsgCreate: object = { players: '' }
 export const MsgCreate = {
   encode(message: MsgCreate, writer: Writer = Writer.create()): Writer {
     for (const v of message.players) {
-      writer.uint32(18).string(v!)
+      writer.uint32(10).string(v!)
     }
     if (message.config !== undefined) {
-      Config.encode(message.config, writer.uint32(26).fork()).ldelim()
+      Config.encode(message.config, writer.uint32(18).fork()).ldelim()
     }
     return writer
   },
@@ -368,10 +369,10 @@ export const MsgCreate = {
     while (reader.pos < end) {
       const tag = reader.uint32()
       switch (tag >>> 3) {
-        case 2:
+        case 1:
           message.players.push(reader.string())
           break
-        case 3:
+        case 2:
           message.config = Config.decode(reader, reader.uint32())
           break
         default:
@@ -481,12 +482,15 @@ export const MsgCreateResponse = {
   }
 }
 
-const baseMsgChangeParams: object = {}
+const baseMsgChangeParams: object = { authority: '' }
 
 export const MsgChangeParams = {
   encode(message: MsgChangeParams, writer: Writer = Writer.create()): Writer {
+    if (message.authority !== '') {
+      writer.uint32(10).string(message.authority)
+    }
     if (message.params !== undefined) {
-      Params.encode(message.params, writer.uint32(10).fork()).ldelim()
+      Params.encode(message.params, writer.uint32(18).fork()).ldelim()
     }
     return writer
   },
@@ -499,6 +503,9 @@ export const MsgChangeParams = {
       const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:
+          message.authority = reader.string()
+          break
+        case 2:
           message.params = Params.decode(reader, reader.uint32())
           break
         default:
@@ -511,6 +518,11 @@ export const MsgChangeParams = {
 
   fromJSON(object: any): MsgChangeParams {
     const message = { ...baseMsgChangeParams } as MsgChangeParams
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = String(object.authority)
+    } else {
+      message.authority = ''
+    }
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params)
     } else {
@@ -521,12 +533,18 @@ export const MsgChangeParams = {
 
   toJSON(message: MsgChangeParams): unknown {
     const obj: any = {}
+    message.authority !== undefined && (obj.authority = message.authority)
     message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined)
     return obj
   },
 
   fromPartial(object: DeepPartial<MsgChangeParams>): MsgChangeParams {
     const message = { ...baseMsgChangeParams } as MsgChangeParams
+    if (object.authority !== undefined && object.authority !== null) {
+      message.authority = object.authority
+    } else {
+      message.authority = ''
+    }
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params)
     } else {
@@ -593,7 +611,6 @@ export const MsgChangeParamsResponse = {
 
 /** Msg defines the Msg service. */
 export interface Msg {
-  /** this line is used by starport scaffolding # proto/tx/rpc */
   Move(request: MsgMove): Promise<MsgMoveResponse>
   Build(request: MsgBuild): Promise<MsgBuildResponse>
   Create(request: MsgCreate): Promise<MsgCreateResponse>

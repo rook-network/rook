@@ -306,10 +306,10 @@ const baseMsgCreate = { players: '' };
 export const MsgCreate = {
     encode(message, writer = Writer.create()) {
         for (const v of message.players) {
-            writer.uint32(18).string(v);
+            writer.uint32(10).string(v);
         }
         if (message.config !== undefined) {
-            Config.encode(message.config, writer.uint32(26).fork()).ldelim();
+            Config.encode(message.config, writer.uint32(18).fork()).ldelim();
         }
         return writer;
     },
@@ -321,10 +321,10 @@ export const MsgCreate = {
         while (reader.pos < end) {
             const tag = reader.uint32();
             switch (tag >>> 3) {
-                case 2:
+                case 1:
                     message.players.push(reader.string());
                     break;
-                case 3:
+                case 2:
                     message.config = Config.decode(reader, reader.uint32());
                     break;
                 default:
@@ -429,11 +429,14 @@ export const MsgCreateResponse = {
         return message;
     }
 };
-const baseMsgChangeParams = {};
+const baseMsgChangeParams = { authority: '' };
 export const MsgChangeParams = {
     encode(message, writer = Writer.create()) {
+        if (message.authority !== '') {
+            writer.uint32(10).string(message.authority);
+        }
         if (message.params !== undefined) {
-            Params.encode(message.params, writer.uint32(10).fork()).ldelim();
+            Params.encode(message.params, writer.uint32(18).fork()).ldelim();
         }
         return writer;
     },
@@ -445,6 +448,9 @@ export const MsgChangeParams = {
             const tag = reader.uint32();
             switch (tag >>> 3) {
                 case 1:
+                    message.authority = reader.string();
+                    break;
+                case 2:
                     message.params = Params.decode(reader, reader.uint32());
                     break;
                 default:
@@ -456,6 +462,12 @@ export const MsgChangeParams = {
     },
     fromJSON(object) {
         const message = { ...baseMsgChangeParams };
+        if (object.authority !== undefined && object.authority !== null) {
+            message.authority = String(object.authority);
+        }
+        else {
+            message.authority = '';
+        }
         if (object.params !== undefined && object.params !== null) {
             message.params = Params.fromJSON(object.params);
         }
@@ -466,11 +478,18 @@ export const MsgChangeParams = {
     },
     toJSON(message) {
         const obj = {};
+        message.authority !== undefined && (obj.authority = message.authority);
         message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined);
         return obj;
     },
     fromPartial(object) {
         const message = { ...baseMsgChangeParams };
+        if (object.authority !== undefined && object.authority !== null) {
+            message.authority = object.authority;
+        }
+        else {
+            message.authority = '';
+        }
         if (object.params !== undefined && object.params !== null) {
             message.params = Params.fromPartial(object.params);
         }

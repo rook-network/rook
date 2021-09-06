@@ -1,11 +1,11 @@
 const { description } = require("../../package");
 
 module.exports = {
-  base: "/plural/",
+  base: "/docs/",
   /**
    * Ref：https://v1.vuepress.vuejs.org/config/#title
    */
-  title: "Plural",
+  title: "Rook",
   /**
    * Ref：https://v1.vuepress.vuejs.org/config/#description
    */
@@ -71,7 +71,7 @@ module.exports = {
 
     nav: [
       // { text: "Rust", link: "https://docs.rs/anchor-lang/latest/anchor_lang/" },
-      { text: "GitHub", link: "https://github.com/cmwaters/plural" }
+      { text: "GitHub", link: "https://github.com/cmwaters/rook" }
     ],
   },
 
