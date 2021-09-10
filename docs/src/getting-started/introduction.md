@@ -1,17 +1,10 @@
 # Introduction
 
-**Plural** is a Solana-based governance toolkit for fostering inclusive institutions
-and empowering collective ownership and decision making.
+**Rook** is a multiplayer strategy game akin to Age of Empires where the objective is to build up a civilization and take over all other opponents. The game has both competitive and cooperative components to it. Each game is designed to be short, around 10 minutes in lenght, depending on the size of the map and the amount of participants. Each participant will usually start the game with a single settlement, the capital and a combination of resources: food, stone, and wood. The capital, like other settlements produces population. Population units can move around the map, in a step-based fashion, building other settlements using the accumulated resources and overcoming opposing populations if there are more units then the opponent. Players can capture one anothers settlements and benefit from the advantages that that settlement brings. Ultimately, players try to capture all the capitals of an opponent. When this happens, instead of toppling the opponent, the two teams merge together. This introduces the collaborative part of the game. Now both players have full control of the faction and must work together to overcome the rest of the teams and be the last one remaining.
 
-The ability for groups of people to come together, to form strong cohesive and
-inclusive entities where everyone feels like a contributor to the betterment of
-the group and a participant in that process has been the dominant recipe for
-success throughout history. This notion is the central theme behind the
-political philosophy of pluralism. The challenge with pluralistic systems most
-notably lies when trying to scale to incorporating increasingly larger groups of
-people. This challenge is exactly what Plural looks at tackling.
+All players have a set of items: a mixture of abilities, traits and settlements that almost uniquely define them. These items, represented as NFT's can be found in game, won off opponents or traded at the marketplace. Winners of games earn the ROOK native token as part of the block rewards. Games can be played with varying levels of stakes to make it interesting.
 
 
 ::: tip NOTE
-Plural is still a work in progress. Its API's and this documentation are subject to change. 
+Rook is still a work in progress and therefore this documentation are subject to change. 
 :::
