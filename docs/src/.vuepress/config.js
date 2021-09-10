@@ -33,7 +33,7 @@ module.exports = {
   themeConfig: {
     repo: "",
     editLinks: false,
-    logo: "/plural_logo.svg",
+    logo: "/rook_logo.svg",
     docsDir: "",
     editLinkText: "",
     lastUpdated: true,

@@ -1,167 +1,6 @@
 {
   "version": 2,
   "projects": {
-    "api": {
-      "root": "apps/api",
-      "sourceRoot": "apps/api/src",
-      "projectType": "application",
-      "targets": {
-        "build": {
-          "executor": "@nrwl/node:build",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/apps/api",
-            "main": "apps/api/src/main.ts",
-            "tsConfig": "apps/api/tsconfig.app.json",
-            "assets": ["apps/api/src/assets"]
-          },
-          "configurations": {
-            "production": {
-              "optimization": true,
-              "extractLicenses": true,
-              "inspect": false,
-              "fileReplacements": [
-                {
-                  "replace": "apps/api/src/environments/environment.ts",
-                  "with": "apps/api/src/environments/environment.prod.ts"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "executor": "@nrwl/node:execute",
-          "options": {
-            "buildTarget": "api:build"
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/api/**/*.ts"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/api"],
-          "options": {
-            "jestConfig": "apps/api/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "api-interfaces": {
-      "root": "libs/api-interfaces",
-      "sourceRoot": "libs/api-interfaces/src",
-      "projectType": "library",
-      "targets": {
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["libs/api-interfaces/**/*.ts"]
-          }
-        }
-      }
-    },
-    "game": {
-      "root": "apps/game",
-      "sourceRoot": "apps/game/src",
-      "projectType": "application",
-      "targets": {
-        "build": {
-          "executor": "@nrwl/web:build",
-          "outputs": ["{options.outputPath}"],
-          "options": {
-            "outputPath": "dist/apps/game",
-            "index": "apps/game/src/index.html",
-            "main": "apps/game/src/main.tsx",
-            "polyfills": "apps/game/src/polyfills.ts",
-            "tsConfig": "apps/game/tsconfig.app.json",
-            "assets": ["apps/game/src/favicon.ico", "apps/game/src/assets"],
-            "styles": [],
-            "scripts": [],
-            "webpackConfig": "@nrwl/react/plugins/webpack"
-          },
-          "configurations": {
-            "production": {
-              "fileReplacements": [
-                {
-                  "replace": "apps/game/src/environments/environment.ts",
-                  "with": "apps/game/src/environments/environment.prod.ts"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
-                }
-              ]
-            }
-          }
-        },
-        "serve": {
-          "executor": "@nrwl/web:dev-server",
-          "options": {
-            "buildTarget": "game:build",
-            "hmr": true
-          },
-          "configurations": {
-            "production": {
-              "buildTarget": "game:build:production",
-              "hmr": false
-            }
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/game/**/*.{ts,tsx,js,jsx}"]
-          }
-        },
-        "test": {
-          "executor": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/game"],
-          "options": {
-            "jestConfig": "apps/game/jest.config.js",
-            "passWithNoTests": true
-          }
-        }
-      }
-    },
-    "game-e2e": {
-      "root": "apps/game-e2e",
-      "sourceRoot": "apps/game-e2e/src",
-      "projectType": "application",
-      "targets": {
-        "e2e": {
-          "executor": "@nrwl/cypress:cypress",
-          "options": {
-            "cypressConfig": "apps/game-e2e/cypress.json",
-            "devServerTarget": "game:serve"
-          },
-          "configurations": {
-            "production": {
-              "devServerTarget": "game:serve:production"
-            }
-          }
-        },
-        "lint": {
-          "executor": "@nrwl/linter:eslint",
-          "options": {
-            "lintFilePatterns": ["apps/game-e2e/**/*.{js,ts}"]
-          }
-        }
-      }
-    },
     "main": {
       "root": "apps/main",
       "sourceRoot": "apps/main/src",
@@ -177,7 +16,7 @@
             "polyfills": "apps/main/src/polyfills.ts",
             "tsConfig": "apps/main/tsconfig.app.json",
             "assets": ["apps/main/src/favicon.ico", "apps/main/src/assets"],
-            "styles": [],
+            "styles": ["apps/main/src/styles.less"],
             "scripts": [],
             "webpackConfig": "@nrwl/react/plugins/webpack"
           },
@@ -210,8 +49,7 @@
           "executor": "@nrwl/web:dev-server",
           "options": {
             "buildTarget": "main:build",
-            "hmr": true,
-            "proxyConfig": "apps/main/proxy.conf.json"
+            "hmr": true
           },
           "configurations": {
             "production": {
@@ -222,6 +60,7 @@
         },
         "lint": {
           "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
           "options": {
             "lintFilePatterns": ["apps/main/**/*.{ts,tsx,js,jsx}"]
           }
@@ -256,6 +95,7 @@
         },
         "lint": {
           "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
           "options": {
             "lintFilePatterns": ["apps/main-e2e/**/*.{js,ts}"]
           }
@@ -269,15 +109,15 @@
   "generators": {
     "@nrwl/react": {
       "application": {
-        "style": "@emotion/styled",
+        "style": "less",
         "linter": "eslint",
         "babel": true
       },
       "component": {
-        "style": "@emotion/styled"
+        "style": "less"
       },
       "library": {
-        "style": "@emotion/styled",
+        "style": "less",
         "linter": "eslint"
       }
     }

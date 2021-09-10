@@ -27,19 +27,6 @@
     ]
   },
   "projects": {
-    "api": {
-      "tags": []
-    },
-    "api-interfaces": {
-      "tags": []
-    },
-    "game": {
-      "tags": []
-    },
-    "game-e2e": {
-      "tags": [],
-      "implicitDependencies": ["game"]
-    },
     "main": {
       "tags": []
     },
