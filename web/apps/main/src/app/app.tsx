@@ -1,7 +1,7 @@
 import styles from './app.module.less';
 
 import { ReactComponent as Logo } from './tower.svg';
-import { GithubOutlined, BookOutlined } from '@ant-design/icons'
+import { GithubOutlined, BookOutlined, CompassOutlined } from '@ant-design/icons'
 
 import { Layout, Menu, Typography, Row, Col, Card, Input, Image, Button } from "antd";
 
@@ -19,6 +19,8 @@ export function App() {
       case "code":
         window.location.href = "https://github.com/cmwaters/rook";
         break;
+      case "roadmap":
+        break;
     }
   }
 
@@ -34,6 +36,7 @@ export function App() {
           </td>
           <td>
             <Menu style={{ float:"right", borderBottom:"none"}} mode="horizontal" onClick={handleClick}>
+              <Menu.Item key="roadmap" icon={<CompassOutlined />}>Roadmap</Menu.Item>
               <Menu.Item key="docs" icon={<BookOutlined />}>Docs</Menu.Item>
               <Menu.Item key="code" icon={<GithubOutlined />}>Code</Menu.Item>
             </Menu>
