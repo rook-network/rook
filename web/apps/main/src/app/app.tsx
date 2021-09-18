@@ -1,9 +1,12 @@
 import styles from './app.module.less';
 
 import { ReactComponent as Logo } from './tower.svg';
+import { ReactComponent as Snapshot1 } from './snapshot-1.svg';
+import { ReactComponent as Snapshot2 } from './snapshot-2.svg';
+import { ReactComponent as Snapshot3 } from './snapshot-3.svg';
 import { GithubOutlined, BookOutlined, CompassOutlined } from '@ant-design/icons'
 
-import { Layout, Menu, Typography, Row, Col, Card, Input, Image, Button } from "antd";
+import { Layout, Menu, Typography, Row, Col, Card, Input, Button } from "antd";
 
 const { Header, Content } = Layout
 const { Title, Text } = Typography
@@ -52,12 +55,12 @@ export function App() {
               <br />
               <br />
               <Search placeholder="COSMOS Address" enterButton="Claim"/>
-              <Image src="https://www.freeiconspng.com/uploads/no-image-icon-6.png" preview={false}/>
+              <Snapshot1 height="256" width="256" style={{margin: '20px'}}/>
             </Card>
           </Col>
           <Col span={6}>
             <Card>
-              <Image src="https://www.freeiconspng.com/uploads/no-image-icon-6.png" preview={false}/>
+              <Snapshot2 height="256" width="256" style={{margin: '20px'}}/>
               <Title>Learn 🤔</Title>
               <Text type="secondary">Get a feel for the game by entering the Dojo</Text>
               <br />
@@ -72,7 +75,7 @@ export function App() {
               <br />
               <br />
               <Button type="primary" style={{float: "right"}}>Play</Button>
-              <Image src="https://www.freeiconspng.com/uploads/no-image-icon-6.png" preview={false}/>
+              <Snapshot3 height="256" width="256" style={{margin: '20px'}}/>
             </Card>
           </Col>
         </Row>

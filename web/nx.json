@@ -27,6 +27,13 @@
     ]
   },
   "projects": {
+    "game": {
+      "tags": []
+    },
+    "game-e2e": {
+      "tags": [],
+      "implicitDependencies": ["game"]
+    },
     "main": {
       "tags": []
     },
