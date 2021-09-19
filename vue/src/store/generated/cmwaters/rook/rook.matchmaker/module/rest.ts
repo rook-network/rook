@@ -135,10 +135,7 @@ export interface MatchmakerRoom {
 }
 
 export interface ProtobufAny {
-  typeUrl?: string;
-
-  /** @format byte */
-  value?: string;
+  "@type"?: string;
 }
 
 export interface RookmatchmakerParams {

@@ -1,4 +1,4 @@
-# <a><img src="./docs/src/.vuepress/public/rook_logo.svg" height="40" valign="top" /></a> Rook
+# <a><img src="./web/apps/game/src/favicon.ico" height="40" valign="top" /></a> Rook
 
 **Rook** is a 2D multiplayer strategy game akin to Age of Empires built using the Cosmos SDK and Tendermint.
 
