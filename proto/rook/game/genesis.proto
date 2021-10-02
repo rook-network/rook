@@ -9,8 +9,8 @@ option go_package = "github.com/cmwaters/rook/x/game/types";
 
 // GenesisState defines the rook module's genesis state.
 message GenesisState {
-    // the global configuration of all rook games
-    Params params = 1 [(gogoproto.nullable) = false];
-    uint32 params_version = 2;
-    uint64 next_game_id = 3;
+  // the global configuration of all rook games
+  Params params = 1 [ (gogoproto.nullable) = false ];
+  uint32 params_version = 2;
+  uint64 next_game_id = 3;
 }

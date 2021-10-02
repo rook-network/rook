@@ -90,6 +90,9 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
+	"github.com/cmwaters/rook/x/claim"
+	claimkeeper "github.com/cmwaters/rook/x/claim/keeper"
+	claimtypes "github.com/cmwaters/rook/x/claim/types"
 	"github.com/cmwaters/rook/x/game"
 	gamekeeper "github.com/cmwaters/rook/x/game/keeper"
 	gametypes "github.com/cmwaters/rook/x/game/types"
@@ -143,6 +146,7 @@ var (
 		vesting.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
+		claim.AppModuleBasic{},
 		matchmaker.AppModuleBasic{},
 		game.AppModuleBasic{},
 	)
@@ -156,6 +160,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		claimtypes.ModuleName:          {authtypes.Minter, authtypes.Burner},
 	}
 )
 
@@ -212,6 +217,7 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+	ClaimKeeper      claimkeeper.Keeper
 	MatchmakerKeeper matchmakerkeeper.Keeper
 	GameKeeper       gamekeeper.Keeper
 
@@ -246,8 +252,9 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
-		matchmakertypes.StoreKey,
+		claimtypes.StoreKey,
 		gametypes.StoreKey,
+		matchmakertypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(
@@ -342,8 +349,16 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
+	app.ClaimKeeper = claimkeeper.NewKeeper(
+		appCodec,
+		keys[claimtypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+	)
+	claimModule := claim.NewAppModule(appCodec, app.ClaimKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
-	app.MatchmakerKeeper = *matchmakerkeeper.NewKeeper(
+	app.MatchmakerKeeper = matchmakerkeeper.NewKeeper(
 		appCodec,
 		keys[matchmakertypes.StoreKey],
 		app.GetSubspace(matchmakertypes.ModuleName),
@@ -351,7 +366,7 @@ func New(
 	)
 	matchmakerModule := matchmaker.NewAppModule(appCodec, app.MatchmakerKeeper)
 
-	app.GameKeeper = *gamekeeper.NewKeeper(
+	app.GameKeeper = gamekeeper.NewKeeper(
 		appCodec,
 		keys[gametypes.StoreKey],
 		memKeys[gametypes.MemStoreKey],
@@ -400,6 +415,7 @@ func New(
 		transferModule,
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		// this line is used by starport scaffolding # stargate/app/appModule
+		claimModule,
 		matchmakerModule,
 		gameModule,
 	)
@@ -413,7 +429,7 @@ func New(
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, gametypes.ModuleName, claimtypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.

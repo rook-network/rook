@@ -31,8 +31,8 @@
 - Market - trades goods (Bazaar) 1:2 ratio
 - Dock - produces food must be next to the sea.
 - Temple - produces as many population as there are temples (Mosque / Cathedral)
-- Foundry - produces stone
-- Castle - exchanges food for population
+- Foundry - produces stone (Arsenal)
+- Castle - exchanges food for population (Citadel)
 - Tower - prevents production and can be used to capture settlements
 - University - produces technology (Academy, Armoury)
 

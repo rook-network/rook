@@ -22,8 +22,7 @@ message MsgMove {
   uint32 population = 5;
 }
 
-message MsgMoveResponse {
-}
+message MsgMoveResponse {}
 
 message MsgBuild {
   string creator = 1;
@@ -32,23 +31,18 @@ message MsgBuild {
   Settlement settlement = 4;
 }
 
-message MsgBuildResponse {
-}
+message MsgBuildResponse {}
 
 message MsgCreate {
   repeated string players = 1; // all players must be signers
-  Config config = 2 [(gogoproto.nullable) = false];
+  Config config = 2 [ (gogoproto.nullable) = false ];
 }
 
-message MsgCreateResponse {
-  uint64 game_id = 1; 
-}
+message MsgCreateResponse { uint64 game_id = 1; }
 
 message MsgChangeParams {
   string authority = 1;
-  Params params = 2 [(gogoproto.nullable) = false];
+  Params params = 2 [ (gogoproto.nullable) = false ];
 }
 
-message MsgChangeParamsResponse {
-  uint32 version = 1;
-}
+message MsgChangeParamsResponse { uint32 version = 1; }

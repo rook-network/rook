@@ -1,0 +1,10 @@
+syntax = "proto3";
+package rook.claim;
+
+option go_package = "github.com/cmwaters/rook/x/claim/types";
+
+service Msg { rpc Activate(MsgActive) returns (MsgActiveResponse); }
+
+message MsgActive { string claimee = 1; }
+
+message MsgActiveResponse {}

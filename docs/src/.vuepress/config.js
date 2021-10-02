@@ -5,7 +5,7 @@ module.exports = {
   /**
    * Ref：https://v1.vuepress.vuejs.org/config/#title
    */
-  title: "Rook",
+  title: "Rook Docs",
   /**
    * Ref：https://v1.vuepress.vuejs.org/config/#description
    */
@@ -39,38 +39,50 @@ module.exports = {
     lastUpdated: true,
     sidebarDepth: 2,
     sidebar: [
-      {
+       {
         collapsable: false,
         title: "What is it",
         children: [
           "/getting-started/introduction",
-          "/getting-started/installation",
         ],
       },
-      {
+      { 
+        title: "Spec",
         collapsable: false,
-        title: "How does it work",
         children: [
-          "/spec/concepts",
-          "/spec/messages",
-          "/spec/state",
-        ],
-      },
-      {
-        collapsable: false,
-        title: "How do I use it",
-        children: [
-          // "/usage/deploy",
-          "/usage/policies",
-          "/usage/use-cases",
-          // "/usage/testnet"
-        ],
-      },
+          "/spec/",
+          { 
+            title: "Claim",
+            collapsable: false,
+            children: [
+              "/spec/claim/01_concepts",
+              "/spec/claim/02_state",
+              "/spec/claim/03_server",
+            ]
+          }
+        ]
+      }
+     
+      // {
+      //   collapsable: false,
+      //   title: "Modules",
+      //   children: [
+      //     "/spec/",
+
+      //   ],
+      // },
+      // {
+      //   collapsable: false,
+      //   title: "How do I use it",
+      //   children: [
+      //     "/usage/items",
+      //   ],
+      // },
       
     ],
 
     nav: [
-      // { text: "Rust", link: "https://docs.rs/anchor-lang/latest/anchor_lang/" },
+      { text: "Home", link: "https://rook.network" },
       { text: "GitHub", link: "https://github.com/cmwaters/rook" }
     ],
   },

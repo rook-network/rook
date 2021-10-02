@@ -9,76 +9,70 @@ option go_package = "github.com/cmwaters/rook/x/matchmaker/types";
 
 // Msg defines the Msg service.
 service Msg {
-    rpc Host(MsgHost) returns (MsgHostResponse);
-    rpc Join(MsgJoin) returns (MsgJoinResponse);
-    rpc Find(MsgFind) returns (MsgFindResponse);
-    rpc Leave(MsgLeave) returns (MsgLeaveResponse);
+  rpc Host(MsgHost) returns (MsgHostResponse);
+  rpc Join(MsgJoin) returns (MsgJoinResponse);
+  rpc Find(MsgFind) returns (MsgFindResponse);
+  rpc Leave(MsgLeave) returns (MsgLeaveResponse);
 
-    rpc AddMode(MsgAddMode) returns (MsgAddModeResponse);
-    rpc RemoveMode(MsgRemoveMode) returns (MsgRemoveModeResponse);
+  rpc AddMode(MsgAddMode) returns (MsgAddModeResponse);
+  rpc RemoveMode(MsgRemoveMode) returns (MsgRemoveModeResponse);
 }
 
 message MsgHost {
-    // The host of the room
-    string creator = 1;
+  // The host of the room
+  string creator = 1;
 
-    oneof game {
-        // Mode defines the game config, the quorum and capacity of players
-        Mode mode = 2;
-        // Or you can use a predefined mode
-        uint32 mode_id = 3;
-    }
+  oneof game {
+    // Mode defines the game config, the quorum and capacity of players
+    Mode mode = 2;
+    // Or you can use a predefined mode
+    uint32 mode_id = 3;
+  }
 
-    // the list of players that are invited to join the room
-    repeated string invitees = 4;
+  // the list of players that are invited to join the room
+  repeated string invitees = 4;
 
-    // public defines whether the room is open for all players to join
-    bool public = 5;
+  // public defines whether the room is open for all players to join
+  bool public = 5;
 
-    // For scheduled games (like tournaments). Participants have until
-    // then to join. The game only starts if the quorum is met.
-    google.protobuf.Timestamp scheduled = 6 [(gogoproto.stdtime) = true];
+  // For scheduled games (like tournaments). Participants have until
+  // then to join. The game only starts if the quorum is met.
+  google.protobuf.Timestamp scheduled = 6 [ (gogoproto.stdtime) = true ];
 }
 
-message MsgHostResponse {
-    uint64 room_id = 1;
-}
+message MsgHostResponse { uint64 room_id = 1; }
 
 message MsgJoin {
-    string creator = 1;
-    uint64 room_id = 2;
+  string creator = 1;
+  uint64 room_id = 2;
 }
 
 message MsgJoinResponse {}
 
 message MsgFind {
-    string creator = 1;
-    uint32 mode = 2;
+  string creator = 1;
+  uint32 mode = 2;
 }
 
-message MsgFindResponse {
-    uint64 room_id = 1;
-}
+message MsgFindResponse { uint64 room_id = 1; }
 
 message MsgLeave {
-    string creator = 1;
-    uint64 room_id = 2;
+  string creator = 1;
+  uint64 room_id = 2;
 }
 
 message MsgLeaveResponse {}
 
 message MsgAddMode {
-    string authority = 1;
-    Mode mode = 2 [(gogoproto.nullable) = false];
+  string authority = 1;
+  Mode mode = 2 [ (gogoproto.nullable) = false ];
 }
 
-message MsgAddModeResponse {
-    uint32 id = 1;
-}
+message MsgAddModeResponse { uint32 id = 1; }
 
 message MsgRemoveMode {
-    string authority = 1;
-    uint32 id = 2;
+  string authority = 1;
+  uint32 id = 2;
 }
 
-message MsgRemoveModeResponse{}
+message MsgRemoveModeResponse {}

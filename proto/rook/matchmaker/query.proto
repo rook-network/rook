@@ -10,51 +10,40 @@ option go_package = "github.com/cmwaters/rook/x/matchmaker/types";
 
 // Query defines the gRPC querier service.
 service Query {
-    // Room returns the current state of a specific room
-    rpc Room(QueryGetRoomRequest) returns (QueryGetRoomResponse) {
-        option (google.api.http).get = "/matchmaker/room/{id}";
-    }
+  // Room returns the current state of a specific room
+  rpc Room(QueryGetRoomRequest) returns (QueryGetRoomResponse) {
+    option (google.api.http).get = "/matchmaker/room/{id}";
+  }
 
-    // Invitations lists all the rooms that a player is invited to
-    rpc Invitations(QueryGetInvitationsRequest) returns (QueryGetInvitationsResponse) {
-        option (google.api.http).get = "/matchmaker/invitations/{player}";
-    }
+  // Invitations lists all the rooms that a player is invited to
+  rpc Invitations(QueryGetInvitationsRequest)
+      returns (QueryGetInvitationsResponse) {
+    option (google.api.http).get = "/matchmaker/invitations/{player}";
+  }
 
-    // Modes lists all the public available modes
-    rpc Modes(QueryGetModesRequest) returns (QueryGetModesResponse) {
-        option (google.api.http).get = "/matchmaker/modes";
-    }
+  // Modes lists all the public available modes
+  rpc Modes(QueryGetModesRequest) returns (QueryGetModesResponse) {
+    option (google.api.http).get = "/matchmaker/modes";
+  }
 
-    // Params lists the current matchmaker params
-    rpc Params(QueryGetParamsRequest) returns (QueryGetParamsResponse) {
-        option (google.api.http).get = "/matchmaker/params";
-    }
+  // Params lists the current matchmaker params
+  rpc Params(QueryGetParamsRequest) returns (QueryGetParamsResponse) {
+    option (google.api.http).get = "/matchmaker/params";
+  }
 }
 
-message QueryGetRoomRequest {
-    uint64 id = 1;
-}
+message QueryGetRoomRequest { uint64 id = 1; }
 
-message QueryGetRoomResponse {
-    Room room = 1;
-}
+message QueryGetRoomResponse { Room room = 1; }
 
-message QueryGetInvitationsRequest {
-    string player = 1;
-}
+message QueryGetInvitationsRequest { string player = 1; }
 
-message QueryGetInvitationsResponse {
-    map<uint64, Room> rooms = 1;
-}
+message QueryGetInvitationsResponse { map<uint64, Room> rooms = 1; }
 
 message QueryGetModesRequest {}
 
-message QueryGetModesResponse {
-    map<uint32, Mode> modes = 1;
-}
+message QueryGetModesResponse { map<uint32, Mode> modes = 1; }
 
 message QueryGetParamsRequest {}
 
-message QueryGetParamsResponse {
-    Params params = 1;
-}
+message QueryGetParamsResponse { Params params = 1; }

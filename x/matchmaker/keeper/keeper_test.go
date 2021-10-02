@@ -26,7 +26,7 @@ var (
 	blockTime  = time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
 )
 
-func setupKeeper(t testing.TB) (*Keeper, sdk.Context) {
+func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 
 	db := tmdb.NewMemDB()

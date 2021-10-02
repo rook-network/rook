@@ -4,11 +4,11 @@ package rook.game;
 option go_package = "github.com/cmwaters/rook/x/game/types";
 
 message Overview {
-  Map map = 1; 
+  Map map = 1;
   uint32 param_version = 2;
 }
 
-message State { 
+message State {
   repeated Faction players = 1;
   repeated Populace gaia = 2;
   uint64 step = 3;
@@ -33,7 +33,7 @@ message Populace {
 
 message Config {
   InitializationConfig initial = 1;
-  MapConfig map = 2; 
+  MapConfig map = 2;
 }
 
 message MapConfig {
@@ -57,8 +57,8 @@ message Params {
 }
 
 message Position {
-  uint32 x = 3; 
-  uint32 y = 4; 
+  uint32 x = 3;
+  uint32 y = 4;
 }
 
 enum Direction {
@@ -69,7 +69,7 @@ enum Direction {
 }
 
 enum Landscape {
-  UNKNOWN = 0; 
+  UNKNOWN = 0;
   PLAINS = 1;
   FOREST = 2;
   MOUNTAINS = 3;

@@ -10,7 +10,7 @@ option go_package = "github.com/cmwaters/rook/x/matchmaker/types";
 
 message Room {
   // the config to be used for the game
-  rook.game.Config config = 1 [(gogoproto.nullable) = false];
+  rook.game.Config config = 1 [ (gogoproto.nullable) = false ];
 
   // the current players in the room
   repeated string players = 2;
@@ -33,29 +33,28 @@ message Room {
 
   oneof time {
     // when the room was created. Rooms get garbage collected after a while
-    google.protobuf.Timestamp created = 8 [(gogoproto.stdtime) = true];
+    google.protobuf.Timestamp created = 8 [ (gogoproto.stdtime) = true ];
 
     // when quorum is reached and we are locked in to starting the game.
     // The prestart_wait_period gives a bufer for more people to join if they
     // want.
-    google.protobuf.Timestamp ready = 9 [(gogoproto.stdtime) = true];
+    google.protobuf.Timestamp ready = 9 [ (gogoproto.stdtime) = true ];
 
     // the time that the game is scheduled to start. Participants have until
     // then to join. The game only starts if the quorum is met. This is good
     // for tournament games
-    google.protobuf.Timestamp scheduled = 10 [(gogoproto.stdtime) = true];
+    google.protobuf.Timestamp scheduled = 10 [ (gogoproto.stdtime) = true ];
   }
 }
 
 // Rooms represents a set of rooms by id
-message Rooms {
-  repeated uint64 ids = 1;
-}
+message Rooms { repeated uint64 ids = 1; }
 
-// Modes are a way of accumulating a small set of possible games that people can choose between
+// Modes are a way of accumulating a small set of possible games that people can
+// choose between
 message Mode {
   // the config to be used for the game
-  rook.game.Config config = 1 [(gogoproto.nullable) = false];
+  rook.game.Config config = 1 [ (gogoproto.nullable) = false ];
 
   // the minimum amount of players needed to start a game
   uint32 quorum = 2;
@@ -65,9 +64,9 @@ message Mode {
 }
 
 message Params {
-  option (gogoproto.equal)            = true;
+  option (gogoproto.equal) = true;
   option (gogoproto.goproto_stringer) = false;
-  
+
   // the maximum duration a room can last for before it is closed and all
   // players are kicked
   google.protobuf.Duration room_lifespan = 1 [
@@ -84,4 +83,3 @@ message Params {
     (gogoproto.moretags) = "yaml:\"prestart_wait_period\""
   ];
 }
-
