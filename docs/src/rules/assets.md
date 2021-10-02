@@ -1,23 +1,10 @@
-# Rook Items
+# Assets
 
-### Terrain
+This section tries to present an up-to-date catalogue of all assets that players can have.
 
-- Sea (Impassable)
-- Plains
-- Forest
-- Mountains (Impassable)
+## Settlements
 
-### Resources
-
-- Population
-- Food
-- Stone
-- Wood
-- Technology
-
-### Settlements
-
-#### Common
+### Common
 
 - Capital - produces everything
 - City - produces population
@@ -26,7 +13,7 @@
 - Lumbermill - produces wood. Must be placed in a forest
 - Quarry - produces stone. Must be placed next to mountains
 
-#### Rare
+### Rare
 
 - Market - trades goods (Bazaar) 1:2 ratio
 - Dock - produces food must be next to the sea.
@@ -36,7 +23,15 @@
 - Tower - prevents production and can be used to capture settlements
 - University - produces technology (Academy, Armoury)
 
-### Abilities
+## Traits
+
+### Technological
 
 - Fortify - population within Cities and Capitals are considered double
-- Roads - Markets can trade at a 1:1 ratio
+- Barter - Markets can trade at a 1:1 ratio
+- Roads - 
+
+### Cultural
+
+- Seafarer 
+- Pluralism - factions can build multiple capitals. Opposing factions must conquer all capitals.

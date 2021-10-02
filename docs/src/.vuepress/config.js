@@ -39,11 +39,42 @@ module.exports = {
     lastUpdated: true,
     sidebarDepth: 2,
     sidebar: [
-       {
+      {
         collapsable: false,
-        title: "What is it",
+        title: "Introduction",
         children: [
-          "/getting-started/introduction",
+          "/introduction/introduction",
+          "/introduction/roadmap",
+        ],
+      },
+      {
+        collapsable: false,
+        title: "Game Rules",
+        children: [
+          "/rules/overview",
+          "/rules/building-blocks",
+          "/rules/setting-up",
+          "/rules/moves",
+          "/rules/objective",
+          "/rules/assets",
+        ],
+      },
+      {
+        collapsable: false,
+        title: "Community",
+        children: [
+          "/community/contributing",
+          // "/community/governance", TODO: add a section on governance
+        ],
+      },
+      {
+        collapsable: false,
+        title: "Infrastructure",
+        children: [
+          "/infrastructure/nodes",
+          "/infrastructure/mainnet",
+          "/infrastructure/testnets",
+          // "/infrastructure/validators", TODO: add the validator section
         ],
       },
       { 
@@ -52,8 +83,23 @@ module.exports = {
         children: [
           "/spec/",
           { 
+            title: "Game",
+            children: [
+              "/spec/game/01_concepts",
+              "/spec/game/02_state",
+              "/spec/game/03_server",
+            ]
+          },
+          { 
+            title: "Matchmaker",
+            children: [
+              "/spec/matchmaker/01_concepts",
+              "/spec/matchmaker/02_state",
+              "/spec/matchmaker/03_server",
+            ]
+          },
+          { 
             title: "Claim",
-            collapsable: false,
             children: [
               "/spec/claim/01_concepts",
               "/spec/claim/02_state",
@@ -61,24 +107,7 @@ module.exports = {
             ]
           }
         ]
-      }
-     
-      // {
-      //   collapsable: false,
-      //   title: "Modules",
-      //   children: [
-      //     "/spec/",
-
-      //   ],
-      // },
-      // {
-      //   collapsable: false,
-      //   title: "How do I use it",
-      //   children: [
-      //     "/usage/items",
-      //   ],
-      // },
-      
+      },
     ],
 
     nav: [

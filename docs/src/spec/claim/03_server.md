@@ -6,7 +6,7 @@ The claims module has a single transaction that can be sent
 
 ### Activate
 
-```proto
+```protobuf
 service Msg { rpc Activate(MsgActive) returns (MsgActiveResponse); }
 
 message MsgActive { string claimee = 1; }
