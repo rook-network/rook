@@ -14,17 +14,8 @@ const { Search } = Input
 
 
 export function App() {
-  const handleClick = (e: any) => {
-    switch(e.key) {
-      case "docs":
-        window.location.href = "https://github.com/cmwaters/rook";
-        break;
-      case "code":
-        window.location.href = "https://github.com/cmwaters/rook";
-        break;
-      case "roadmap":
-        break;
-    }
+  const redirectToDocs = () => {
+    window.location.href = "https://cmwaters.github.io/rook";
   }
 
   return (
@@ -38,11 +29,12 @@ export function App() {
             </div>
           </td>
           <td>
-            <Menu style={{ float:"right", borderBottom:"none"}} mode="horizontal" onClick={handleClick}>
+            {/* TODO: Add menu bar back in */}
+            {/* <Menu style={{ float:"right", borderBottom:"none"}} mode="horizontal" onClick={handleClick}>
               <Menu.Item key="roadmap" icon={<CompassOutlined />}>Roadmap</Menu.Item>
               <Menu.Item key="docs" icon={<BookOutlined />}>Docs</Menu.Item>
               <Menu.Item key="code" icon={<GithubOutlined />}>Code</Menu.Item>
-            </Menu>
+            </Menu> */}
           </td>
         </table>
       </Header>
@@ -61,11 +53,12 @@ export function App() {
           <Col span={6}>
             <Card>
               <Snapshot2 height="256" width="256" style={{margin: '20px'}}/>
-              <Title>Learn 🤔</Title>
-              <Text type="secondary">Get a feel for the game by entering the Dojo</Text>
+              <Title>Learn 🤓</Title>
+              <Text type="secondary">Peek into the docs to learn how to play</Text>
+              {/* <Text type="secondary">Get a feel for the game by entering the Dojo</Text> */}
               <br />
               <br />
-              <Button type="primary" style={{float: "right"}}>Enter</Button>
+              <Button type="primary" style={{float: "right"}} onClick={redirectToDocs}>Enter</Button>
             </Card>
           </Col>
           <Col span={6}>
@@ -74,7 +67,7 @@ export function App() {
               <Text type="secondary">Try out the alpha version</Text>
               <br />
               <br />
-              <Button type="primary" style={{float: "right"}}>Play</Button>
+              <Button type="primary" style={{float: "right", backgroundColor:"#666"}}>Coming Soon</Button>
               <Snapshot3 height="256" width="256" style={{margin: '20px'}}/>
             </Card>
           </Col>

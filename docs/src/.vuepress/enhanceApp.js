@@ -11,5 +11,5 @@ export default ({
   siteData, // site metadata
 }) => {
   // ...apply enhancements for the site.
-  router.addRoutes([{ path: "/", redirect: "/getting-started/introduction" }]);
+  router.addRoutes([{ path: "/", redirect: "/introduction/introduction" }]);
 };
