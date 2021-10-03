@@ -28,12 +28,12 @@ var testGenesis = types.GenesisState{
 	ClaimRecords: []types.ClaimRecord{
 		{
 			Address:                acc1.String(),
-			InitialClaimableAmount: sdk.Coins{sdk.NewInt64Coin(types.DefaultClaimDenom, 1000000000)},
+			InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 1000000000),
 			ActionCompleted:        []bool{true, false, true, true},
 		},
 		{
 			Address:                acc2.String(),
-			InitialClaimableAmount: sdk.Coins{sdk.NewInt64Coin(types.DefaultClaimDenom, 500000000)},
+			InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 500000000),
 			ActionCompleted:        []bool{false, false, false, false},
 		},
 	},
@@ -47,7 +47,7 @@ func TestClaimInitGenesis(t *testing.T) {
 	claim.InitGenesis(ctx, app.ClaimKeeper, genesis)
 
 	coin := app.ClaimKeeper.GetModuleAccountBalance(ctx)
-	require.Equal(t, coin.String(), genesis.ModuleAccountBalance.String())
+	require.Equal(t, coin.String(), genesis.TotalClaimable().String())
 
 	params, err := app.ClaimKeeper.GetParams(ctx)
 	require.NoError(t, err)
@@ -68,28 +68,27 @@ func TestClaimExportGenesis(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, claimRecord, types.ClaimRecord{
 		Address:                acc2.String(),
-		InitialClaimableAmount: sdk.Coins{sdk.NewInt64Coin(types.DefaultClaimDenom, 500000000)},
+		InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 500000000),
 		ActionCompleted:        []bool{false, false, false, false},
 	})
 
-	claimableAmount, err := app.ClaimKeeper.GetClaimableAmountForAction(ctx, acc2, types.ActionSwap)
+	claimableAmount, err := app.ClaimKeeper.GetClaimableAmountForAction(ctx, acc2, types.ActionPlay)
 	require.NoError(t, err)
-	require.Equal(t, claimableAmount, sdk.Coins{sdk.NewInt64Coin(types.DefaultClaimDenom, 125000000)})
+	require.Equal(t, claimableAmount, sdk.NewInt64Coin(types.DefaultClaimDenom, 125000000))
 
-	app.ClaimKeeper.AfterSwap(ctx, acc2)
+	app.ClaimKeeper.AfterPlayedGame(ctx, 1, acc2)
 
 	genesisExported := claim.ExportGenesis(ctx, app.ClaimKeeper)
-	require.Equal(t, genesisExported.ModuleAccountBalance, genesis.ModuleAccountBalance.Sub(claimableAmount[0]))
 	require.Equal(t, genesisExported.Params, genesis.Params)
 	require.Equal(t, genesisExported.ClaimRecords, []types.ClaimRecord{
 		{
 			Address:                acc1.String(),
-			InitialClaimableAmount: sdk.Coins{sdk.NewInt64Coin(types.DefaultClaimDenom, 1000000000)},
+			InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 1000000000),
 			ActionCompleted:        []bool{true, false, true, true},
 		},
 		{
 			Address:                acc2.String(),
-			InitialClaimableAmount: sdk.Coins{sdk.NewInt64Coin(types.DefaultClaimDenom, 500000000)},
+			InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 500000000),
 			ActionCompleted:        []bool{false, true, false, false},
 		},
 	})

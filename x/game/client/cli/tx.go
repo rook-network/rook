@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/spf13/cobra"
-
-	"github.com/arcane-systems/rook/x/game/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/spf13/cobra"
+
+	"github.com/arcane-systems/rook/x/game/types"
 )
 
 var (
@@ -29,8 +29,6 @@ func GetTxCmd() *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-
-	// this line is used by starport scaffolding # 1
 
 	cmd.AddCommand(CmdCreate())
 

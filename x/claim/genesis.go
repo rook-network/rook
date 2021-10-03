@@ -13,7 +13,7 @@ import (
 // state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	// TODO: Can we ensure that the module account created is equal everytime?
-	k.CreateModuleAccount(ctx, genState.ModuleAccountBalance)
+	k.CreateModuleAccount(ctx, genState.TotalClaimable())
 
 	if genState.Params.AirdropStartTime.Equal(time.Time{}) {
 		genState.Params.AirdropStartTime = ctx.BlockTime()
@@ -27,7 +27,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	params, _ := k.GetParams(ctx)
 	genesis := types.DefaultGenesis()
-	genesis.ModuleAccountBalance = k.GetModuleAccountBalance(ctx)
 	genesis.Params = params
 	genesis.ClaimRecords = k.GetClaimRecords(ctx)
 	return genesis

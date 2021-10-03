@@ -49,16 +49,15 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 	genState := app.ModuleBasics.DefaultGenesis(encCfg.Marshaler)
 	claimGenState := claimtypes.DefaultGenesis()
-	claimGenState.ModuleAccountBalance = sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(30))
 	claimGenState.ClaimRecords = []types.ClaimRecord{
 		{
 			Address:                addr1.String(),
-			InitialClaimableAmount: sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 10)),
+			InitialClaimableAmount: sdk.NewInt64Coin(sdk.DefaultBondDenom, 10),
 			ActionCompleted:        []bool{false, false, false, false},
 		},
 		{
 			Address:                addr2.String(),
-			InitialClaimableAmount: sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 20)),
+			InitialClaimableAmount: sdk.NewInt64Coin(sdk.DefaultBondDenom, 20),
 			ActionCompleted:        []bool{false, false, false, false},
 		},
 	}
@@ -190,7 +189,7 @@ func (s *IntegrationTestSuite) TestCmdQueryClaimableForAction() {
 			"query claimable-for-action amount",
 			[]string{
 				addr2.String(),
-				types.ActionAddLiquidity.String(),
+				types.ActionPlay.String(),
 				fmt.Sprintf("--%s=json", tmcli.OutputFlag),
 			},
 			sdk.Coins{sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(5))},

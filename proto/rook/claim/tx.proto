@@ -3,8 +3,8 @@ package rook.claim;
 
 option go_package = "github.com/arcane-systems/rook/x/claim/types";
 
-service Msg { rpc Activate(MsgActive) returns (MsgActiveResponse); }
+service Msg { rpc Activate(MsgActivate) returns (MsgActivateResponse); }
 
-message MsgActive { string claimee = 1; }
+message MsgActivate { string claimee = 1; }
 
-message MsgActiveResponse {}
+message MsgActivateResponse {}

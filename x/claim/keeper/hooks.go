@@ -3,33 +3,32 @@ package keeper
 import (
 	"github.com/arcane-systems/rook/x/claim/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
-func (k Keeper) AfterAddLiquidity(ctx sdk.Context, sender sdk.AccAddress) {
-	_, err := k.ClaimCoinsForAction(ctx, sender, types.ActionAddLiquidity)
+func (k Keeper) AfterTrade(ctx sdk.Context, sender sdk.AccAddress) {
+	_, err := k.ClaimCoinsForAction(ctx, sender, types.ActionTrade)
 	if err != nil {
 		panic(err.Error())
 	}
 }
 
-func (k Keeper) AfterSwap(ctx sdk.Context, sender sdk.AccAddress) {
-	_, err := k.ClaimCoinsForAction(ctx, sender, types.ActionSwap)
+func (k Keeper) AfterWonGame(ctx sdk.Context, sender sdk.AccAddress) {
+	_, err := k.ClaimCoinsForAction(ctx, sender, types.ActionWin)
 	if err != nil {
 		panic(err.Error())
 	}
 }
 
-func (k Keeper) AfterProposalVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress) {
-	_, err := k.ClaimCoinsForAction(ctx, voterAddr, types.ActionVote)
+func (k Keeper) AfterPlayedGame(ctx sdk.Context, gameID uint64, voterAddr sdk.AccAddress) {
+	_, err := k.ClaimCoinsForAction(ctx, voterAddr, types.ActionPlay)
 	if err != nil {
 		panic(err.Error())
 	}
 }
 
 func (k Keeper) AfterDelegationModified(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) {
-	_, err := k.ClaimCoinsForAction(ctx, delAddr, types.ActionDelegateStake)
+	_, err := k.ClaimCoinsForAction(ctx, delAddr, types.ActionDelegate)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -42,7 +41,6 @@ type Hooks struct {
 	k Keeper
 }
 
-var _ govtypes.GovHooks = Hooks{}
 var _ stakingtypes.StakingHooks = Hooks{}
 
 // Return the wrapper struct
@@ -53,18 +51,6 @@ func (k Keeper) Hooks() Hooks {
 // game hooks
 
 // TODO: add game hooks
-
-// governance hooks
-func (h Hooks) AfterProposalSubmission(ctx sdk.Context, proposalID uint64) {}
-func (h Hooks) AfterProposalDeposit(ctx sdk.Context, proposalID uint64, depositorAddr sdk.AccAddress) {
-}
-
-func (h Hooks) AfterProposalVote(ctx sdk.Context, proposalID uint64, voterAddr sdk.AccAddress) {
-	h.k.AfterProposalVote(ctx, proposalID, voterAddr)
-}
-
-func (h Hooks) AfterProposalFailedMinDeposit(ctx sdk.Context, proposalID uint64)  {}
-func (h Hooks) AfterProposalVotingPeriodEnded(ctx sdk.Context, proposalID uint64) {}
 
 // staking hooks
 func (h Hooks) AfterValidatorCreated(ctx sdk.Context, valAddr sdk.ValAddress)   {}

@@ -25,8 +25,8 @@ message ClaimRecord {
   string address = 1 [ (gogoproto.moretags) = "yaml:\"address\"" ];
 
   // total initial claimable amount for the user
-  repeated cosmos.base.v1beta1.Coin initial_claimable_amount = 2 [
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins",
+  cosmos.base.v1beta1.Coin initial_claimable_amount = 2 [
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"initial_claimable_amount\""
   ];

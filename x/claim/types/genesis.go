@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type Actions []Action
@@ -35,4 +36,15 @@ func GetGenesisStateFromAppState(cdc codec.JSONCodec, appState map[string]json.R
 	}
 
 	return &genesisState
+}
+
+// TotalClaimable calculates the total possible claimable airdrop allotment
+func (gs GenesisState) TotalClaimable() sdk.Coin {
+	totalClaimable := sdk.Coin{}
+
+	for _, claimRecord := range gs.ClaimRecords {
+		totalClaimable = totalClaimable.Add(claimRecord.InitialClaimableAmount)
+	}
+
+	return totalClaimable
 }
