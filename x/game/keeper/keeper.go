@@ -6,7 +6,7 @@ import (
 
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/cmwaters/rook/x/game/types"
+	"github.com/arcane-systems/rook/x/game/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"

@@ -10,7 +10,7 @@ import (
 	// "github.com/cosmos/cosmos-sdk/client/flags"
 	// sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/cmwaters/rook/x/matchmaker/types"
+	"github.com/arcane-systems/rook/x/matchmaker/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module

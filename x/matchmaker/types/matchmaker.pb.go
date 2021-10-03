@@ -5,7 +5,7 @@ package types
 
 import (
 	fmt "fmt"
-	types "github.com/cmwaters/rook/x/game/types"
+	types "github.com/arcane-systems/rook/x/game/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"

@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	rook "github.com/cmwaters/rook/app"
-	"github.com/cmwaters/rook/testutil/simapp"
-	"github.com/cmwaters/rook/x/claim"
-	"github.com/cmwaters/rook/x/claim/types"
+	rook "github.com/arcane-systems/rook/app"
+	"github.com/arcane-systems/rook/testutil/simapp"
+	"github.com/arcane-systems/rook/x/claim"
+	"github.com/arcane-systems/rook/x/claim/types"
 )
 
 var now = time.Now().UTC()

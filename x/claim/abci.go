@@ -1,7 +1,7 @@
 package claim
 
 import (
-	"github.com/cmwaters/rook/x/claim/keeper"
+	"github.com/arcane-systems/rook/x/claim/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

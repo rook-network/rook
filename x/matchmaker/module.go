@@ -11,9 +11,9 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/cmwaters/rook/x/matchmaker/client/cli"
-	"github.com/cmwaters/rook/x/matchmaker/keeper"
-	"github.com/cmwaters/rook/x/matchmaker/types"
+	"github.com/arcane-systems/rook/x/matchmaker/client/cli"
+	"github.com/arcane-systems/rook/x/matchmaker/keeper"
+	"github.com/arcane-systems/rook/x/matchmaker/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"

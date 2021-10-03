@@ -5,7 +5,7 @@ package rook.game;
 import "rook/game/game.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/cmwaters/rook/x/game/types";
+option go_package = "github.com/arcane-systems/rook/x/game/types";
 
 // GenesisState defines the rook module's genesis state.
 message GenesisState {

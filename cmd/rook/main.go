@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/cmwaters/rook/app"
-	"github.com/cmwaters/rook/cmd/rook/cmd"
+	"github.com/arcane-systems/rook/app"
+	"github.com/arcane-systems/rook/cmd/rook/cmd"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 )
 

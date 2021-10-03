@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/cmwaters/rook/x/claim/keeper"
-	"github.com/cmwaters/rook/x/claim/types"
+	"github.com/arcane-systems/rook/x/claim/keeper"
+	"github.com/arcane-systems/rook/x/claim/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis

@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	"github.com/cmwaters/rook/testutil/simapp"
-	"github.com/cmwaters/rook/x/game/keeper"
-	"github.com/cmwaters/rook/x/game/types"
+	"github.com/arcane-systems/rook/testutil/simapp"
+	"github.com/arcane-systems/rook/x/game/keeper"
+	"github.com/arcane-systems/rook/x/game/types"
 )
 
 func TestGame(t *testing.T) {

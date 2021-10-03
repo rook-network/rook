@@ -112,7 +112,7 @@ module.exports = {
 
     nav: [
       { text: "Home", link: "https://rook.network" },
-      { text: "GitHub", link: "https://github.com/cmwaters/rook" }
+      { text: "GitHub", link: "https://github.com/arcane-systems/rook" }
     ],
   },
 

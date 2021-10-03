@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"github.com/cmwaters/rook/x/game/types"
+	"github.com/arcane-systems/rook/x/game/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

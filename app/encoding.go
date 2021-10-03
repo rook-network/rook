@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/cmwaters/rook/app/params"
+	"github.com/arcane-systems/rook/app/params"
 	"github.com/cosmos/cosmos-sdk/std"
 )
 

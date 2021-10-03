@@ -3,8 +3,8 @@ package claim
 import (
 	"fmt"
 
-	"github.com/cmwaters/rook/x/claim/keeper"
-	"github.com/cmwaters/rook/x/claim/types"
+	"github.com/arcane-systems/rook/x/claim/keeper"
+	"github.com/arcane-systems/rook/x/claim/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )

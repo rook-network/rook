@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "rook/claim/claim.proto";
 
-option go_package = "github.com/cmwaters/rook/x/claim/types";
+option go_package = "github.com/arcane-systems/rook/x/claim/types";
 
 // Query defines the gRPC querier service.
 service Query {

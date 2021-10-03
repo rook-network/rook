@@ -1,4 +1,4 @@
-module github.com/cmwaters/rook
+module github.com/arcane-systems/rook
 
 go 1.17
 

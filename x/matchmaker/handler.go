@@ -3,8 +3,8 @@ package matchmaker
 import (
 	"fmt"
 
-	"github.com/cmwaters/rook/x/matchmaker/keeper"
-	"github.com/cmwaters/rook/x/matchmaker/types"
+	"github.com/arcane-systems/rook/x/matchmaker/keeper"
+	"github.com/arcane-systems/rook/x/matchmaker/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )

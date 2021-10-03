@@ -8,10 +8,10 @@ import (
 	"github.com/stretchr/testify/require"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	"github.com/cmwaters/rook/testutil/simapp"
-	game "github.com/cmwaters/rook/x/game/types"
-	"github.com/cmwaters/rook/x/matchmaker/keeper"
-	"github.com/cmwaters/rook/x/matchmaker/types"
+	"github.com/arcane-systems/rook/testutil/simapp"
+	game "github.com/arcane-systems/rook/x/game/types"
+	"github.com/arcane-systems/rook/x/matchmaker/keeper"
+	"github.com/arcane-systems/rook/x/matchmaker/types"
 )
 
 func TestMatchmaker(t *testing.T) {

@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/suite"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
-	"github.com/cmwaters/rook/app"
-	"github.com/cmwaters/rook/testutil/simapp"
-	"github.com/cmwaters/rook/x/claim/types"
+	"github.com/arcane-systems/rook/app"
+	"github.com/arcane-systems/rook/testutil/simapp"
+	"github.com/arcane-systems/rook/x/claim/types"
 )
 
 type KeeperTestSuite struct {

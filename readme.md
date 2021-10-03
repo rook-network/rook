@@ -10,6 +10,6 @@ All players have a set of items: a mixture of abilities, traits and settlements 
 
 ## Documentation
 
-For full documentation of how the game works, how to run a node and play it locally, and the wider mechanics of the blockchain refer to the [docs](https://cmwaters.github.io/rook/)
+For full documentation of how the game works, how to run a node and play it locally, and the wider mechanics of the blockchain refer to the [docs](https://arcane-systems.github.io/rook/)
 
 *This repository is current a WIP*

@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"github.com/cmwaters/rook/x/claim/types"
+	"github.com/arcane-systems/rook/x/claim/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"

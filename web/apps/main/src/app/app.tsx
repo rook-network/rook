@@ -15,7 +15,7 @@ const { Search } = Input
 
 export function App() {
   const redirectToDocs = () => {
-    window.location.href = "https://cmwaters.github.io/rook";
+    window.location.href = "https://arcane-systems.github.io/rook";
   }
 
   return (

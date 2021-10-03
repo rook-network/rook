@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"time"
 
-	"github.com/cmwaters/rook/x/claim/types"
+	"github.com/arcane-systems/rook/x/claim/types"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"

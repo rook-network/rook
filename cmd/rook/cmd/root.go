@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cmwaters/rook/app/params"
+	"github.com/arcane-systems/rook/app/params"
 	"github.com/cosmos/cosmos-sdk/snapshots"
 
 	"github.com/spf13/cast"
@@ -16,7 +16,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/cmwaters/rook/app"
+	"github.com/arcane-systems/rook/app"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"

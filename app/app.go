@@ -25,7 +25,7 @@ import (
 	ibchost "github.com/cosmos/ibc-go/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/modules/core/keeper"
 
-	appparams "github.com/cmwaters/rook/app/params"
+	appparams "github.com/arcane-systems/rook/app/params"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -90,15 +90,15 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
-	"github.com/cmwaters/rook/x/claim"
-	claimkeeper "github.com/cmwaters/rook/x/claim/keeper"
-	claimtypes "github.com/cmwaters/rook/x/claim/types"
-	"github.com/cmwaters/rook/x/game"
-	gamekeeper "github.com/cmwaters/rook/x/game/keeper"
-	gametypes "github.com/cmwaters/rook/x/game/types"
-	"github.com/cmwaters/rook/x/matchmaker"
-	matchmakerkeeper "github.com/cmwaters/rook/x/matchmaker/keeper"
-	matchmakertypes "github.com/cmwaters/rook/x/matchmaker/types"
+	"github.com/arcane-systems/rook/x/claim"
+	claimkeeper "github.com/arcane-systems/rook/x/claim/keeper"
+	claimtypes "github.com/arcane-systems/rook/x/claim/types"
+	"github.com/arcane-systems/rook/x/game"
+	gamekeeper "github.com/arcane-systems/rook/x/game/keeper"
+	gametypes "github.com/arcane-systems/rook/x/game/types"
+	"github.com/arcane-systems/rook/x/matchmaker"
+	matchmakerkeeper "github.com/arcane-systems/rook/x/matchmaker/keeper"
+	matchmakertypes "github.com/arcane-systems/rook/x/matchmaker/types"
 )
 
 const Name = "rook"

@@ -11,10 +11,10 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/cmwaters/rook/x/claim/client/cli"
-	"github.com/cmwaters/rook/x/claim/client/rest"
-	"github.com/cmwaters/rook/x/claim/keeper"
-	"github.com/cmwaters/rook/x/claim/types"
+	"github.com/arcane-systems/rook/x/claim/client/cli"
+	"github.com/arcane-systems/rook/x/claim/client/rest"
+	"github.com/arcane-systems/rook/x/claim/keeper"
+	"github.com/arcane-systems/rook/x/claim/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"

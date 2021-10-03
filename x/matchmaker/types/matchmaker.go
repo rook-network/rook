@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	game "github.com/cmwaters/rook/x/game/types"
+	game "github.com/arcane-systems/rook/x/game/types"
 )
 
 func NewRoom(config game.Config, players, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
