@@ -8,6 +8,7 @@ import (
 
 // x/claim module sentinel errors
 var (
-	ErrIncorrectModuleAccountBalance = sdkerrors.Register(ModuleName, 1100,
-		"claim module account balance != sum of all claim record InitialClaimableAmounts")
+	ErrClaimInactive    = sdkerrors.Register(ModuleName, 1100, "claimee must first activate their claim before performing other actions")
+	ErrRecordNotFound   = sdkerrors.Register(ModuleName, 1101, "claim record not found")
+	ErrAlreadyActivated = sdkerrors.Register(ModuleName, 1102, "claim has already been activated")
 )

@@ -40,7 +40,7 @@ func GetGenesisStateFromAppState(cdc codec.JSONCodec, appState map[string]json.R
 
 // TotalClaimable calculates the total possible claimable airdrop allotment
 func (gs GenesisState) TotalClaimable() sdk.Coin {
-	totalClaimable := sdk.Coin{}
+	totalClaimable := sdk.NewInt64Coin(gs.Params.ClaimDenom, 0)
 
 	for _, claimRecord := range gs.ClaimRecords {
 		totalClaimable = totalClaimable.Add(claimRecord.InitialClaimableAmount)

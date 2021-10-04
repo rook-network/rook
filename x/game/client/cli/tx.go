@@ -30,12 +30,12 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	cmd.AddCommand(CmdCreate())
+	cmd.AddCommand(CmdTxCreate())
 
 	return cmd
 }
 
-func CmdCreate() *cobra.Command {
+func CmdTxCreate() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create [players...]",
 		Short: "Broadcast message create",

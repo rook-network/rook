@@ -52,15 +52,16 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	claimGenState.ClaimRecords = []types.ClaimRecord{
 		{
 			Address:                addr1.String(),
-			InitialClaimableAmount: sdk.NewInt64Coin(sdk.DefaultBondDenom, 10),
-			ActionCompleted:        []bool{false, false, false, false},
+			InitialClaimableAmount: sdk.NewInt64Coin(sdk.DefaultBondDenom, 100),
+			ActionCompleted:        []bool{true, false, false, false, false},
 		},
 		{
 			Address:                addr2.String(),
 			InitialClaimableAmount: sdk.NewInt64Coin(sdk.DefaultBondDenom, 20),
-			ActionCompleted:        []bool{false, false, false, false},
+			ActionCompleted:        []bool{false, false, false, false, false},
 		},
 	}
+	claimGenState.Params.ClaimDenom = sdk.DefaultBondDenom
 	claimGenStateBz := encCfg.Marshaler.MustMarshalJSON(claimGenState)
 	genState[claimtypes.ModuleName] = claimGenStateBz
 
@@ -80,7 +81,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 		},
 		GenesisState:    genState,
 		TimeoutCommit:   2 * time.Second,
-		ChainID:         "osmosis-1",
+		ChainID:         "rook-1",
 		NumValidators:   1,
 		BondDenom:       sdk.DefaultBondDenom,
 		MinGasPrices:    fmt.Sprintf("0.000006%s", sdk.DefaultBondDenom),
@@ -183,16 +184,16 @@ func (s *IntegrationTestSuite) TestCmdQueryClaimableForAction() {
 	testCases := []struct {
 		name  string
 		args  []string
-		coins sdk.Coins
+		coins sdk.Coin
 	}{
 		{
-			"query claimable-for-action amount",
+			"query claimable-for-action",
 			[]string{
-				addr2.String(),
+				addr1.String(),
 				types.ActionPlay.String(),
 				fmt.Sprintf("--%s=json", tmcli.OutputFlag),
 			},
-			sdk.Coins{sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(5))},
+			sdk.NewInt64Coin(s.cfg.BondDenom, 20),
 		},
 	}
 
@@ -209,6 +210,41 @@ func (s *IntegrationTestSuite) TestCmdQueryClaimableForAction() {
 			var result types.QueryClaimableForActionResponse
 			s.Require().NoError(clientCtx.JSONCodec.UnmarshalJSON(out.Bytes(), &result))
 			s.Require().Equal(result.Coins.String(), tc.coins.String())
+		})
+	}
+}
+
+func (s *IntegrationTestSuite) TestCmdTxActivate() {
+	val := s.network.Validators[0]
+
+	testCases := []struct {
+		name  string
+		args  []string
+		coins sdk.Coin
+	}{
+		{
+			"submit activate claim tx",
+			[]string{
+				addr1.String(),
+				fmt.Sprintf("--%s=json", tmcli.OutputFlag),
+			},
+			sdk.NewInt64Coin(s.cfg.BondDenom, 20),
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+
+		s.Run(tc.name, func() {
+			cmd := cli.GetCmdTxActivate()
+			clientCtx := val.ClientCtx
+
+			out, err := clitestutil.ExecTestCLICmd(clientCtx, cmd, tc.args)
+			s.Require().NoError(err)
+
+			var result types.MsgActivateResponse
+			s.Require().NoError(clientCtx.JSONCodec.UnmarshalJSON(out.Bytes(), &result))
+			s.Require().Equal(result.Claimed.String(), tc.coins.String())
 		})
 	}
 }

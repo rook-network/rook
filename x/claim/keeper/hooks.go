@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	"github.com/arcane-systems/rook/x/claim/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -8,29 +10,37 @@ import (
 
 func (k Keeper) AfterTrade(ctx sdk.Context, sender sdk.AccAddress) {
 	_, err := k.ClaimCoinsForAction(ctx, sender, types.ActionTrade)
-	if err != nil {
-		panic(err.Error())
+	switch err {
+	case nil, types.ErrClaimInactive, types.ErrRecordNotFound:
+	default:
+		panic(fmt.Sprintf("AfterTrade: %s", err.Error()))
 	}
 }
 
 func (k Keeper) AfterWonGame(ctx sdk.Context, sender sdk.AccAddress) {
 	_, err := k.ClaimCoinsForAction(ctx, sender, types.ActionWin)
-	if err != nil {
-		panic(err.Error())
+	switch err {
+	case nil, types.ErrClaimInactive, types.ErrRecordNotFound:
+	default:
+		panic(fmt.Sprintf("AfterWonGame: %s", err.Error()))
 	}
 }
 
 func (k Keeper) AfterPlayedGame(ctx sdk.Context, gameID uint64, voterAddr sdk.AccAddress) {
 	_, err := k.ClaimCoinsForAction(ctx, voterAddr, types.ActionPlay)
-	if err != nil {
-		panic(err.Error())
+	switch err {
+	case nil, types.ErrClaimInactive, types.ErrRecordNotFound:
+	default:
+		panic(fmt.Sprintf("AfterPlayedGame: %s", err.Error()))
 	}
 }
 
 func (k Keeper) AfterDelegationModified(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) {
 	_, err := k.ClaimCoinsForAction(ctx, delAddr, types.ActionDelegate)
-	if err != nil {
-		panic(err.Error())
+	switch err {
+	case nil, types.ErrClaimInactive, types.ErrRecordNotFound:
+	default:
+		panic(fmt.Sprintf("AfterDelegationModified: %s", err.Error()))
 	}
 }
 

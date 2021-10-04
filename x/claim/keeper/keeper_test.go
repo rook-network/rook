@@ -11,15 +11,16 @@ import (
 
 	"github.com/arcane-systems/rook/app"
 	"github.com/arcane-systems/rook/testutil/simapp"
+	"github.com/arcane-systems/rook/x/claim/keeper"
 	"github.com/arcane-systems/rook/x/claim/types"
 )
 
 type KeeperTestSuite struct {
 	suite.Suite
 
-	ctx sdk.Context
-	// querier sdk.Querier
-	app *app.App
+	ctx       sdk.Context
+	app       *app.App
+	msgServer types.MsgServer
 }
 
 func (suite *KeeperTestSuite) SetupTest() {
@@ -38,6 +39,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	})
 
 	suite.ctx = suite.ctx.WithBlockTime(airdropStartTime)
+	suite.msgServer = keeper.NewMsgServerImpl(suite.app.ClaimKeeper)
 }
 
 func TestKeeperTestSuite(t *testing.T) {

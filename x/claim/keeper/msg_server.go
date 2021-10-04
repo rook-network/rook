@@ -28,7 +28,12 @@ func (m msgServer) Activate(goCtx context.Context, msg *types.MsgActivate) (*typ
 		return nil, err
 	}
 
-	_, err = m.Keeper.ClaimCoinsForAction(ctx, claimee, types.ActionActivate)
+	claim, err := m.Keeper.ClaimCoinsForAction(ctx, claimee, types.ActionActivate)
+	if err != nil {
+		return nil, err
+	}
 
-	return &types.MsgActivateResponse{}, err
+	return &types.MsgActivateResponse{
+		Claimed: claim,
+	}, nil
 }

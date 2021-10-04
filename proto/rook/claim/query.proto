@@ -37,11 +37,8 @@ message QueryModuleAccountBalanceRequest {}
 // QueryParamsResponse is the response type for the Query/Params RPC method.
 message QueryModuleAccountBalanceResponse {
   // params defines the parameters of the module.
-  cosmos.base.v1beta1.Coin moduleAccountBalance = 1 [
-    (gogoproto.moretags) = "yaml:\"coins\"",
-    (gogoproto.nullable) = false,
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin"
-  ];
+  cosmos.base.v1beta1.Coin moduleAccountBalance = 1
+      [ (gogoproto.moretags) = "yaml:\"coins\"", (gogoproto.nullable) = false ];
 }
 
 // QueryParamsRequest is the request type for the Query/Params RPC method.
@@ -70,11 +67,8 @@ message QueryClaimableForActionRequest {
 }
 
 message QueryClaimableForActionResponse {
-  cosmos.base.v1beta1.Coin coins = 1 [
-    (gogoproto.moretags) = "yaml:\"coins\"",
-    (gogoproto.nullable) = false,
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin"
-  ];
+  cosmos.base.v1beta1.Coin coins = 1
+      [ (gogoproto.moretags) = "yaml:\"coins\"", (gogoproto.nullable) = false ];
 }
 
 message QueryTotalClaimableRequest {
@@ -82,9 +76,6 @@ message QueryTotalClaimableRequest {
 }
 
 message QueryTotalClaimableResponse {
-  cosmos.base.v1beta1.Coin coins = 1 [
-    (gogoproto.moretags) = "yaml:\"coins\"",
-    (gogoproto.nullable) = false,
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin"
-  ];
+  cosmos.base.v1beta1.Coin coins = 1
+      [ (gogoproto.moretags) = "yaml:\"coins\"", (gogoproto.nullable) = false ];
 }

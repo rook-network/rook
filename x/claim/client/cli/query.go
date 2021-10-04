@@ -37,7 +37,7 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 // parameters.
 func GetCmdQueryModuleAccountBalance() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "module-account-balance",
+		Use:   "remainder",
 		Short: "Query the current claim module's account balance",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -96,7 +96,7 @@ func GetCmdQueryParams() *cobra.Command {
 // GetCmdQueryClaimRecord implements the query claim-records command.
 func GetCmdQueryClaimRecord() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "claim-record [address]",
+		Use:   "record [address]",
 		Args:  cobra.ExactArgs(1),
 		Short: "Query the claim record for an account.",
 		Long: strings.TrimSpace(
@@ -104,7 +104,7 @@ func GetCmdQueryClaimRecord() *cobra.Command {
 This contains an address' initial claimable amounts, and the completed actions.
 
 Example:
-$ %s query claim claim-record <address>
+$ %s query claim record <address>
 `,
 				version.AppName,
 			),
@@ -151,7 +151,7 @@ $ %s query claim claimable-for-action osmo1ey69r37gfxvxg62sh4r0ktpuc46pzjrm23kcr
 
 			action, ok := types.Action_value[args[1]]
 			if !ok {
-				return fmt.Errorf("invalid Action type: %s.  Valid actions are %s, %s, %s, %s", args[1],
+				return fmt.Errorf("invalid Action type: %s.  Valid actions are %s, %s, %s, %s. %s", args[1],
 					types.ActionActivate, types.ActionWin, types.ActionPlay, types.ActionDelegate, types.ActionTrade)
 			}
 

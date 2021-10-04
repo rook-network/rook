@@ -21,12 +21,13 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	claimTxCmd.AddCommand(CmdActivate())
+	claimTxCmd.AddCommand(GetCmdTxActivate())
 
 	return claimTxCmd
 }
 
-func CmdActivate() *cobra.Command {
+// GetCmdActivate returns the command that broadcasts a MsgActivate to activate a claim
+func GetCmdTxActivate() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "activate [claimee]",
 		Short: "Broadcast airdrop activation message",

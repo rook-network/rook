@@ -313,10 +313,18 @@ func New(
 	)
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, app.BaseApp)
 
+	app.ClaimKeeper = claimkeeper.NewKeeper(
+		appCodec,
+		keys[claimtypes.StoreKey],
+		app.AccountKeeper,
+		app.BankKeeper,
+	)
+	claimModule := claim.NewAppModule(appCodec, app.ClaimKeeper)
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
-		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
+		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks(), app.ClaimKeeper.Hooks()),
 	)
 
 	app.AuthzKeeper = authzkeeper.NewKeeper(keys[authzkeeper.StoreKey], appCodec, app.BaseApp.MsgServiceRouter())
@@ -348,14 +356,6 @@ func New(
 	)
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
-
-	app.ClaimKeeper = claimkeeper.NewKeeper(
-		appCodec,
-		keys[claimtypes.StoreKey],
-		app.AccountKeeper,
-		app.BankKeeper,
-	)
-	claimModule := claim.NewAppModule(appCodec, app.ClaimKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	app.MatchmakerKeeper = matchmakerkeeper.NewKeeper(

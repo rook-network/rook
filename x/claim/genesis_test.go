@@ -12,6 +12,7 @@ import (
 	rook "github.com/arcane-systems/rook/app"
 	"github.com/arcane-systems/rook/testutil/simapp"
 	"github.com/arcane-systems/rook/x/claim"
+	"github.com/arcane-systems/rook/x/claim/keeper"
 	"github.com/arcane-systems/rook/x/claim/types"
 )
 
@@ -29,12 +30,12 @@ var testGenesis = types.GenesisState{
 		{
 			Address:                acc1.String(),
 			InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 1000000000),
-			ActionCompleted:        []bool{true, false, true, true},
+			ActionCompleted:        []bool{true, false, true, true, false},
 		},
 		{
 			Address:                acc2.String(),
 			InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 500000000),
-			ActionCompleted:        []bool{false, false, false, false},
+			ActionCompleted:        []bool{false, false, false, false, false},
 		},
 	},
 }
@@ -69,14 +70,16 @@ func TestClaimExportGenesis(t *testing.T) {
 	require.Equal(t, claimRecord, types.ClaimRecord{
 		Address:                acc2.String(),
 		InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 500000000),
-		ActionCompleted:        []bool{false, false, false, false},
+		ActionCompleted:        []bool{false, false, false, false, false},
 	})
 
 	claimableAmount, err := app.ClaimKeeper.GetClaimableAmountForAction(ctx, acc2, types.ActionPlay)
 	require.NoError(t, err)
-	require.Equal(t, claimableAmount, sdk.NewInt64Coin(types.DefaultClaimDenom, 125000000))
+	require.Equal(t, claimableAmount, sdk.NewInt64Coin(types.DefaultClaimDenom, 100000000))
 
-	app.ClaimKeeper.AfterPlayedGame(ctx, 1, acc2)
+	msgServer := keeper.NewMsgServerImpl(app.ClaimKeeper)
+	_, err = msgServer.Activate(sdk.WrapSDKContext(ctx), types.NewMsgActivate(acc2.String()))
+	require.NoError(t, err)
 
 	genesisExported := claim.ExportGenesis(ctx, app.ClaimKeeper)
 	require.Equal(t, genesisExported.Params, genesis.Params)
@@ -84,12 +87,12 @@ func TestClaimExportGenesis(t *testing.T) {
 		{
 			Address:                acc1.String(),
 			InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 1000000000),
-			ActionCompleted:        []bool{true, false, true, true},
+			ActionCompleted:        []bool{true, false, true, true, false},
 		},
 		{
 			Address:                acc2.String(),
 			InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 500000000),
-			ActionCompleted:        []bool{false, true, false, false},
+			ActionCompleted:        []bool{true, false, false, false, false},
 		},
 	})
 }

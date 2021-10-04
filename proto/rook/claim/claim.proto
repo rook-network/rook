@@ -12,6 +12,7 @@ option go_package = "github.com/arcane-systems/rook/x/claim/types";
 enum Action {
   option (gogoproto.goproto_enum_prefix) = false;
 
+  // Activate action must be completed before all others
   ActionActivate = 0;
   ActionPlay = 1;
   ActionWin = 2;
@@ -26,7 +27,6 @@ message ClaimRecord {
 
   // total initial claimable amount for the user
   cosmos.base.v1beta1.Coin initial_claimable_amount = 2 [
-    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"initial_claimable_amount\""
   ];

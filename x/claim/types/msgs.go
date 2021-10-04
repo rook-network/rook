@@ -36,7 +36,7 @@ func (msg *MsgActivate) GetSignBytes() []byte {
 
 func (msg *MsgActivate) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Claimee); err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid player address (%s)", err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid claimee address (%s)", err)
 	}
 
 	return nil
