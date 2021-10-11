@@ -19,7 +19,7 @@ func (k Keeper) GetParams(ctx sdk.Context) (types.Params, error) {
 // SetParams set params
 func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
 	if err := params.ValidateBasic(); err != nil {
-		return fmt.Errorf("failed to set params: %v", err)
+		return fmt.Errorf("failed to set invalid params: %v", err)
 	}
 	store := ctx.KVStore(k.storeKey)
 	bz, err := k.cdc.Marshal(&params)

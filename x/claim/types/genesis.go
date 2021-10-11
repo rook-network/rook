@@ -52,7 +52,7 @@ func (gs GenesisState) TotalClaimable() sdk.Coin {
 
 func (gs GenesisState) ValidateBasic() error {
 	if err := gs.Params.ValidateBasic(); err != nil {
-		return err 
+		return err
 	}
 
 	for _, claimRecord := range gs.ClaimRecords {

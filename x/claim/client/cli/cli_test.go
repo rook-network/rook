@@ -8,11 +8,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 
 	"github.com/arcane-systems/rook/app"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/arcane-systems/rook/x/claim/client/cli"
 	"github.com/arcane-systems/rook/x/claim/types"
 	claimtypes "github.com/arcane-systems/rook/x/claim/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"

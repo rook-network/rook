@@ -24,12 +24,11 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 		genState.Params.AirdropStartTime = ctx.BlockTime()
 	}
 
-	k.SetParams(ctx, genState.Params)
-	k.SetClaimRecords(ctx, genState.ClaimRecords)
-
-	_, err := k.GetParams(ctx)
-	if err != nil {
-		panic(err)
+	if err := k.SetParams(ctx, genState.Params); err != nil {
+		panic(fmt.Sprintf("unable to set params in genesis: %v", err))
+	}
+	if err := k.SetClaimRecords(ctx, genState.ClaimRecords); err != nil {
+		panic(fmt.Sprintf("failed to set claim records in init genesis: %v", err))
 	}
 }
 

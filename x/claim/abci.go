@@ -1,6 +1,8 @@
 package claim
 
 import (
+	"fmt"
+
 	"github.com/arcane-systems/rook/x/claim/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -10,7 +12,11 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 
 	params, err := k.GetParams(ctx)
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("unable to get params in end blocker: %v", err))
+	}
+
+	if err := params.ValidateBasic(); err != nil {
+		panic(fmt.Sprintf("invalid params from end blocker: %v", err))
 	}
 
 	// End Airdrop

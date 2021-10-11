@@ -453,6 +453,7 @@ func New(
 		authz.ModuleName,
 		matchmakertypes.ModuleName,
 		gametypes.ModuleName,
+		claimtypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
