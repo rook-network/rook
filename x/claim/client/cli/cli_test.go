@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 
 	"github.com/arcane-systems/rook/app"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/arcane-systems/rook/x/claim/client/cli"
 	"github.com/arcane-systems/rook/x/claim/types"
 	claimtypes "github.com/arcane-systems/rook/x/claim/types"
@@ -49,6 +50,7 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 	genState := app.ModuleBasics.DefaultGenesis(encCfg.Marshaler)
 	claimGenState := claimtypes.DefaultGenesis()
+	s.T().Log(addr1.String())
 	claimGenState.ClaimRecords = []types.ClaimRecord{
 		{
 			Address:                addr1.String(),
@@ -174,6 +176,7 @@ func (s *IntegrationTestSuite) TestCmdQueryClaimRecord() {
 
 			var result types.QueryClaimRecordResponse
 			s.Require().NoError(clientCtx.JSONCodec.UnmarshalJSON(out.Bytes(), &result))
+			s.Require().Equal(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100).String(), result.ClaimRecord.InitialClaimableAmount.String())
 		})
 	}
 }
@@ -226,6 +229,7 @@ func (s *IntegrationTestSuite) TestCmdTxActivate() {
 			"submit activate claim tx",
 			[]string{
 				addr1.String(),
+				fmt.Sprintf("--%s=%s", flags.FlagFrom, val.Address.String()),
 				fmt.Sprintf("--%s=json", tmcli.OutputFlag),
 			},
 			sdk.NewInt64Coin(s.cfg.BondDenom, 20),

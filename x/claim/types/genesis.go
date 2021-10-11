@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -47,4 +48,18 @@ func (gs GenesisState) TotalClaimable() sdk.Coin {
 	}
 
 	return totalClaimable
+}
+
+func (gs GenesisState) ValidateBasic() error {
+	if err := gs.Params.ValidateBasic(); err != nil {
+		return err 
+	}
+
+	for _, claimRecord := range gs.ClaimRecords {
+		if claimRecord.InitialClaimableAmount.Denom != gs.Params.ClaimDenom {
+			return fmt.Errorf("unexpected claim record denom: %v, wanted: %v", claimRecord.InitialClaimableAmount.Denom, gs.Params.ClaimDenom)
+		}
+	}
+
+	return nil
 }

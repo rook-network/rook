@@ -37,6 +37,7 @@ func (suite *KeeperTestSuite) TestHookBeforeAirdropStart() {
 		AirdropStartTime:   airdropStartTime,
 		DurationUntilDecay: time.Hour,
 		DurationOfDecay:    time.Hour * 4,
+		ClaimDenom: sdk.DefaultBondDenom,
 	})
 	suite.Require().NoError(err)
 
@@ -383,6 +384,7 @@ func (suite *KeeperTestSuite) TestClaimOfDecayed() {
 			AirdropStartTime:   airdropStartTime,
 			DurationUntilDecay: durationUntilDecay,
 			DurationOfDecay:    durationOfDecay,
+			ClaimDenom: sdk.DefaultBondDenom,
 		})
 		suite.NoError(err)
 

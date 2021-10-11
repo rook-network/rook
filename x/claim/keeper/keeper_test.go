@@ -40,6 +40,8 @@ func (suite *KeeperTestSuite) SetupTest() {
 
 	suite.ctx = suite.ctx.WithBlockTime(airdropStartTime)
 	suite.msgServer = keeper.NewMsgServerImpl(suite.app.ClaimKeeper)
+
+	
 }
 
 func TestKeeperTestSuite(t *testing.T) {
