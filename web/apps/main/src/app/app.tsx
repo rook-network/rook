@@ -4,7 +4,9 @@ import { ReactComponent as Logo } from './tower.svg';
 import { ReactComponent as Snapshot1 } from './snapshot-1.svg';
 import { ReactComponent as Snapshot2 } from './snapshot-2.svg';
 import { ReactComponent as Snapshot3 } from './snapshot-3.svg';
-import { GithubOutlined, BookOutlined, CompassOutlined } from '@ant-design/icons'
+import { GithubOutlined, BookOutlined, CompassOutlined, AlertTwoTone } from '@ant-design/icons'
+
+import { Wallet } from '../components/wallet'
 
 import { Layout, Menu, Typography, Row, Col, Card, Input, Button } from "antd";
 
@@ -12,11 +14,19 @@ const { Header, Content } = Layout
 const { Title, Text } = Typography
 const { Search } = Input
 
+declare global {
+    interface Window { getOfflineSigner: any; keplr: any; }
+}
 
 export function App() {
   const redirectToDocs = () => {
     window.location.href = "https://arcane-systems.github.io/rook";
   }
+
+  const claimButton = <Button type="primary" style={{float: "right"}}>Claim</Button>
+  // else {
+  //   claimButton = <Button type="primary" style={{float: "right", backgroundColor:"#999", borderColor: "#999"}}>Connect Your Wallet</Button>
+  // }
 
   return (
     <Layout>
@@ -29,6 +39,7 @@ export function App() {
             </div>
           </td>
           <td>
+            <Wallet style={{float: "right"}}></Wallet>
             {/* TODO: Add menu bar back in */}
             {/* <Menu style={{ float:"right", borderBottom:"none"}} mode="horizontal" onClick={handleClick}>
               <Menu.Item key="roadmap" icon={<CompassOutlined />}>Roadmap</Menu.Item>
@@ -38,22 +49,24 @@ export function App() {
           </td>
         </table>
       </Header>
-      <Content style={{ margin: "40px" }}>
+      <Content style={{ margin: "30px" }}>
         <Row justify="space-around">
           <Col span={6}>
             <Card>
-              <Title>Claim 🎁</Title>
-              <Text type="secondary">Get your airdrop of goodies</Text>
+              <Title>Claim</Title>
+              <Text type="secondary">Start your journey as an ATOM tokenholder by claiming your first airdrop</Text>
               <br />
               <br />
-              <Search placeholder="COSMOS Address" enterButton="Claim"/>
-              <Snapshot1 height="256" width="256" style={{margin: '20px'}}/>
+              {claimButton}
+              <br />
+              <br />
+              <Snapshot1 height="40vh" width="100%" style={{margin: '10px'}}/>
             </Card>
           </Col>
           <Col span={6}>
             <Card>
-              <Snapshot2 height="256" width="256" style={{margin: '20px'}}/>
-              <Title>Learn 🤓</Title>
+              <Snapshot2 height="40vh" width="100%" style={{margin: '10px'}}/>
+              <Title>Learn</Title>
               <Text type="secondary">Peek into the docs to learn how to play</Text>
               {/* <Text type="secondary">Get a feel for the game by entering the Dojo</Text> */}
               <br />
@@ -63,12 +76,14 @@ export function App() {
           </Col>
           <Col span={6}>
             <Card>
-              <Title>Play 🕹</Title>
+              <Title>Play</Title>
               <Text type="secondary">Try out the alpha version</Text>
               <br />
               <br />
-              <Button type="primary" style={{float: "right", backgroundColor:"#666"}}>Coming Soon</Button>
-              <Snapshot3 height="256" width="256" style={{margin: '20px'}}/>
+              <Button type="primary" style={{float: "right"}} disabled>Coming Soon</Button>
+              <br />
+              <br />
+              <Snapshot3 height="40vh" width="100%" style={{margin: '10px'}}/>
             </Card>
           </Col>
         </Row>
