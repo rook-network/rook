@@ -43,7 +43,7 @@ module.exports = {
         collapsable: false,
         title: "Introduction",
         children: [
-          "/introduction/introduction",
+          "/introduction/welcome",
           "/introduction/roadmap",
         ],
       },
