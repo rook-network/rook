@@ -12,6 +12,8 @@ message MsgActivate { string claimee = 1; }
 
 message MsgActivateResponse {
   // The first installment earned from activating the airdrop
-  cosmos.base.v1beta1.Coin claimed = 2
-      [ (gogoproto.moretags) = "yaml:\"claimed\"", (gogoproto.nullable) = false ];
+  cosmos.base.v1beta1.Coin claimed = 2 [
+    (gogoproto.moretags) = "yaml:\"claimed\"",
+    (gogoproto.nullable) = false
+  ];
 }

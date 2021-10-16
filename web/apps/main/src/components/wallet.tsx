@@ -1,18 +1,23 @@
+import styles from "./wallet.module.less"
 import React from 'react';
 import { Button } from 'antd';
 import { CreditCardOutlined } from '@ant-design/icons'
-
-interface Account {
-    address: string
-}
+// import { SigningCosmosClient, Account } from '@cosmjs/launchpad'
+import { SigningStargateClient, Account, Coin } from '@cosmjs/stargate';
+// import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 
 interface IWalletProps {
     style?: any
 }
 
 interface IWalletState {
-    isConnected: boolean;
-    accounts: Account[];
+    account: Account | null;
+    balance: Coin | null;
+    rpcEndpoint: string;
+    restEndpoint: string;
+    chainID: string;
+    height: number;
+    client: SigningStargateClient | null
 }
 
 export class Wallet extends React.Component<IWalletProps, IWalletState> {
@@ -20,8 +25,13 @@ export class Wallet extends React.Component<IWalletProps, IWalletState> {
         super(props);
 
         this.state = {
-            isConnected: false,
-            accounts: [],
+            account: null,
+            balance: null,
+            rpcEndpoint: "http://localhost:26657",
+            restEndpoint: "http://localhost:1317",
+            chainID: "rook-single",
+            height: 0,
+            client: null,
         }
 
         if (this.keplrEnabled()) {
@@ -38,21 +48,22 @@ export class Wallet extends React.Component<IWalletProps, IWalletState> {
             alert("please install keplr extension")
         } 
 
+
         if (window.keplr.experimentalSuggestChain) {
             try {
                 await window.keplr.experimentalSuggestChain({
                     // Chain-id of the Cosmos SDK chain.
-                    chainId: "rook-single",
+                    chainId: this.state.chainID,
                     // The name of the chain to be displayed to the user.
                     chainName: "Rook",
                     // RPC endpoint of the chain.
-                    rpc: "http://localhost:26657",
+                    rpc: this.state.rpcEndpoint,
                     // REST endpoint of the chain.
-                    rest: "http://localhost:1317",
+                    rest: this.state.restEndpoint,
                     // Staking coin information
                     stakeCurrency: {
                         // Coin denomination to be displayed to the user.
-                        coinDenom: "rook",
+                        coinDenom: "ROOK",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
                         coinMinimalDenom: "urook",
                         // # of decimal points to convert minimal denomination to user-facing denomination.
@@ -91,7 +102,7 @@ export class Wallet extends React.Component<IWalletProps, IWalletState> {
                     // List of all coin/tokens used in this chain.
                     currencies: [{
                         // Coin denomination to be displayed to the user.
-                        coinDenom: "rook",
+                        coinDenom: "ROOK",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
                         coinMinimalDenom: "urook",
                         // # of decimal points to convert minimal denomination to user-facing denomination.
@@ -103,7 +114,7 @@ export class Wallet extends React.Component<IWalletProps, IWalletState> {
                     // List of coin/tokens used as a fee token in this chain.
                     feeCurrencies: [{
                         // Coin denomination to be displayed to the user.
-                        coinDenom: "rook",
+                        coinDenom: "ROOK",
                         // Actual denom (i.e. uatom, uscrt) used by the blockchain.
                         coinMinimalDenom: "urook",
                         // # of decimal points to convert minimal denomination to user-facing denomination.
@@ -135,31 +146,84 @@ export class Wallet extends React.Component<IWalletProps, IWalletState> {
             alert("Please use the recent version of keplr extension");
         }
 
-        const chainId = "rook-single";
-        await window.keplr.enable(chainId)
+        await window.keplr.enable(this.state.chainID)
 
-        const offlineSigner = window.getOfflineSigner(chainId)
+        const offlineSigner = window.keplr.getOfflineSigner(this.state.chainID)
 
         const accounts = await offlineSigner.getAccounts()
 
+        // Initialize the gaia api with the offline signer that is injected by Keplr extension.
+        const cosmJS = await SigningStargateClient.connectWithSigner(
+            "http://localhost:26657",
+            offlineSigner,
+        );
+
+        const height = await cosmJS.getHeight()
+
+        const balance = await cosmJS.getBalance(accounts[0].address, "urook")
+
         this.setState({
-            isConnected: true,
-            accounts: accounts
+            account: accounts[0],
+            balance: balance,
+            client: cosmJS,
+            height: height,
         })
     }
 
+    toggleChainInfo = () => {
+        
+        if (this.state.account === null) return
+        const address = document.getElementById("wallet_address")
+        if (address === null) return
+        const chainInfo = document.getElementById("chain_info")
+        if (chainInfo !== null) {
+            if (chainInfo.style.display === "none") {
+                chainInfo.style.display = "block"
+                address.innerText = this.state.account.address
+                navigator.clipboard.writeText(this.state.account.address)
+            } else {
+                chainInfo.style.display = "none"
+                address.innerText = this.state.account.address.substring(0, 12) + "..."
+            }
+
+        }
+    }
+
     render() {
-        if (!this.state.isConnected) {
+        if (this.state.account === null || this.state.balance === null) {
             return (
-                <Button type="primary" style={this.props.style} onClick={this.connectWallet}>Connect</Button>
+                <div style={this.props.style}>
+                    <Button type="primary" onClick={this.connectWallet}>Connect</Button>
+                </div>
             )
         }
 
+        const balance = convertURook(this.state.balance.amount)
+
         return (
-            <div style={this.props.style}>
-                <CreditCardOutlined />
-                <span style={{margin: "5px"}}>{this.state.accounts[0].address.substring(0, 12)}...</span>
+            <div style={this.props.style} className={styles.wallet} onClick={this.toggleChainInfo}>
+                <table>
+                    <td>
+                        <CreditCardOutlined />
+                        <span id="wallet_address" style={{marginLeft: "8px"}}>{this.state.account.address.substring(0, 12)}...</span>
+                        <p style={{textAlign: "right", fontWeight: "bold", marginBottom: "0px"}}>
+                            {balance} ROOK
+                        </p>
+                    </td>
+                    <td id="chain_info" style={{display: "none", paddingLeft: "10px", fontSize: "12px", borderLeft: "2px solid black", marginLeft: "10px"}}>
+                        Chain: <strong>{this.state.chainID}</strong> 
+                        <br />
+                        Height: <strong>{this.state.height}</strong>
+                    </td>
+                </table>
+                
             </div>
+
         )
     }
+}
+
+function convertURook(val: string): string {
+    const number = parseInt(val, 10)
+    return (number/1000000).toString()
 }

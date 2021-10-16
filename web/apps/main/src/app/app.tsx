@@ -1,4 +1,4 @@
-import styles from './app.module.less';
+// import './app.module.less';
 
 import { ReactComponent as Logo } from './tower.svg';
 import { ReactComponent as Snapshot1 } from './snapshot-1.svg';
@@ -24,9 +24,6 @@ export function App() {
   }
 
   const claimButton = <Button type="primary" style={{float: "right"}}>Claim</Button>
-  // else {
-  //   claimButton = <Button type="primary" style={{float: "right", backgroundColor:"#999", borderColor: "#999"}}>Connect Your Wallet</Button>
-  // }
 
   return (
     <Layout>
