@@ -26,14 +26,14 @@ ActionTrade    Action = 4
 ```
 
 Note that unlike Osmosis, users don't start with 20% but must register themselves (anyone can
-register an address) by sending an `Activate` message.
-The rest of the actions are monitored by registring claim **hooks** to the staking, game, and market modules.
+register an address) by sending an `Activate` message. Only when the airdrop is activated can the
+remainder of the airdrop be collected.
 
+The rest of the actions are monitored by registring claim **hooks** to the staking, game, and market modules.
 This means that when you perform an action, the claims module will immediately unlock those coins if they are applicable.
-These actions can be performed in any order.
+These remaining actions can be performed in any order.
 
 The code is structured by separating out a segment of the tokens as "claimable", indexed by each action type.
 So if Alice delegates tokens, the claims module will move the 20% of the claimables associated with staking to her liquid balance.
 If she delegates again, there will not be additional tokens given, as the relevant action has already been performed.
 Every action must be performed to claim the full amount.
-
