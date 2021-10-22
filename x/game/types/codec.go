@@ -9,11 +9,11 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// this line is used by starport scaffolding # 2
-	cdc.RegisterConcrete(&MsgCreate{}, "rook/Create", nil)
+	cdc.RegisterConcrete(&MsgCreate{}, "rook/MsgCreate", nil)
 
-	cdc.RegisterConcrete(&MsgMove{}, "rook/Move", nil)
+	cdc.RegisterConcrete(&MsgMove{}, "rook/MsgMove", nil)
 
-	cdc.RegisterConcrete(&MsgBuild{}, "rook/Build", nil)
+	cdc.RegisterConcrete(&MsgBuild{}, "rook/MsgBuild", nil)
 
 }
 

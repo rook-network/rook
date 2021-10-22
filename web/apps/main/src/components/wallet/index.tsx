@@ -11,7 +11,8 @@ export interface WalletInfo {
 }
 
 interface IWalletProps {
-    wallet: WalletInfo
+    wallet: WalletInfo,
+    connect: () => void
 }
 
 interface IWalletState {
@@ -48,7 +49,7 @@ class Wallet extends React.Component<IWalletProps, IWalletState> {
         if (this.props.wallet.address === "") {
             return (
                 <div>
-                    <Button type="primary">No Wallet Connected</Button>
+                    <Button type="primary" onClick={this.props.connect}>No Wallet Connected</Button>
                 </div>
             )
         }

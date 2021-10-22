@@ -5,6 +5,7 @@ import { ReactComponent as Snapshot2 } from './snapshot-2.svg';
 import { ReactComponent as Snapshot3 } from './snapshot-3.svg';
 import Wallet, { WalletInfo } from '../components/wallet/'
 import { Provider } from '../components/provider'
+import { isBroadcastTxSuccess } from '@cosmjs/stargate';
 import { Layout, Menu, Typography, Row, Col, Card, Input, Button } from "antd";
 
 const { Header, Content } = Layout
@@ -33,9 +34,49 @@ class App extends React.Component<{}, IAppState> {
         balance: 0,
       }
     }
+    this.claimTokens = this.claimTokens.bind(this)
+    this.connectWallet = this.connectWallet.bind(this)
   }
 
   async componentDidMount() {
+    this.connectWallet()
+  }
+
+  redirectToDocs() {
+    window.location.href = "https://arcane-systems.github.io/rook";
+  }
+
+  async claimTokens() {
+    const resp = await this.provider.claimTokens()
+    if (resp === null) {
+      console.log("node wasn't connected")
+      return
+    }
+    if (isBroadcastTxSuccess(resp)) {
+      console.log("successfully claimed airdrop")
+      const balance = await this.provider.getBalance()
+      this.setState({
+        wallet: {
+          chainID: this.provider.chainID,
+          height: resp.height,
+          address: this.provider.getAddress(),
+          balance: balance
+        }
+      })
+    } else {
+      console.log("failed to claim airdrop: " + resp.rawLog)
+      this.setState({
+        wallet: {
+          chainID: this.state.wallet.chainID,
+          height: resp.height,
+          address: this.provider.getAddress(),
+          balance: this.state.wallet.balance
+        }
+      })
+    }
+  }
+
+  async connectWallet() {
     const address = await this.provider.connectWallet()
     if (address == null) return 
     const balance = await this.provider.getBalance()
@@ -47,15 +88,7 @@ class App extends React.Component<{}, IAppState> {
         balance: balance,
         height: height,
       }
-    })  
-  }
-
-  redirectToDocs() {
-    window.location.href = "https://arcane-systems.github.io/rook";
-  }
-
-  async claimTokens() {
-    await this.provider.claimTokens()
+    }) 
   }
 
   render() {
@@ -70,7 +103,7 @@ class App extends React.Component<{}, IAppState> {
                 </div>
             </td>
             <td style={{ float: "right" }}>
-                <Wallet wallet = {this.state.wallet}></Wallet>
+                <Wallet wallet={this.state.wallet} connect={this.connectWallet}></Wallet>
             </td>
             </table>
         </Header>

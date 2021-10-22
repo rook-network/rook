@@ -8,7 +8,7 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgActivate{}, "rook/Activate", nil)
+	cdc.RegisterConcrete(&MsgActivate{}, "rook/MsgActivate", nil)
 
 }
 

@@ -1,9 +1,24 @@
 import React from 'react';
-import { SigningStargateClient, Coin } from '@cosmjs/stargate';
+import { defaultRegistryTypes, SigningStargateClient, BroadcastTxResponse } from '@cosmjs/stargate';
+import { Registry } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing'
 import config from "../../config";
+import { MsgActivate } from "../../codec/rook/claim/tx"
+// import { MsgFundCommunityPool } from "../../codec/cosmos/distribution/v1beta1/tx"
+
+const rookRegistry = new Registry([
+  ...defaultRegistryTypes,
+  ["/rook.claim.MsgActivate", MsgActivate],
+]);
 
 export interface TxProvider {
   claimTokens(address: string): Promise<number>
+}
+
+export type ClaimResponse = {
+  success: boolean
+  error: string
+  height: number
+  balance: number
 }
 
 export class Provider {
@@ -13,12 +28,15 @@ export class Provider {
 
   constructor() {
     this.chainID = config.chainID;
+
   }
 
   async connectWallet(): Promise<string|null> {
     if (!keplrEnabled() || !window.keplr.experimentalSuggestChain) {
       return null
     }
+
+    console.log("attempting to connect with keplr wallet")
 
     try { 
       suggestChainToKeplr()
@@ -33,15 +51,24 @@ export class Provider {
     this.client = await SigningStargateClient.connectWithSigner(
       config.rpcEndpoint,
       offlineSigner,
+      { registry: rookRegistry }
     )
 
     const accounts = await offlineSigner.getAccounts()
     this.address = accounts[0].address
+    console.log("connected to " + this.address)
     return accounts[0].address
   }
 
   isConnected() {
-    return this.client != null
+    return this.client != null && this.address != null
+  }
+
+  getAddress(): string {
+    if (this.isConnected()) {
+      return this.address!
+    }
+    return ""
   }
 
   async getBalance(): Promise<number> {
@@ -63,8 +90,24 @@ export class Provider {
     return
   }
 
-  claimTokens() {
-    return
+  async claimTokens(): Promise<BroadcastTxResponse | null> {
+    if (this.client === null || this.address === null) return null
+    const message = {
+      typeUrl: "/rook.claim.MsgActivate",
+      value: {
+        claimee: this.address
+      }
+    }
+    const fee = {
+      amount: [
+        {
+          denom: config.coinDenom,
+          amount: "0",
+        }
+      ],
+      gas: "500000",
+    }
+    return await this.client.signAndBroadcast(this.address, [message], fee)
   }
 }
 
