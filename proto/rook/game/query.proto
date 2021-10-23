@@ -13,15 +13,15 @@ service Query {
 
   // Queries a game state by id.
   rpc GameState(QueryGetGameStateRequest) returns (QueryGetGameStateResponse) {
-    option (google.api.http).get = "/rook/game_state/{id}";
+    option (google.api.http).get = "/game/state/{id}";
   }
 
   rpc Game(QueryGetGameRequest) returns (QueryGetGameResponse) {
-    option (google.api.http).get = "/rook/game/{id}";
+    option (google.api.http).get = "/game/game/{id}";
   }
 
   rpc Params(QueryGetParamsRequest) returns (QueryGetParamsResponse) {
-    option (google.api.http).get = "/rook/params/{version}";
+    option (google.api.http).get = "/game/params/{version}";
   }
 }
 

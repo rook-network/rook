@@ -50,7 +50,7 @@ message Room {
 // IndexedRoom pins an id to the room
 message IndexedRoom {
   uint64 id = 1;
-  Room room = 2;
+  Room room = 2 [(gogoproto.nullable) = false];
 }
 
 // Rooms represents a set of rooms by id
@@ -72,7 +72,7 @@ message Mode {
 // IndexedMode pins an id to the mode
 message IndexedMode {
   uint32 id = 1;
-  Mode mode = 2;
+  Mode mode = 2 [(gogoproto.nullable) = false];
 }
 
 message Params {

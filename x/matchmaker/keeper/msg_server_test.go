@@ -99,5 +99,5 @@ func TestMatchmaker(t *testing.T) {
 
 	queryParamsResp, err := querier.Params(goCtx, &types.QueryGetParamsRequest{})
 	require.NoError(t, err)
-	require.Equal(t, newParams, *queryParamsResp.Params)
+	require.Equal(t, newParams, queryParamsResp.Params)
 }

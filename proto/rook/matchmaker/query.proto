@@ -1,6 +1,7 @@
 syntax = "proto3";
 package rook.matchmaker;
 
+import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "rook/matchmaker/matchmaker.proto";
 
@@ -38,12 +39,12 @@ message QueryGetRoomResponse { Room room = 1; }
 
 message QueryGetInvitationsRequest { string player = 1; }
 
-message QueryGetInvitationsResponse { repeated IndexedRoom rooms = 1; }
+message QueryGetInvitationsResponse { repeated IndexedRoom rooms = 1 [(gogoproto.nullable) = false]; }
 
 message QueryGetModesRequest {}
 
-message QueryGetModesResponse { repeated IndexedMode modes = 1; }
+message QueryGetModesResponse { repeated IndexedMode modes = 1 [(gogoproto.nullable) = false]; }
 
 message QueryGetParamsRequest {}
 
-message QueryGetParamsResponse { Params params = 1; }
+message QueryGetParamsResponse { Params params = 1 [(gogoproto.nullable) = false]; }

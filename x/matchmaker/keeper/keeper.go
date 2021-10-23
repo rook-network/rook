@@ -242,6 +242,10 @@ func (k Keeper) GetParams(ctx sdk.Context) types.Params {
 func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 	store := ctx.KVStore(k.storeKey)
 	k.SetParams(ctx, genState.Params)
+	for _, mode := range genState.InitialModes {
+		k.SetMode(ctx, genState.NextModeId, mode)
+		genState.NextModeId++
+	}
 	store.Set(types.ModeIDKey, types.ModeIDBytes(genState.NextModeId))
 	store.Set(types.RoomIDKey, types.RoomIDBytes(genState.NextRoomId))
 }

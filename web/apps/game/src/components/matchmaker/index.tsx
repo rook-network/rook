@@ -1,23 +1,33 @@
 import styles from './matchmaker.module.less';
 import React from 'react'
 import Card from '../card'
-import { Mode } from '../../codec/rook/matchmaker/matchmaker'
-import { Config } from '../../codec/rook/game/game'
+import { Mode, IndexedMode } from '../../codec/rook/matchmaker/matchmaker'
+import { MsgFind } from '../../codec/rook/matchmaker/tx'
+import { MatchmakerProvider } from "../provider"
 
+export interface MMProps {
+  provider: MatchmakerProvider
+  modes: IndexedMode[]
+  address: string
+}
 
 export interface MMState {
   status: Status
-  mode: Mode
+  mode?: Mode
 }
 
 type Status = 'home' | 'find' | 'host' | 'join' | 'room' | 'mode'
 
-class Matchmaker extends React.Component {
-  constructor(props: any) {
+class Matchmaker extends React.Component<MMProps, MMState> {
+  constructor(props: MMProps) {
     super(props)
     this.state = {
       status: 'home'
     }
+    
+    this.hostGame = this.hostGame.bind(this)
+    this.joinGame = this.joinGame.bind(this)
+    this.findGame = this.findGame.bind(this)
   }
 
   hostGame() {
@@ -28,7 +38,19 @@ class Matchmaker extends React.Component {
     alert("joining game")
   }
 
-  findGame() {
+  async findGame() {
+    // if there is only one mode then we use that one
+    if (this.props.modes.length === 1) {
+      this.setState({
+        mode: this.props.modes[0].mode
+      })
+      const resp = await this.props.provider.tx.Find({
+        creator: this.props.address,
+        mode: this.props.modes[0].id
+      } as MsgFind)
+      console.log(resp)
+    }
+    
     alert("finding game")
   }
 

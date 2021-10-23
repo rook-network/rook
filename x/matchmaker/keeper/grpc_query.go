@@ -27,7 +27,7 @@ func (q Keeper) Invitations(goCtx context.Context, req *types.QueryGetInvitation
 func (q Keeper) Modes(goCtx context.Context, req *types.QueryGetModesRequest) (*types.QueryGetModesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	store := ctx.KVStore(q.storeKey)
-	modes := make(map[uint32]*types.Mode)
+	modes := make([]types.IndexedMode, 0)
 
 	iter := store.Iterator(
 		types.ModeKey(0),
@@ -37,7 +37,10 @@ func (q Keeper) Modes(goCtx context.Context, req *types.QueryGetModesRequest) (*
 		modeID := types.ParseModeKey(iter.Key())
 		var mode types.Mode
 		q.cdc.MustUnmarshal(iter.Value(), &mode)
-		modes[modeID] = &mode
+		modes = append(modes, types.IndexedMode{
+			Id: modeID,
+			Mode: mode,
+		})
 	}
 
 	return &types.QueryGetModesResponse{Modes: modes}, nil
@@ -46,5 +49,5 @@ func (q Keeper) Modes(goCtx context.Context, req *types.QueryGetModesRequest) (*
 func (q Keeper) Params(goCtx context.Context, req *types.QueryGetParamsRequest) (*types.QueryGetParamsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	params := q.GetParams(ctx)
-	return &types.QueryGetParamsResponse{Params: &params}, nil
+	return &types.QueryGetParamsResponse{Params: params}, nil
 }
