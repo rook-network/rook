@@ -29,12 +29,12 @@ var testGenesis = types.GenesisState{
 	ClaimRecords: []types.ClaimRecord{
 		{
 			Address:                acc1.String(),
-			InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 1000000000),
+			InitialClaimableAmount: 100000000,
 			ActionCompleted:        []bool{true, false, true, true, false},
 		},
 		{
 			Address:                acc2.String(),
-			InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 500000000),
+			InitialClaimableAmount: 500000000,
 			ActionCompleted:        []bool{false, false, false, false, false},
 		},
 	},
@@ -69,7 +69,7 @@ func TestClaimExportGenesis(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, claimRecord, types.ClaimRecord{
 		Address:                acc2.String(),
-		InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 500000000),
+		InitialClaimableAmount: 500000000,
 		ActionCompleted:        []bool{false, false, false, false, false},
 	})
 
@@ -86,12 +86,12 @@ func TestClaimExportGenesis(t *testing.T) {
 	require.Equal(t, genesisExported.ClaimRecords, []types.ClaimRecord{
 		{
 			Address:                acc1.String(),
-			InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 1000000000),
+			InitialClaimableAmount: 100000000,
 			ActionCompleted:        []bool{true, false, true, true, false},
 		},
 		{
 			Address:                acc2.String(),
-			InitialClaimableAmount: sdk.NewInt64Coin(types.DefaultClaimDenom, 500000000),
+			InitialClaimableAmount: 500000000,
 			ActionCompleted:        []bool{true, false, false, false, false},
 		},
 	})

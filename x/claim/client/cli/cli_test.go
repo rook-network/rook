@@ -54,12 +54,12 @@ func (s *IntegrationTestSuite) SetupSuite() {
 	claimGenState.ClaimRecords = []types.ClaimRecord{
 		{
 			Address:                addr1.String(),
-			InitialClaimableAmount: sdk.NewInt64Coin(sdk.DefaultBondDenom, 100),
+			InitialClaimableAmount: 100,
 			ActionCompleted:        []bool{true, false, false, false, false},
 		},
 		{
 			Address:                addr2.String(),
-			InitialClaimableAmount: sdk.NewInt64Coin(sdk.DefaultBondDenom, 20),
+			InitialClaimableAmount: 20,
 			ActionCompleted:        []bool{false, false, false, false, false},
 		},
 	}
@@ -176,7 +176,7 @@ func (s *IntegrationTestSuite) TestCmdQueryClaimRecord() {
 
 			var result types.QueryClaimRecordResponse
 			s.Require().NoError(clientCtx.JSONCodec.UnmarshalJSON(out.Bytes(), &result))
-			s.Require().Equal(sdk.NewInt64Coin(sdk.DefaultBondDenom, 100).String(), result.ClaimRecord.InitialClaimableAmount.String())
+			s.Require().Equal(int64(100), result.ClaimRecord.InitialClaimableAmount)
 		})
 	}
 }

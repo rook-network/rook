@@ -117,6 +117,14 @@ func NewMode(config game.Config, quorum, capacity uint32) Mode {
 	}
 }
 
+func DefaultMode() Mode {
+	return Mode{
+		Config:   game.DefaultConfig(),
+		Quorum:   2,
+		Capacity: 4,
+	}
+}
+
 func (m Mode) ValidateBasic() error {
 	if err := m.Config.ValidateBasic(int(m.Capacity)); err != nil {
 		return err

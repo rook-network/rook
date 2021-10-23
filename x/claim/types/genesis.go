@@ -2,7 +2,6 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -41,25 +40,15 @@ func GetGenesisStateFromAppState(cdc codec.JSONCodec, appState map[string]json.R
 
 // TotalClaimable calculates the total possible claimable airdrop allotment
 func (gs GenesisState) TotalClaimable() sdk.Coin {
-	totalClaimable := sdk.NewInt64Coin(gs.Params.ClaimDenom, 0)
+	var totalClaimable int64 = 0
 
 	for _, claimRecord := range gs.ClaimRecords {
-		totalClaimable = totalClaimable.Add(claimRecord.InitialClaimableAmount)
+		totalClaimable += claimRecord.InitialClaimableAmount
 	}
 
-	return totalClaimable
+	return sdk.NewInt64Coin(gs.Params.ClaimDenom, totalClaimable)
 }
 
 func (gs GenesisState) ValidateBasic() error {
-	if err := gs.Params.ValidateBasic(); err != nil {
-		return err
-	}
-
-	for _, claimRecord := range gs.ClaimRecords {
-		if claimRecord.InitialClaimableAmount.Denom != gs.Params.ClaimDenom {
-			return fmt.Errorf("unexpected claim record denom: %v, wanted: %v", claimRecord.InitialClaimableAmount.Denom, gs.Params.ClaimDenom)
-		}
-	}
-
-	return nil
+	return gs.Params.ValidateBasic()
 }

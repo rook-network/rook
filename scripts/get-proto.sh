@@ -3,7 +3,7 @@ set -o errexit -o nounset -o pipefail
 command -v shellcheck >/dev/null && shellcheck "$0"
 
 # make sure the version matches that of go.mod
-COSMOS_SDK_VERSION="v0.44.1"
+COSMOS_SDK_VERSION="v0.44.3"
 PROTO_DIR="./third-party"
 COSMOS_DIR="$PROTO_DIR/cosmos"
 COSMOS_SDK_DIR="$COSMOS_DIR/cosmos-sdk"

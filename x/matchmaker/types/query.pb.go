@@ -434,7 +434,7 @@ type QueryClient interface {
 	Room(ctx context.Context, in *QueryGetRoomRequest, opts ...grpc.CallOption) (*QueryGetRoomResponse, error)
 	// Invitations lists all the rooms that a player is invited to
 	Invitations(ctx context.Context, in *QueryGetInvitationsRequest, opts ...grpc.CallOption) (*QueryGetInvitationsResponse, error)
-	// Modes lists all the public available modes
+	// Modes lists all the publicly available modes
 	Modes(ctx context.Context, in *QueryGetModesRequest, opts ...grpc.CallOption) (*QueryGetModesResponse, error)
 	// Params lists the current matchmaker params
 	Params(ctx context.Context, in *QueryGetParamsRequest, opts ...grpc.CallOption) (*QueryGetParamsResponse, error)
@@ -490,7 +490,7 @@ type QueryServer interface {
 	Room(context.Context, *QueryGetRoomRequest) (*QueryGetRoomResponse, error)
 	// Invitations lists all the rooms that a player is invited to
 	Invitations(context.Context, *QueryGetInvitationsRequest) (*QueryGetInvitationsResponse, error)
-	// Modes lists all the public available modes
+	// Modes lists all the publicly available modes
 	Modes(context.Context, *QueryGetModesRequest) (*QueryGetModesResponse, error)
 	// Params lists the current matchmaker params
 	Params(context.Context, *QueryGetParamsRequest) (*QueryGetParamsResponse, error)

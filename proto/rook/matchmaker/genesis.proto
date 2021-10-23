@@ -9,7 +9,7 @@ option go_package = "github.com/arcane-systems/rook/x/matchmaker/types";
 // GenesisState defines the matchmaker module's genesis state.
 message GenesisState {
   Params params = 1 [ (gogoproto.nullable) = false ];
-  repeated Mode initial_modes = 2;
+  repeated Mode initial_modes = 2 [ (gogoproto.nullable) = false ];
   uint32 next_mode_id = 3;
   uint64 next_room_id = 4;
 }

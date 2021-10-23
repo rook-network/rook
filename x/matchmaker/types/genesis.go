@@ -12,9 +12,10 @@ const DefaultIndex uint64 = 1
 // DefaultGenesis returns the default Capability genesis state
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Params:     DefaultParams(),
-		NextModeId: 1,
-		NextRoomId: 1,
+		Params:       DefaultParams(),
+		InitialModes: []Mode{DefaultMode()},
+		NextModeId:   1,
+		NextRoomId:   1,
 	}
 }
 

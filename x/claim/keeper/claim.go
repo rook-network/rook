@@ -138,16 +138,16 @@ func (k Keeper) GetClaimableAmountForAction(ctx sdk.Context, addr sdk.AccAddress
 		return sdk.Coin{}, types.ErrRecordNotFound
 	}
 
-	emptyClaim := sdk.NewInt64Coin(claimRecord.InitialClaimableAmount.Denom, 0)
+	params, err := k.GetParams(ctx)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	emptyClaim := sdk.NewInt64Coin(params.ClaimDenom, 0)
 
 	// if action already completed, nothing is claimable
 	if claimRecord.ActionCompleted[action] {
 		return emptyClaim, nil
-	}
-
-	params, err := k.GetParams(ctx)
-	if err != nil {
-		return sdk.Coin{}, err
 	}
 
 	// If we are before the start time, do nothing.
@@ -158,8 +158,8 @@ func (k Keeper) GetClaimableAmountForAction(ctx sdk.Context, addr sdk.AccAddress
 	}
 
 	InitialClaimablePerAction := sdk.NewCoin(
-		claimRecord.InitialClaimableAmount.Denom,
-		claimRecord.InitialClaimableAmount.Amount.QuoRaw(int64(len(types.Action_name))),
+		params.ClaimDenom,
+		sdk.NewInt(claimRecord.InitialClaimableAmount).QuoRaw(int64(len(types.Action_name))),
 	)
 
 	elapsedAirdropTime := ctx.BlockTime().Sub(params.AirdropStartTime)
@@ -195,7 +195,12 @@ func (k Keeper) GetUserTotalClaimable(ctx sdk.Context, addr sdk.AccAddress) (sdk
 		return sdk.Coin{}, nil
 	}
 
-	totalClaimable := sdk.NewInt64Coin(claimRecord.InitialClaimableAmount.Denom, 0)
+	params, err := k.GetParams(ctx)
+	if err != nil {
+		return sdk.Coin{}, err
+	}
+
+	totalClaimable := sdk.NewInt64Coin(params.ClaimDenom, 0)
 	for action := range types.Action_name {
 		claimableForAction, err := k.GetClaimableAmountForAction(ctx, addr, types.Action(action))
 		if err != nil {
