@@ -10,7 +10,7 @@ import {
   directionToJSON,
   settlementFromJSON,
   settlementToJSON,
-} from "../../rook/game/game";
+} from "./game";
 
 export const protobufPackage = "rook.game";
 

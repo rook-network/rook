@@ -1,12 +1,12 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Coin } from "../../../cosmos/base/v1beta1/coin";
+import { Coin } from "../../base/v1beta1/coin";
 import {
   PageRequest,
   PageResponse,
-} from "../../../cosmos/base/query/v1beta1/pagination";
-import { Params, Metadata } from "../../../cosmos/bank/v1beta1/bank";
+} from "../../base/query/v1beta1/pagination";
+import { Params, Metadata } from "./bank";
 
 export const protobufPackage = "cosmos.bank.v1beta1";
 
@@ -83,15 +83,18 @@ export interface QueryParamsResponse {
   params?: Params;
 }
 
-/** QueryDenomsMetadataRequest is the request type for the Query/DenomsMetadata RPC method. */
+/**
+ * QueryDenomsMetadataRequest is the request type for the Query/DenomsMetadata
+ * RPC method.
+ */
 export interface QueryDenomsMetadataRequest {
   /** pagination defines an optional pagination for the request. */
   pagination?: PageRequest;
 }
 
 /**
- * QueryDenomsMetadataResponse is the response type for the Query/DenomsMetadata RPC
- * method.
+ * QueryDenomsMetadataResponse is the response type for the Query/DenomsMetadata
+ * RPC method.
  */
 export interface QueryDenomsMetadataResponse {
   /** metadata provides the client information for all the registered tokens. */
@@ -100,18 +103,24 @@ export interface QueryDenomsMetadataResponse {
   pagination?: PageResponse;
 }
 
-/** QueryDenomMetadataRequest is the request type for the Query/DenomMetadata RPC method. */
+/**
+ * QueryDenomMetadataRequest is the request type for the Query/DenomMetadata RPC
+ * method.
+ */
 export interface QueryDenomMetadataRequest {
   /** denom is the coin denom to query the metadata for. */
   denom: string;
 }
 
 /**
- * QueryDenomMetadataResponse is the response type for the Query/DenomMetadata RPC
- * method.
+ * QueryDenomMetadataResponse is the response type for the Query/DenomMetadata
+ * RPC method.
  */
 export interface QueryDenomMetadataResponse {
-  /** metadata describes and provides all the client information for the requested token. */
+  /**
+   * metadata describes and provides all the client information for the
+   * requested token.
+   */
   metadata?: Metadata;
 }
 
@@ -1174,7 +1183,10 @@ export interface Query {
   DenomMetadata(
     request: QueryDenomMetadataRequest
   ): Promise<QueryDenomMetadataResponse>;
-  /** DenomsMetadata queries the client metadata for all registered coin denominations. */
+  /**
+   * DenomsMetadata queries the client metadata for all registered coin
+   * denominations.
+   */
   DenomsMetadata(
     request: QueryDenomsMetadataRequest
   ): Promise<QueryDenomsMetadataResponse>;

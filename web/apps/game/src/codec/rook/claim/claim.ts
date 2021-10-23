@@ -1,7 +1,6 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Coin } from "../../cosmos/base/v1beta1/coin";
 import { Duration } from "../../google/protobuf/duration";
 import { Timestamp } from "../../google/protobuf/timestamp";
 
@@ -63,7 +62,7 @@ export interface ClaimRecord {
   /** address of claim user */
   address: string;
   /** total initial claimable amount for the user */
-  initialClaimableAmount?: Coin;
+  initialClaimableAmount: Long;
   /**
    * true if action is completed
    * index of bool in array refers to action enum #
@@ -80,7 +79,11 @@ export interface Params {
   claimDenom: string;
 }
 
-const baseClaimRecord: object = { address: "", actionCompleted: false };
+const baseClaimRecord: object = {
+  address: "",
+  initialClaimableAmount: Long.ZERO,
+  actionCompleted: false,
+};
 
 export const ClaimRecord = {
   encode(
@@ -90,11 +93,8 @@ export const ClaimRecord = {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
     }
-    if (message.initialClaimableAmount !== undefined) {
-      Coin.encode(
-        message.initialClaimableAmount,
-        writer.uint32(18).fork()
-      ).ldelim();
+    if (!message.initialClaimableAmount.isZero()) {
+      writer.uint32(16).int64(message.initialClaimableAmount);
     }
     writer.uint32(26).fork();
     for (const v of message.actionCompleted) {
@@ -116,7 +116,7 @@ export const ClaimRecord = {
           message.address = reader.string();
           break;
         case 2:
-          message.initialClaimableAmount = Coin.decode(reader, reader.uint32());
+          message.initialClaimableAmount = reader.int64() as Long;
           break;
         case 3:
           if ((tag & 7) === 2) {
@@ -148,11 +148,11 @@ export const ClaimRecord = {
       object.initialClaimableAmount !== undefined &&
       object.initialClaimableAmount !== null
     ) {
-      message.initialClaimableAmount = Coin.fromJSON(
+      message.initialClaimableAmount = Long.fromString(
         object.initialClaimableAmount
       );
     } else {
-      message.initialClaimableAmount = undefined;
+      message.initialClaimableAmount = Long.ZERO;
     }
     if (
       object.actionCompleted !== undefined &&
@@ -169,9 +169,9 @@ export const ClaimRecord = {
     const obj: any = {};
     message.address !== undefined && (obj.address = message.address);
     message.initialClaimableAmount !== undefined &&
-      (obj.initialClaimableAmount = message.initialClaimableAmount
-        ? Coin.toJSON(message.initialClaimableAmount)
-        : undefined);
+      (obj.initialClaimableAmount = (
+        message.initialClaimableAmount || Long.ZERO
+      ).toString());
     if (message.actionCompleted) {
       obj.actionCompleted = message.actionCompleted.map((e) => e);
     } else {
@@ -192,11 +192,9 @@ export const ClaimRecord = {
       object.initialClaimableAmount !== undefined &&
       object.initialClaimableAmount !== null
     ) {
-      message.initialClaimableAmount = Coin.fromPartial(
-        object.initialClaimableAmount
-      );
+      message.initialClaimableAmount = object.initialClaimableAmount as Long;
     } else {
-      message.initialClaimableAmount = undefined;
+      message.initialClaimableAmount = Long.ZERO;
     }
     if (
       object.actionCompleted !== undefined &&

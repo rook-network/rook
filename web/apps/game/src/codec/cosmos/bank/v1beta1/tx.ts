@@ -1,8 +1,8 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Coin } from "../../../cosmos/base/v1beta1/coin";
-import { Input, Output } from "../../../cosmos/bank/v1beta1/bank";
+import { Coin } from "../../base/v1beta1/coin";
+import { Input, Output } from "./bank";
 
 export const protobufPackage = "cosmos.bank.v1beta1";
 
@@ -303,9 +303,15 @@ export const MsgMultiSendResponse = {
 
 /** Msg defines the bank Msg service. */
 export interface Msg {
-  /** Send defines a method for sending coins from one account to another account. */
+  /**
+   * Send defines a method for sending coins from one account to another
+   * account.
+   */
   Send(request: MsgSend): Promise<MsgSendResponse>;
-  /** MultiSend defines a method for sending coins from some accounts to other accounts. */
+  /**
+   * MultiSend defines a method for sending coins from some accounts to other
+   * accounts.
+   */
   MultiSend(request: MsgMultiSend): Promise<MsgMultiSendResponse>;
 }
 

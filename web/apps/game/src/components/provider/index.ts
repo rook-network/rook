@@ -1,7 +1,13 @@
-import { BroadcastTxResponse, SigningStargateClient, StdFee } from "@cosmjs/stargate"
+import { BroadcastTxResponse, SigningStargateClient, StdFee, QueryClient, createProtobufRpcClient } from "@cosmjs/stargate"
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc'
 import config from "../../config"
 import { Registry } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing'
-import { MsgFind, MsgHost, MsgJoin, MsgLeave } from '../../codec/rook/matchmaker/tx'
+import { MsgFind, MsgHost, MsgJoin, MsgLeave, MsgClientImpl as MatchmakerTxClient} from '../../codec/rook/matchmaker/tx'
+import { Mode } from '../../codec/rook/matchmaker/matchmaker'
+import { QueryClientImpl as MatchmakerQueryClient} from '../../codec/rook/matchmaker/query'
+import { QueryClientImpl as GameQueryClient } from '../../codec/rook/game/query'
+import { MsgClientImpl as GameTxClient } from '../../codec/rook/game/tx'
+
 import Long from 'long';
 
 const typeMsgFind = "/rook.matchmaker.MsgFind"
@@ -16,12 +22,46 @@ const rookRegistry = new Registry([
     [typeMsgLeave, MsgLeave],
 ])
 
-export class Provider {
-    private client: SigningStargateClient | null = null
-    public readonly chainID: string
-    private address: string | null = null
+export class MatchmakerProvider {
+    public query: MatchmakerQueryClient
+    public tx: MatchmakerTxClient
 
-    async connect(): Promise<string> {
+    constructor(querier: QueryClient) {
+        const protoRpcClient = createProtobufRpcClient(querier)
+        this.query = new MatchmakerQueryClient(protoRpcClient)
+        this.tx = new MatchmakerTxClient(protoRpcClient)
+    }
+}
+
+export class GameProvider {
+    public query: GameQueryClient
+    public tx: GameTxClient
+
+    constructor(querier: QueryClient) {
+        const protoRpcClient = createProtobufRpcClient(querier)
+        this.query = new GameQueryClient(protoRpcClient)
+        this.tx = new GameTxClient(protoRpcClient)
+    }
+}
+
+export class Provider {
+    private client: SigningStargateClient
+    private querier: QueryClient
+    public readonly matchmaker: MatchmakerProvider
+    public readonly game: GameProvider
+    public readonly chainID: string
+    private address: string
+
+    constructor(client: SigningStargateClient, querier: QueryClient, address: string) {
+        this.client = client
+        this.querier = querier
+        this.address = address
+        this.chainID = config.chainID
+        this.matchmaker = new MatchmakerProvider(this.querier)
+        this.game = new GameProvider(this.querier)
+    }
+
+    public static async connect(): Promise<Provider> {
         if (!keplrEnabled() || !window.keplr.experimentalSuggestChain) {
             throw new Error("keplr is not connected. Please install the extension first")
         }
@@ -38,20 +78,19 @@ export class Provider {
 
         const offlineSigner = window.keplr.getOfflineSigner(config.chainID)
 
-        this.client = await SigningStargateClient.connectWithSigner(
+        const client = await SigningStargateClient.connectWithSigner(
             config.rpcEndpoint,
             offlineSigner,
             { registry: rookRegistry }
         )
 
-        const accounts = await offlineSigner.getAccounts()
-        this.address = accounts[0].address
-        console.log("connected to " + this.address)
-        return accounts[0].address
-    }
+        const tmClient = await Tendermint34Client.connect(config.rpcEndpoint)
+        const querier = QueryClient.withExtensions(tmClient)
 
-    constructor() {
-        this.chainID = config.chainID
+        const accounts = await offlineSigner.getAccounts()
+        if (accounts.length === 0)
+            throw new Error("keplr has no accounts")
+        return new Provider(client, querier, accounts[0].address)
     }
 
     isConnected() {
@@ -79,6 +118,17 @@ export class Provider {
         }
         return await this.client.getHeight()
     }
+
+    async getModes(): Promise<Mode> {
+        if (this.client === null || this.address === null)
+            throw new Error("client not initialized")
+
+        return {
+            quorum: 2,
+            capacity: 4,
+        }
+    }
+
 
     async findGame(mode: number): Promise<BroadcastTxResponse> {
         if (this.client === null || this.address === null)

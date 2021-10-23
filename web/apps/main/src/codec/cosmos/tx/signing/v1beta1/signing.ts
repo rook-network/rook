@@ -2,7 +2,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { Any } from "../../../../google/protobuf/any";
-import { CompactBitArray } from "../../../../cosmos/crypto/multisig/v1beta1/multisig";
+import { CompactBitArray } from "../../../crypto/multisig/v1beta1/multisig";
 
 export const protobufPackage = "cosmos.tx.signing.v1beta1";
 
@@ -86,8 +86,8 @@ export interface SignatureDescriptor {
   data?: SignatureDescriptor_Data;
   /**
    * sequence is the sequence of the account, which describes the
-   * number of committed transactions signed by a given address. It is used to prevent
-   * replay attacks.
+   * number of committed transactions signed by a given address. It is used to
+   * prevent replay attacks.
    */
   sequence: Long;
 }

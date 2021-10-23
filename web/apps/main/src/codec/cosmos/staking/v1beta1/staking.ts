@@ -4,7 +4,7 @@ import _m0 from "protobufjs/minimal";
 import { Header } from "../../../tendermint/types/types";
 import { Any } from "../../../google/protobuf/any";
 import { Duration } from "../../../google/protobuf/duration";
-import { Coin } from "../../../cosmos/base/v1beta1/coin";
+import { Coin } from "../../base/v1beta1/coin";
 import { Timestamp } from "../../../google/protobuf/timestamp";
 
 export const protobufPackage = "cosmos.staking.v1beta1";
@@ -76,15 +76,24 @@ export interface HistoricalInfo {
 export interface CommissionRates {
   /** rate is the commission rate charged to delegators, as a fraction. */
   rate: string;
-  /** max_rate defines the maximum commission rate which validator can ever charge, as a fraction. */
+  /**
+   * max_rate defines the maximum commission rate which validator can ever
+   * charge, as a fraction.
+   */
   maxRate: string;
-  /** max_change_rate defines the maximum daily increase of the validator commission, as a fraction. */
+  /**
+   * max_change_rate defines the maximum daily increase of the validator
+   * commission, as a fraction.
+   */
   maxChangeRate: string;
 }
 
 /** Commission defines commission parameters for a given validator. */
 export interface Commission {
-  /** commission_rates defines the initial commission rates to be used for creating a validator. */
+  /**
+   * commission_rates defines the initial commission rates to be used for
+   * creating a validator.
+   */
   commissionRates?: CommissionRates;
   /** update_time is the last time the commission rate was changed. */
   updateTime?: Date;
@@ -115,11 +124,20 @@ export interface Description {
  * multiplied by exchange rate.
  */
 export interface Validator {
-  /** operator_address defines the address of the validator's operator; bech encoded in JSON. */
+  /**
+   * operator_address defines the address of the validator's operator; bech
+   * encoded in JSON.
+   */
   operatorAddress: string;
-  /** consensus_pubkey is the consensus public key of the validator, as a Protobuf Any. */
+  /**
+   * consensus_pubkey is the consensus public key of the validator, as a
+   * Protobuf Any.
+   */
   consensusPubkey?: Any;
-  /** jailed defined whether the validator has been jailed from bonded status or not. */
+  /**
+   * jailed defined whether the validator has been jailed from bonded status or
+   * not.
+   */
   jailed: boolean;
   /** status is the validator status (bonded/unbonding/unbonded). */
   status: BondStatus;
@@ -129,13 +147,22 @@ export interface Validator {
   delegatorShares: string;
   /** description defines the description terms for the validator. */
   description?: Description;
-  /** unbonding_height defines, if unbonding, the height at which this validator has begun unbonding. */
+  /**
+   * unbonding_height defines, if unbonding, the height at which this validator
+   * has begun unbonding.
+   */
   unbondingHeight: Long;
-  /** unbonding_time defines, if unbonding, the min time for the validator to complete unbonding. */
+  /**
+   * unbonding_time defines, if unbonding, the min time for the validator to
+   * complete unbonding.
+   */
   unbondingTime?: Date;
   /** commission defines the commission parameters. */
   commission?: Commission;
-  /** min_self_delegation is the validator's self declared minimum self delegation. */
+  /**
+   * min_self_delegation is the validator's self declared minimum self
+   * delegation.
+   */
   minSelfDelegation: string;
 }
 
@@ -209,7 +236,10 @@ export interface UnbondingDelegationEntry {
   creationHeight: Long;
   /** completion_time is the unix time for unbonding completion. */
   completionTime?: Date;
-  /** initial_balance defines the tokens initially scheduled to receive at completion. */
+  /**
+   * initial_balance defines the tokens initially scheduled to receive at
+   * completion.
+   */
   initialBalance: string;
   /** balance defines the tokens to receive at completion. */
   balance: string;
@@ -223,7 +253,10 @@ export interface RedelegationEntry {
   completionTime?: Date;
   /** initial_balance defines the initial balance when redelegation started. */
   initialBalance: string;
-  /** shares_dst is the amount of destination-validator shares created by redelegation. */
+  /**
+   * shares_dst is the amount of destination-validator shares created by
+   * redelegation.
+   */
   sharesDst: string;
 }
 
@@ -234,9 +267,15 @@ export interface RedelegationEntry {
 export interface Redelegation {
   /** delegator_address is the bech32-encoded address of the delegator. */
   delegatorAddress: string;
-  /** validator_src_address is the validator redelegation source operator address. */
+  /**
+   * validator_src_address is the validator redelegation source operator
+   * address.
+   */
   validatorSrcAddress: string;
-  /** validator_dst_address is the validator redelegation destination operator address. */
+  /**
+   * validator_dst_address is the validator redelegation destination operator
+   * address.
+   */
   validatorDstAddress: string;
   /** entries are the redelegation entries. */
   entries: RedelegationEntry[];
@@ -248,7 +287,10 @@ export interface Params {
   unbondingTime?: Duration;
   /** max_validators is the maximum number of validators. */
   maxValidators: number;
-  /** max_entries is the max entries for either unbonding delegation or redelegation (per pair/trio). */
+  /**
+   * max_entries is the max entries for either unbonding delegation or
+   * redelegation (per pair/trio).
+   */
   maxEntries: number;
   /** historical_entries is the number of historical entries to persist. */
   historicalEntries: number;

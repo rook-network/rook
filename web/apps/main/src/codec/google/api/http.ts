@@ -43,7 +43,8 @@ export interface Http {
  *
  *     service Messaging {
  *       rpc GetMessage(GetMessageRequest) returns (Message) {
- *         option (google.api.http).get = "/v1/messages/{message_id}/{sub.subfield}";
+ *         option (google.api.http).get =
+ *         "/v1/messages/{message_id}/{sub.subfield}";
  *       }
  *     }
  *     message GetMessageRequest {
@@ -70,7 +71,8 @@ export interface Http {
  *
  * HTTP | RPC
  * -----|-----
- * `GET /v1/messages/123456/foo`  | `GetMessage(message_id: "123456" sub: SubMessage(subfield: "foo"))`
+ * `GET /v1/messages/123456/foo`  | `GetMessage(message_id: "123456" sub:
+ * SubMessage(subfield: "foo"))`
  *
  * In general, not only fields but also field paths can be referenced
  * from a path pattern. Fields mapped to the path pattern cannot be
@@ -100,7 +102,9 @@ export interface Http {
  *
  * HTTP | RPC
  * -----|-----
- * `GET /v1/messages/123456?revision=2&sub.subfield=foo` | `GetMessage(message_id: "123456" revision: 2 sub: SubMessage(subfield: "foo"))`
+ * `GET /v1/messages/123456?revision=2&sub.subfield=foo` |
+ * `GetMessage(message_id: "123456" revision: 2 sub: SubMessage(subfield:
+ * "foo"))`
  *
  * Note that fields which are mapped to HTTP parameters must have a
  * primitive type or a repeated primitive type. Message types are not
@@ -132,7 +136,8 @@ export interface Http {
  *
  * HTTP | RPC
  * -----|-----
- * `PUT /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id: "123456" message { text: "Hi!" })`
+ * `PUT /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id:
+ * "123456" message { text: "Hi!" })`
  *
  * The special name `*` can be used in the body mapping to define that
  * every field not bound by the path template should be mapped to the
@@ -157,7 +162,8 @@ export interface Http {
  *
  * HTTP | RPC
  * -----|-----
- * `PUT /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id: "123456" text: "Hi!")`
+ * `PUT /v1/messages/123456 { "text": "Hi!" }` | `UpdateMessage(message_id:
+ * "123456" text: "Hi!")`
  *
  * Note that when using `*` in the body mapping, it is not possible to
  * have HTTP parameters, as all fields not bound by the path end in
@@ -190,7 +196,8 @@ export interface Http {
  * HTTP | RPC
  * -----|-----
  * `GET /v1/messages/123456` | `GetMessage(message_id: "123456")`
- * `GET /v1/users/me/messages/123456` | `GetMessage(user_id: "me" message_id: "123456")`
+ * `GET /v1/users/me/messages/123456` | `GetMessage(user_id: "me" message_id:
+ * "123456")`
  *
  * # Rules for HTTP mapping
  *
@@ -250,7 +257,8 @@ export interface HttpRule {
   /**
    * Selects methods to which this rule applies.
    *
-   * Refer to [selector][google.api.DocumentationRule.selector] for syntax details.
+   * Refer to [selector][google.api.DocumentationRule.selector] for syntax
+   * details.
    */
   selector: string;
   /** Used for listing and getting information about resources. */

@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Coin } from "../../../cosmos/base/v1beta1/coin";
+import { Coin } from "../../base/v1beta1/coin";
 
 export const protobufPackage = "cosmos.distribution.v1beta1";
 
@@ -14,7 +14,10 @@ export interface MsgSetWithdrawAddress {
   withdrawAddress: string;
 }
 
-/** MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response type. */
+/**
+ * MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response
+ * type.
+ */
 export interface MsgSetWithdrawAddressResponse {}
 
 /**
@@ -26,7 +29,10 @@ export interface MsgWithdrawDelegatorReward {
   validatorAddress: string;
 }
 
-/** MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward response type. */
+/**
+ * MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward
+ * response type.
+ */
 export interface MsgWithdrawDelegatorRewardResponse {}
 
 /**
@@ -37,7 +43,10 @@ export interface MsgWithdrawValidatorCommission {
   validatorAddress: string;
 }
 
-/** MsgWithdrawValidatorCommissionResponse defines the Msg/WithdrawValidatorCommission response type. */
+/**
+ * MsgWithdrawValidatorCommissionResponse defines the
+ * Msg/WithdrawValidatorCommission response type.
+ */
 export interface MsgWithdrawValidatorCommissionResponse {}
 
 /**

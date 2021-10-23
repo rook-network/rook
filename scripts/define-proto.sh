@@ -18,10 +18,13 @@ protoc \
   --proto_path="$ROOK_PROTO_DIR" \
   --ts_proto_opt="esModuleInterop=true,forceLong=long,useOptionals=true" \
   "$ROOK_PROTO_DIR/rook/claim/claim.proto" \
+  "$ROOK_PROTO_DIR/rook/claim/query.proto" \
   "$ROOK_PROTO_DIR/rook/claim/tx.proto" \
   "$ROOK_PROTO_DIR/rook/game/game.proto" \
+  "$ROOK_PROTO_DIR/rook/game/query.proto" \
   "$ROOK_PROTO_DIR/rook/game/tx.proto" \
   "$ROOK_PROTO_DIR/rook/matchmaker/matchmaker.proto" \
+  "$ROOK_PROTO_DIR/rook/matchmaker/query.proto" \
   "$ROOK_PROTO_DIR/rook/matchmaker/tx.proto" \
   "$COSMOS_PROTO_DIR/cosmos/auth/v1beta1/auth.proto" \
   "$COSMOS_PROTO_DIR/cosmos/auth/v1beta1/query.proto" \

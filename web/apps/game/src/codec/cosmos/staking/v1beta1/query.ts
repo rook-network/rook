@@ -4,7 +4,7 @@ import _m0 from "protobufjs/minimal";
 import {
   PageRequest,
   PageResponse,
-} from "../../../cosmos/base/query/v1beta1/pagination";
+} from "../../base/query/v1beta1/pagination";
 import {
   Validator,
   DelegationResponse,
@@ -13,7 +13,7 @@ import {
   Pool,
   Params,
   RedelegationResponse,
-} from "../../../cosmos/staking/v1beta1/staking";
+} from "./staking";
 
 export const protobufPackage = "cosmos.staking.v1beta1";
 

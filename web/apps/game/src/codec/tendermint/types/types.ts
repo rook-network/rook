@@ -1,9 +1,9 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Proof } from "../../tendermint/crypto/proof";
-import { Consensus } from "../../tendermint/version/types";
-import { ValidatorSet } from "../../tendermint/types/validator";
+import { Proof } from "../crypto/proof";
+import { Consensus } from "../version/types";
+import { ValidatorSet } from "./validator";
 import { Timestamp } from "../../google/protobuf/timestamp";
 
 export const protobufPackage = "tendermint.types";
@@ -173,7 +173,10 @@ export interface Vote {
   signature: Uint8Array;
 }
 
-/** Commit contains the evidence that a block was committed by a set of validators. */
+/**
+ * Commit contains the evidence that a block was committed by a set of
+ * validators.
+ */
 export interface Commit {
   height: Long;
   round: number;
@@ -216,7 +219,10 @@ export interface BlockMeta {
   numTxs: Long;
 }
 
-/** TxProof represents a Merkle proof of the presence of a transaction in the Merkle tree. */
+/**
+ * TxProof represents a Merkle proof of the presence of a transaction in the
+ * Merkle tree.
+ */
 export interface TxProof {
   rootHash: Uint8Array;
   data: Uint8Array;

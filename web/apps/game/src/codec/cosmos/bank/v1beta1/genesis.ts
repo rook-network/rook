@@ -1,8 +1,8 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Params, Metadata } from "../../../cosmos/bank/v1beta1/bank";
-import { Coin } from "../../../cosmos/base/v1beta1/coin";
+import { Params, Metadata } from "./bank";
+import { Coin } from "../../base/v1beta1/coin";
 
 export const protobufPackage = "cosmos.bank.v1beta1";
 
@@ -13,8 +13,9 @@ export interface GenesisState {
   /** balances is an array containing the balances of all the accounts. */
   balances: Balance[];
   /**
-   * supply represents the total supply. If it is left empty, then supply will be calculated based on the provided
-   * balances. Otherwise, it will be used to validate that the sum of the balances equals this amount.
+   * supply represents the total supply. If it is left empty, then supply will
+   * be calculated based on the provided balances. Otherwise, it will be used to
+   * validate that the sum of the balances equals this amount.
    */
   supply: Coin[];
   /** denom_metadata defines the metadata of the differents coins. */

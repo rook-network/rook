@@ -8,11 +8,14 @@ declare global {
 }
 
 class App extends React.Component {
-  constructor(props: any) {
-    super(props)
-    this.state = {
-      provider: new Provider()
-    }
+  provider: Provider | null = null
+
+  // constructor(props: any) {
+  //   super(props)
+  // }
+
+  async componentDidMount() {
+    this.provider = await Provider.connect()
   }
 
   render() {

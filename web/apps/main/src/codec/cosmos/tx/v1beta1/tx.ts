@@ -6,9 +6,9 @@ import {
   SignMode,
   signModeFromJSON,
   signModeToJSON,
-} from "../../../cosmos/tx/signing/v1beta1/signing";
-import { CompactBitArray } from "../../../cosmos/crypto/multisig/v1beta1/multisig";
-import { Coin } from "../../../cosmos/base/v1beta1/coin";
+} from "../signing/v1beta1/signing";
+import { CompactBitArray } from "../../crypto/multisig/v1beta1/multisig";
+import { Coin } from "../../base/v1beta1/coin";
 
 export const protobufPackage = "cosmos.tx.v1beta1";
 
@@ -92,7 +92,8 @@ export interface TxBody {
   /**
    * memo is any arbitrary note/comment to be added to the transaction.
    * WARNING: in clients, any publicly exposed text should not be called memo,
-   * but should be called `note` instead (see https://github.com/cosmos/cosmos-sdk/issues/9122).
+   * but should be called `note` instead (see
+   * https://github.com/cosmos/cosmos-sdk/issues/9122).
    */
   memo: string;
   /**
@@ -202,15 +203,17 @@ export interface Fee {
    */
   gasLimit: Long;
   /**
-   * if unset, the first signer is responsible for paying the fees. If set, the specified account must pay the fees.
-   * the payer must be a tx signer (and thus have signed this field in AuthInfo).
-   * setting this field does *not* change the ordering of required signers for the transaction.
+   * if unset, the first signer is responsible for paying the fees. If set, the
+   * specified account must pay the fees. the payer must be a tx signer (and
+   * thus have signed this field in AuthInfo). setting this field does *not*
+   * change the ordering of required signers for the transaction.
    */
   payer: string;
   /**
-   * if set, the fee payer (either the first signer or the value of the payer field) requests that a fee grant be used
-   * to pay fees instead of the fee payer's own balance. If an appropriate fee grant does not exist or the chain does
-   * not support fee grants, this will fail
+   * if set, the fee payer (either the first signer or the value of the payer
+   * field) requests that a fee grant be used to pay fees instead of the fee
+   * payer's own balance. If an appropriate fee grant does not exist or the
+   * chain does not support fee grants, this will fail
    */
   granter: string;
 }
