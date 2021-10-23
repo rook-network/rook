@@ -38,11 +38,11 @@ message QueryGetRoomResponse { Room room = 1; }
 
 message QueryGetInvitationsRequest { string player = 1; }
 
-message QueryGetInvitationsResponse { map<uint64, Room> rooms = 1; }
+message QueryGetInvitationsResponse { repeated IndexedRoom rooms = 1; }
 
 message QueryGetModesRequest {}
 
-message QueryGetModesResponse { map<uint32, Mode> modes = 1; }
+message QueryGetModesResponse { repeated IndexedMode modes = 1; }
 
 message QueryGetParamsRequest {}
 

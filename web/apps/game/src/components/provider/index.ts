@@ -119,17 +119,6 @@ export class Provider {
         return await this.client.getHeight()
     }
 
-    async getModes(): Promise<Mode> {
-        if (this.client === null || this.address === null)
-            throw new Error("client not initialized")
-
-        return {
-            quorum: 2,
-            capacity: 4,
-        }
-    }
-
-
     async findGame(mode: number): Promise<BroadcastTxResponse> {
         if (this.client === null || this.address === null)
             throw new Error("client not initialized")

@@ -6,13 +6,18 @@ ROOT_PROTO_DIR="./third-party/cosmos/cosmos-sdk"
 ROOK_PROTO_DIR="./proto"
 COSMOS_PROTO_DIR="$ROOT_PROTO_DIR/proto"
 THIRD_PARTY_PROTO_DIR="$ROOT_PROTO_DIR/third_party/proto"
-OUT_DIR="./web/libs/codec"
+GAME_APP_DIR="./web/apps/game/src/codec"
+MAIN_APP_DIR="./web/apps/main/src"
 
-mkdir -p "$OUT_DIR"
+rm -rf "$GAME_APP_DIR"
+rm -rf "$MAIN_APP_DIR/codec"
+
+mkdir -p "$GAME_APP_DIR"
+mkdir -p "$MAIN_APP_DIR/codec"
 
 protoc \
   --plugin="./web/node_modules/.bin/protoc-gen-ts_proto" \
-  --ts_proto_out="$OUT_DIR" \
+  --ts_proto_out="$GAME_APP_DIR" \
   --proto_path="$COSMOS_PROTO_DIR" \
   --proto_path="$THIRD_PARTY_PROTO_DIR" \
   --proto_path="$ROOK_PROTO_DIR" \
@@ -66,6 +71,9 @@ protoc \
 #   "$THIRD_PARTY_PROTO_DIR/tendermint/types/types.proto" \
 #   "$THIRD_PARTY_PROTO_DIR/tendermint/types/validator.proto" \
 #   "$THIRD_PARTY_PROTO_DIR/tendermint/version/types.proto"
+
+# copy the files across to the main app as well
+cp -r $GAME_APP_DIR $MAIN_APP_DIR
 
 # Remove unnecessary codec files
 rm -rf \

@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { PublicKey } from "../crypto/keys";
+import { PublicKey } from "../../tendermint/crypto/keys";
 
 export const protobufPackage = "tendermint.types";
 

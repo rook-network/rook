@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Mode } from "./matchmaker";
+import { Mode } from "../../rook/matchmaker/matchmaker";
 import { Timestamp } from "../../google/protobuf/timestamp";
 
 export const protobufPackage = "rook.matchmaker";

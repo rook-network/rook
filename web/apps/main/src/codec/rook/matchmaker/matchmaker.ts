@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Config } from "../game/game";
+import { Config } from "../../rook/game/game";
 import { Duration } from "../../google/protobuf/duration";
 import { Timestamp } from "../../google/protobuf/timestamp";
 
@@ -41,6 +41,12 @@ export interface Room {
   scheduled?: Date | undefined;
 }
 
+/** IndexedRoom pins an id to the room */
+export interface IndexedRoom {
+  id: Long;
+  room?: Room;
+}
+
 /** Rooms represents a set of rooms by id */
 export interface Rooms {
   ids: Long[];
@@ -57,6 +63,12 @@ export interface Mode {
   quorum: number;
   /** the max amount of players that can join the room */
   capacity: number;
+}
+
+/** IndexedMode pins an id to the mode */
+export interface IndexedMode {
+  id: number;
+  mode?: Mode;
 }
 
 export interface Params {
@@ -319,6 +331,83 @@ export const Room = {
   },
 };
 
+const baseIndexedRoom: object = { id: Long.UZERO };
+
+export const IndexedRoom = {
+  encode(
+    message: IndexedRoom,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (!message.id.isZero()) {
+      writer.uint32(8).uint64(message.id);
+    }
+    if (message.room !== undefined) {
+      Room.encode(message.room, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): IndexedRoom {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseIndexedRoom } as IndexedRoom;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint64() as Long;
+          break;
+        case 2:
+          message.room = Room.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): IndexedRoom {
+    const message = { ...baseIndexedRoom } as IndexedRoom;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = Long.fromString(object.id);
+    } else {
+      message.id = Long.UZERO;
+    }
+    if (object.room !== undefined && object.room !== null) {
+      message.room = Room.fromJSON(object.room);
+    } else {
+      message.room = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: IndexedRoom): unknown {
+    const obj: any = {};
+    message.id !== undefined &&
+      (obj.id = (message.id || Long.UZERO).toString());
+    message.room !== undefined &&
+      (obj.room = message.room ? Room.toJSON(message.room) : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<IndexedRoom>): IndexedRoom {
+    const message = { ...baseIndexedRoom } as IndexedRoom;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id as Long;
+    } else {
+      message.id = Long.UZERO;
+    }
+    if (object.room !== undefined && object.room !== null) {
+      message.room = Room.fromPartial(object.room);
+    } else {
+      message.room = undefined;
+    }
+    return message;
+  },
+};
+
 const baseRooms: object = { ids: Long.UZERO };
 
 export const Rooms = {
@@ -475,6 +564,82 @@ export const Mode = {
       message.capacity = object.capacity;
     } else {
       message.capacity = 0;
+    }
+    return message;
+  },
+};
+
+const baseIndexedMode: object = { id: 0 };
+
+export const IndexedMode = {
+  encode(
+    message: IndexedMode,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.id !== 0) {
+      writer.uint32(8).uint32(message.id);
+    }
+    if (message.mode !== undefined) {
+      Mode.encode(message.mode, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): IndexedMode {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseIndexedMode } as IndexedMode;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.id = reader.uint32();
+          break;
+        case 2:
+          message.mode = Mode.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): IndexedMode {
+    const message = { ...baseIndexedMode } as IndexedMode;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = Number(object.id);
+    } else {
+      message.id = 0;
+    }
+    if (object.mode !== undefined && object.mode !== null) {
+      message.mode = Mode.fromJSON(object.mode);
+    } else {
+      message.mode = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: IndexedMode): unknown {
+    const obj: any = {};
+    message.id !== undefined && (obj.id = message.id);
+    message.mode !== undefined &&
+      (obj.mode = message.mode ? Mode.toJSON(message.mode) : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<IndexedMode>): IndexedMode {
+    const message = { ...baseIndexedMode } as IndexedMode;
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id;
+    } else {
+      message.id = 0;
+    }
+    if (object.mode !== undefined && object.mode !== null) {
+      message.mode = Mode.fromPartial(object.mode);
+    } else {
+      message.mode = undefined;
     }
     return message;
   },

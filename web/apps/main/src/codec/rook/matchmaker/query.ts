@@ -1,7 +1,12 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { Room, Mode, Params } from "./matchmaker";
+import {
+  Room,
+  Params,
+  IndexedRoom,
+  IndexedMode,
+} from "../../rook/matchmaker/matchmaker";
 
 export const protobufPackage = "rook.matchmaker";
 
@@ -18,23 +23,13 @@ export interface QueryGetInvitationsRequest {
 }
 
 export interface QueryGetInvitationsResponse {
-  rooms: { [key: Long]: Room };
-}
-
-export interface QueryGetInvitationsResponse_RoomsEntry {
-  key: Long;
-  value?: Room;
+  rooms: IndexedRoom[];
 }
 
 export interface QueryGetModesRequest {}
 
 export interface QueryGetModesResponse {
-  modes: { [key: number]: Mode };
-}
-
-export interface QueryGetModesResponse_ModesEntry {
-  key: number;
-  value?: Mode;
+  modes: IndexedMode[];
 }
 
 export interface QueryGetParamsRequest {}
@@ -240,12 +235,9 @@ export const QueryGetInvitationsResponse = {
     message: QueryGetInvitationsResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    Object.entries(message.rooms).forEach(([key, value]) => {
-      QueryGetInvitationsResponse_RoomsEntry.encode(
-        { key: key as any, value },
-        writer.uint32(10).fork()
-      ).ldelim();
-    });
+    for (const v of message.rooms) {
+      IndexedRoom.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
     return writer;
   },
 
@@ -258,18 +250,12 @@ export const QueryGetInvitationsResponse = {
     const message = {
       ...baseQueryGetInvitationsResponse,
     } as QueryGetInvitationsResponse;
-    message.rooms = {};
+    message.rooms = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          const entry1 = QueryGetInvitationsResponse_RoomsEntry.decode(
-            reader,
-            reader.uint32()
-          );
-          if (entry1.value !== undefined) {
-            message.rooms[entry1.key] = entry1.value;
-          }
+          message.rooms.push(IndexedRoom.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -283,22 +269,23 @@ export const QueryGetInvitationsResponse = {
     const message = {
       ...baseQueryGetInvitationsResponse,
     } as QueryGetInvitationsResponse;
-    message.rooms = {};
+    message.rooms = [];
     if (object.rooms !== undefined && object.rooms !== null) {
-      Object.entries(object.rooms).forEach(([key, value]) => {
-        message.rooms[Number(key)] = Room.fromJSON(value);
-      });
+      for (const e of object.rooms) {
+        message.rooms.push(IndexedRoom.fromJSON(e));
+      }
     }
     return message;
   },
 
   toJSON(message: QueryGetInvitationsResponse): unknown {
     const obj: any = {};
-    obj.rooms = {};
     if (message.rooms) {
-      Object.entries(message.rooms).forEach(([k, v]) => {
-        obj.rooms[k] = Room.toJSON(v);
-      });
+      obj.rooms = message.rooms.map((e) =>
+        e ? IndexedRoom.toJSON(e) : undefined
+      );
+    } else {
+      obj.rooms = [];
     }
     return obj;
   },
@@ -309,101 +296,11 @@ export const QueryGetInvitationsResponse = {
     const message = {
       ...baseQueryGetInvitationsResponse,
     } as QueryGetInvitationsResponse;
-    message.rooms = {};
+    message.rooms = [];
     if (object.rooms !== undefined && object.rooms !== null) {
-      Object.entries(object.rooms).forEach(([key, value]) => {
-        if (value !== undefined) {
-          message.rooms[Number(key)] = Room.fromPartial(value);
-        }
-      });
-    }
-    return message;
-  },
-};
-
-const baseQueryGetInvitationsResponse_RoomsEntry: object = { key: Long.UZERO };
-
-export const QueryGetInvitationsResponse_RoomsEntry = {
-  encode(
-    message: QueryGetInvitationsResponse_RoomsEntry,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (!message.key.isZero()) {
-      writer.uint32(8).uint64(message.key);
-    }
-    if (message.value !== undefined) {
-      Room.encode(message.value, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryGetInvitationsResponse_RoomsEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetInvitationsResponse_RoomsEntry,
-    } as QueryGetInvitationsResponse_RoomsEntry;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.key = reader.uint64() as Long;
-          break;
-        case 2:
-          message.value = Room.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+      for (const e of object.rooms) {
+        message.rooms.push(IndexedRoom.fromPartial(e));
       }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetInvitationsResponse_RoomsEntry {
-    const message = {
-      ...baseQueryGetInvitationsResponse_RoomsEntry,
-    } as QueryGetInvitationsResponse_RoomsEntry;
-    if (object.key !== undefined && object.key !== null) {
-      message.key = Long.fromString(object.key);
-    } else {
-      message.key = Long.UZERO;
-    }
-    if (object.value !== undefined && object.value !== null) {
-      message.value = Room.fromJSON(object.value);
-    } else {
-      message.value = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetInvitationsResponse_RoomsEntry): unknown {
-    const obj: any = {};
-    message.key !== undefined &&
-      (obj.key = (message.key || Long.UZERO).toString());
-    message.value !== undefined &&
-      (obj.value = message.value ? Room.toJSON(message.value) : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetInvitationsResponse_RoomsEntry>
-  ): QueryGetInvitationsResponse_RoomsEntry {
-    const message = {
-      ...baseQueryGetInvitationsResponse_RoomsEntry,
-    } as QueryGetInvitationsResponse_RoomsEntry;
-    if (object.key !== undefined && object.key !== null) {
-      message.key = object.key as Long;
-    } else {
-      message.key = Long.UZERO;
-    }
-    if (object.value !== undefined && object.value !== null) {
-      message.value = Room.fromPartial(object.value);
-    } else {
-      message.value = undefined;
     }
     return message;
   },
@@ -460,12 +357,9 @@ export const QueryGetModesResponse = {
     message: QueryGetModesResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    Object.entries(message.modes).forEach(([key, value]) => {
-      QueryGetModesResponse_ModesEntry.encode(
-        { key: key as any, value },
-        writer.uint32(10).fork()
-      ).ldelim();
-    });
+    for (const v of message.modes) {
+      IndexedMode.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
     return writer;
   },
 
@@ -476,18 +370,12 @@ export const QueryGetModesResponse = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseQueryGetModesResponse } as QueryGetModesResponse;
-    message.modes = {};
+    message.modes = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          const entry1 = QueryGetModesResponse_ModesEntry.decode(
-            reader,
-            reader.uint32()
-          );
-          if (entry1.value !== undefined) {
-            message.modes[entry1.key] = entry1.value;
-          }
+          message.modes.push(IndexedMode.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -499,22 +387,23 @@ export const QueryGetModesResponse = {
 
   fromJSON(object: any): QueryGetModesResponse {
     const message = { ...baseQueryGetModesResponse } as QueryGetModesResponse;
-    message.modes = {};
+    message.modes = [];
     if (object.modes !== undefined && object.modes !== null) {
-      Object.entries(object.modes).forEach(([key, value]) => {
-        message.modes[Number(key)] = Mode.fromJSON(value);
-      });
+      for (const e of object.modes) {
+        message.modes.push(IndexedMode.fromJSON(e));
+      }
     }
     return message;
   },
 
   toJSON(message: QueryGetModesResponse): unknown {
     const obj: any = {};
-    obj.modes = {};
     if (message.modes) {
-      Object.entries(message.modes).forEach(([k, v]) => {
-        obj.modes[k] = Mode.toJSON(v);
-      });
+      obj.modes = message.modes.map((e) =>
+        e ? IndexedMode.toJSON(e) : undefined
+      );
+    } else {
+      obj.modes = [];
     }
     return obj;
   },
@@ -523,100 +412,11 @@ export const QueryGetModesResponse = {
     object: DeepPartial<QueryGetModesResponse>
   ): QueryGetModesResponse {
     const message = { ...baseQueryGetModesResponse } as QueryGetModesResponse;
-    message.modes = {};
+    message.modes = [];
     if (object.modes !== undefined && object.modes !== null) {
-      Object.entries(object.modes).forEach(([key, value]) => {
-        if (value !== undefined) {
-          message.modes[Number(key)] = Mode.fromPartial(value);
-        }
-      });
-    }
-    return message;
-  },
-};
-
-const baseQueryGetModesResponse_ModesEntry: object = { key: 0 };
-
-export const QueryGetModesResponse_ModesEntry = {
-  encode(
-    message: QueryGetModesResponse_ModesEntry,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.key !== 0) {
-      writer.uint32(8).uint32(message.key);
-    }
-    if (message.value !== undefined) {
-      Mode.encode(message.value, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryGetModesResponse_ModesEntry {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetModesResponse_ModesEntry,
-    } as QueryGetModesResponse_ModesEntry;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.key = reader.uint32();
-          break;
-        case 2:
-          message.value = Mode.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
+      for (const e of object.modes) {
+        message.modes.push(IndexedMode.fromPartial(e));
       }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): QueryGetModesResponse_ModesEntry {
-    const message = {
-      ...baseQueryGetModesResponse_ModesEntry,
-    } as QueryGetModesResponse_ModesEntry;
-    if (object.key !== undefined && object.key !== null) {
-      message.key = Number(object.key);
-    } else {
-      message.key = 0;
-    }
-    if (object.value !== undefined && object.value !== null) {
-      message.value = Mode.fromJSON(object.value);
-    } else {
-      message.value = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: QueryGetModesResponse_ModesEntry): unknown {
-    const obj: any = {};
-    message.key !== undefined && (obj.key = message.key);
-    message.value !== undefined &&
-      (obj.value = message.value ? Mode.toJSON(message.value) : undefined);
-    return obj;
-  },
-
-  fromPartial(
-    object: DeepPartial<QueryGetModesResponse_ModesEntry>
-  ): QueryGetModesResponse_ModesEntry {
-    const message = {
-      ...baseQueryGetModesResponse_ModesEntry,
-    } as QueryGetModesResponse_ModesEntry;
-    if (object.key !== undefined && object.key !== null) {
-      message.key = object.key;
-    } else {
-      message.key = 0;
-    }
-    if (object.value !== undefined && object.value !== null) {
-      message.value = Mode.fromPartial(object.value);
-    } else {
-      message.value = undefined;
     }
     return message;
   },

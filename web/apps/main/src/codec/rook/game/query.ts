@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { State, Overview, Params } from "./game";
+import { State, Overview, Params } from "../../rook/game/game";
 
 export const protobufPackage = "rook.game";
 

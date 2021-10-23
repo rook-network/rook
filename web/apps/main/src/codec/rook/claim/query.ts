@@ -8,7 +8,7 @@ import {
   Action,
   actionFromJSON,
   actionToJSON,
-} from "./claim";
+} from "../../rook/claim/claim";
 
 export const protobufPackage = "rook.claim";
 

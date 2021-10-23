@@ -47,6 +47,12 @@ message Room {
   }
 }
 
+// IndexedRoom pins an id to the room
+message IndexedRoom {
+  uint64 id = 1;
+  Room room = 2;
+}
+
 // Rooms represents a set of rooms by id
 message Rooms { repeated uint64 ids = 1; }
 
@@ -61,6 +67,12 @@ message Mode {
 
   // the max amount of players that can join the room
   uint32 capacity = 3;
+}
+
+// IndexedMode pins an id to the mode
+message IndexedMode {
+  uint32 id = 1;
+  Mode mode = 2;
 }
 
 message Params {
