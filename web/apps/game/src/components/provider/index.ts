@@ -2,45 +2,194 @@ import { BroadcastTxResponse, SigningStargateClient, StdFee, QueryClient, create
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc'
 import config from "../../config"
 import { Registry } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing'
-import { MsgFind, MsgHost, MsgJoin, MsgLeave, MsgClientImpl as MatchmakerTxClient} from '../../codec/rook/matchmaker/tx'
-import { Mode } from '../../codec/rook/matchmaker/matchmaker'
+import { 
+    MsgFind, MsgHost, MsgJoin, MsgLeave, MsgAddMode, MsgRemoveMode, Msg as IMatchmakerMsgClient,
+    MsgFindResponse, MsgHostResponse, MsgJoinResponse, MsgLeaveResponse, MsgAddModeResponse, MsgRemoveModeResponse
+} from '../../codec/rook/matchmaker/tx'
 import { QueryClientImpl as MatchmakerQueryClient} from '../../codec/rook/matchmaker/query'
 import { QueryClientImpl as GameQueryClient } from '../../codec/rook/game/query'
-import { MsgClientImpl as GameTxClient } from '../../codec/rook/game/tx'
+import _m0 from "protobufjs/minimal";
+import { 
+    Msg as IGameMsgClient, MsgCreate, MsgBuild, MsgMove, MsgChangeParams,
+    MsgCreateResponse, MsgBuildResponse, MsgMoveResponse, MsgChangeParamsResponse
+} from '../../codec/rook/game/tx'
 
 import Long from 'long';
 
 const typeMsgFind = "/rook.matchmaker.MsgFind"
 const typeMsgHost = "/rook.matchmaker.MsgHost"
 const typeMsgJoin = "/rook.matchmaker.MsgJoin"
-const typeMsgLeave = "/rook.matchmaker.MsgLeave" 
+const typeMsgLeave = "/rook.matchmaker.MsgLeave"
+const typeMsgAddMode = "/rook.matchmaker.MsgAddMode"
+const typeMsgRemoveMode = "/rook.matchmaker.MsgRemoveMode" 
+const typeMsgCreate = "/rook.game.MsgCreate"
+const typeMsgBuild = "/rook.game.MsgBuild"
+const typeMsgMove = "/rook.game.MsgMove"
+const typeMsgChangeParams = "/rook.game.MsgChamgeParams"
 
 const rookRegistry = new Registry([
+    // matchmaker types
     [typeMsgFind, MsgFind],
     [typeMsgHost, MsgHost],
     [typeMsgJoin, MsgJoin],
     [typeMsgLeave, MsgLeave],
+    [typeMsgAddMode, MsgAddMode],
+    [typeMsgRemoveMode, MsgRemoveMode],
+    // game types
+    [typeMsgCreate, MsgCreate],
+    [typeMsgBuild, MsgBuild],
+    [typeMsgMove, MsgMove],
+    [typeMsgChangeParams, MsgChangeParams]
 ])
+
+const defaultFee: StdFee = {
+    amount: [
+        { 
+            denom: config.coinDenom,
+            amount: "0",
+        }
+    ],
+    gas: "100000"
+}
 
 export class MatchmakerProvider {
     public query: MatchmakerQueryClient
-    public tx: MatchmakerTxClient
+    public tx: IMatchmakerMsgClient
 
-    constructor(querier: QueryClient) {
+    constructor(querier: QueryClient, client: SigningStargateClient, address: string) {
         const protoRpcClient = createProtobufRpcClient(querier)
         this.query = new MatchmakerQueryClient(protoRpcClient)
-        this.tx = new MatchmakerTxClient(protoRpcClient)
+        this.tx = new MatchmakerMsgClient(client, address)
+    }
+}
+
+export class MatchmakerMsgClient implements IMatchmakerMsgClient {
+    private client: SigningStargateClient
+    private address: string
+
+    constructor(client: SigningStargateClient, address: string) {
+        this.client = client
+        this.address = address
+    }
+
+    private async send(request: any, typeUrl: string): Promise<BroadcastTxResponse> {
+        return await this.client.signAndBroadcast(
+            this.address,
+            [{
+                typeUrl: typeUrl,
+                value: request
+            }], 
+            defaultFee 
+        )
+    }
+
+    async Host(request: MsgHost): Promise<MsgHostResponse> {
+        const resp = await this.send(request, typeMsgHost)
+        console.log(resp.data)
+        if (resp.data === undefined)
+            throw new Error(resp.rawLog)
+        return MsgHostResponse.decode(new _m0.Reader(resp.data[0]!.data))
+    }
+
+    async Join(request: MsgJoin): Promise<MsgJoinResponse> {
+        const resp = await this.send(request, typeMsgJoin)
+        console.log(resp.data)
+        if (resp.data === undefined)
+            throw new Error(resp.rawLog)
+        return MsgJoinResponse.decode(new _m0.Reader(resp.data[0]?.data))
+    }
+
+    async Find(request: MsgFind): Promise<MsgFindResponse> {
+        const resp = await this.send(request, typeMsgFind)
+        console.log(resp.data)
+        if (resp.data === undefined)
+            throw new Error(resp.rawLog)
+        return MsgFindResponse.decode(new _m0.Reader(resp.data[0]!.data))
+    }
+
+    async Leave(request: MsgLeave): Promise<MsgLeaveResponse> {
+        const resp = await this.send(request, typeMsgLeave)
+        console.log(resp.data)
+        if (resp.data === undefined)
+            throw new Error(resp.rawLog)
+        return MsgLeaveResponse.decode(new _m0.Reader(resp.data[0]!.data))
+    }
+
+    async AddMode(request: MsgAddMode): Promise<MsgAddModeResponse> {
+        const resp = await this.send(request, typeMsgAddMode)
+        console.log(resp.data)
+        if (resp.data === undefined)
+            throw new Error(resp.rawLog)
+        return MsgAddModeResponse.decode(new _m0.Reader(resp.data[0]!.data))
+    }
+
+    async RemoveMode(request: MsgRemoveMode): Promise<MsgRemoveModeResponse> {
+        const resp = await this.send(request, typeMsgRemoveMode)
+        console.log(resp.data)
+        if (resp.data === undefined)
+            throw new Error(resp.rawLog)
+        return MsgRemoveModeResponse.decode(new _m0.Reader(resp.data[0]!.data))
     }
 }
 
 export class GameProvider {
     public query: GameQueryClient
-    public tx: GameTxClient
+    public tx: IGameMsgClient
 
-    constructor(querier: QueryClient) {
+    constructor(querier: QueryClient, client: SigningStargateClient, address: string) {
         const protoRpcClient = createProtobufRpcClient(querier)
         this.query = new GameQueryClient(protoRpcClient)
-        this.tx = new GameTxClient(protoRpcClient)
+        this.tx = new GameMsgClient(client, address)
+    }
+}
+
+export class GameMsgClient implements IGameMsgClient {
+    private client: SigningStargateClient
+    private readonly address: string
+
+    constructor(client: SigningStargateClient, address: string) {
+        this.client = client
+        this.address = address
+    }
+
+    private async send(request: any, typeUrl: string) {
+        return await this.client.signAndBroadcast(
+            this.address,
+            [{ typeUrl: typeUrl, value: request}],
+            defaultFee
+        )
+    }
+
+    async Move(request: MsgMove): Promise<MsgMoveResponse> {
+        const resp = await this.send(request, typeMsgMove)
+        console.log(resp.data)
+        if (resp.data === undefined)
+            throw new Error(resp.rawLog)
+        return MsgMoveResponse.decode(new _m0.Reader(resp.data[0]!.data))
+    }
+
+    async Build(request: MsgBuild): Promise<MsgBuildResponse> {
+        const resp = await this.send(request, typeMsgBuild)
+        console.log(resp.data)
+        if (resp.data === undefined)
+            throw new Error(resp.rawLog)
+        return MsgBuildResponse.decode(new _m0.Reader(resp.data[0]!.data))
+    }
+
+    async Create(request: MsgCreate): Promise<MsgCreateResponse> {
+        const resp = await this.send(request, typeMsgCreate)
+        console.log(resp.data)
+        if (resp.data === undefined)
+            throw new Error(resp.rawLog)
+        return MsgCreateResponse.decode(new _m0.Reader(resp.data[0]!.data))
+    }
+
+    async ChangeParams(request: MsgChangeParams): Promise<MsgChangeParamsResponse> {
+        const resp = await this.send(request, typeMsgChangeParams)
+        console.log(resp.data)
+        if (resp.data === undefined)
+            throw new Error(resp.rawLog)
+        return MsgChangeParamsResponse.decode(new _m0.Reader(resp.data[0]!.data))
     }
 }
 
@@ -57,8 +206,8 @@ export class Provider {
         this.querier = querier
         this.address = address
         this.chainID = config.chainID
-        this.matchmaker = new MatchmakerProvider(this.querier)
-        this.game = new GameProvider(this.querier)
+        this.matchmaker = new MatchmakerProvider(this.querier, this.client, this.address)
+        this.game = new GameProvider(this.querier, this.client, this.address)
     }
 
     public static async connect(): Promise<Provider> {

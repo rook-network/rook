@@ -165,6 +165,23 @@ func (k Keeper) GetNextModeID(ctx sdk.Context) uint32 {
 	return types.ParseModeID(store.Get(types.ModeIDKey))
 }
 
+func (k Keeper) GetAllModes(ctx sdk.Context) []types.Mode {
+	modes := make([]types.Mode, 0)
+	store := ctx.KVStore(k.storeKey)
+
+	modeIter := store.Iterator(
+		types.ModeKey(0),
+		types.ModeKey(1<<31-1),
+	)
+	for ; modeIter.Valid(); modeIter.Next() {
+		var mode types.Mode
+		k.cdc.MustUnmarshal(modeIter.Value(), &mode)
+		modes = append(modes, mode)
+	}
+
+	return modes
+}
+
 func (k Keeper) IncrementNextModeID(ctx sdk.Context) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -252,8 +269,9 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 
 func (k Keeper) ExportGenesis(ctx sdk.Context) types.GenesisState {
 	return types.GenesisState{
-		Params:     k.GetParams(ctx),
-		NextRoomId: k.GetNextRoomID(ctx),
-		NextModeId: k.GetNextModeID(ctx),
+		Params:       k.GetParams(ctx),
+		InitialModes: k.GetAllModes(ctx),
+		NextRoomId:   k.GetNextRoomID(ctx),
+		NextModeId:   k.GetNextModeID(ctx),
 	}
 }

@@ -38,7 +38,7 @@ func (q Keeper) Modes(goCtx context.Context, req *types.QueryGetModesRequest) (*
 		var mode types.Mode
 		q.cdc.MustUnmarshal(iter.Value(), &mode)
 		modes = append(modes, types.IndexedMode{
-			Id: modeID,
+			Id:   modeID,
 			Mode: mode,
 		})
 	}

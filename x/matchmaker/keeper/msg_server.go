@@ -40,7 +40,7 @@ func (m msgServer) Host(goCtx context.Context, msg *types.MsgHost) (*types.MsgHo
 	case *types.MsgHost_ModeId:
 		mode, exists := m.Keeper.GetMode(ctx, g.ModeId)
 		if !exists {
-			return nil, sdkerrors.Wrapf(types.ErrModeNotFound, "%d", g.ModeId)
+			return nil, sdkerrors.Wrapf(types.ErrModeNotFound, "modeID: %d", g.ModeId)
 		}
 		room = types.NewRoom(mode.Config, []string{msg.Creator}, msg.Invitees,
 			msg.Public, mode.Quorum, mode.Capacity, time)
@@ -90,7 +90,7 @@ func (m msgServer) Find(goCtx context.Context, msg *types.MsgFind) (*types.MsgFi
 
 	rooms, exists := m.Keeper.GetRoomsByMode(ctx, msg.Mode)
 	if !exists {
-		return nil, sdkerrors.Wrapf(types.ErrModeNotFound, "%d", msg.Mode)
+		return nil, sdkerrors.Wrapf(types.ErrModeNotFound, "modeID: %d", msg.Mode)
 	}
 
 	if len(rooms.Ids) == 0 {
