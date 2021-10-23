@@ -1,9 +1,7 @@
-import React from 'react';
 import { defaultRegistryTypes, SigningStargateClient, BroadcastTxResponse } from '@cosmjs/stargate';
 import { Registry } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing'
 import config from "../../config";
 import { MsgActivate } from "../../codec/rook/claim/tx"
-// import { MsgFundCommunityPool } from "../../codec/cosmos/distribution/v1beta1/tx"
 
 const rookRegistry = new Registry([
   ...defaultRegistryTypes,

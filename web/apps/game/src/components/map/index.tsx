@@ -1,5 +1,5 @@
 import styles from './map.module.less';
-import Tile from '../tile/tile'
+import Tile from '../tile'
 
 /* eslint-disable-next-line */
 export interface MapProps {
