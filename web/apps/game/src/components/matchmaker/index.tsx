@@ -4,13 +4,6 @@ import Card from '../card'
 import { Mode } from '../../codec/rook/matchmaker/matchmaker'
 import { Config } from '../../codec/rook/game/game'
 
-// export interface MMState {
-
-// }
-
-// export interface MMProps {
-
-// }
 
 export interface MMState {
   status: Status

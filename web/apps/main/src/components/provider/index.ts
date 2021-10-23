@@ -88,8 +88,9 @@ export class Provider {
     return
   }
 
-  async claimTokens(): Promise<BroadcastTxResponse | null> {
-    if (this.client === null || this.address === null) return null
+  async claimTokens(): Promise<BroadcastTxResponse> {
+    if (this.client === null || this.address === null)
+      throw new Error("client not initialized")
     const message = {
       typeUrl: "/rook.claim.MsgActivate",
       value: {

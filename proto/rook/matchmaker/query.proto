@@ -21,7 +21,7 @@ service Query {
     option (google.api.http).get = "/matchmaker/invitations/{player}";
   }
 
-  // Modes lists all the public available modes
+  // Modes lists all the publicly available modes
   rpc Modes(QueryGetModesRequest) returns (QueryGetModesResponse) {
     option (google.api.http).get = "/matchmaker/modes";
   }
