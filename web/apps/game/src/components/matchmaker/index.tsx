@@ -44,6 +44,8 @@ class Matchmaker extends React.Component<MMProps, MMState> {
       this.setState({
         mode: this.props.modes[0].mode
       })
+      // const resp = await this.props.provider.findGame(this.props.modes[0].id)
+
       const resp = await this.props.provider.tx.Find({
         creator: this.props.address,
         mode: this.props.modes[0].id
@@ -55,6 +57,13 @@ class Matchmaker extends React.Component<MMProps, MMState> {
   }
 
   render() {
+    if (this.props.provider === undefined) {
+      return (
+        <Card>
+          <p>Unable to connect to wallet. Please ensure you have the Keplr extension installed and then refresh this page.</p>
+        </Card>
+      )
+    } 
     return (
       <Card>
         <table className={styles.table}>

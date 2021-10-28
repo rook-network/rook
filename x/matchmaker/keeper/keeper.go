@@ -261,6 +261,7 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 	k.SetParams(ctx, genState.Params)
 	for _, mode := range genState.InitialModes {
 		k.SetMode(ctx, genState.NextModeId, mode)
+		k.SetRooms(ctx, genState.NextModeId, types.Rooms{})
 		genState.NextModeId++
 	}
 	store.Set(types.ModeIDKey, types.ModeIDBytes(genState.NextModeId))

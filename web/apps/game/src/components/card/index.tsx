@@ -17,3 +17,19 @@ export class Card extends Component<CardProps> {
 }
 
 export default Card;
+
+export interface NotConnectedCardProps {
+  connectFn: () => void;
+}
+
+export class NotConnectedCard extends Component<NotConnectedCardProps> {
+  render() {
+    return (
+      <Card>
+        <h3>No Account Connected</h3>
+        <p>Please install the Keplr extension and login to an account to continue</p>
+        <button className={styles.button} onClick={this.props.connectFn}>Retry</button>
+      </Card>
+    )
+  }
+}

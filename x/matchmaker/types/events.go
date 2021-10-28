@@ -5,4 +5,7 @@ const (
 	EventTypeRoomReady   = "room_ready"
 	EventTypeClosingRoom = "closing_room"
 	EventTypeJoinedRoom  = "joined_room"
+
+	AttributeKeyPlayer = "player"
+	AttributeKeyRoomID = "room_id"
 )

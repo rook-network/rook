@@ -40,7 +40,7 @@ class Wallet extends React.Component<IWalletProps, IWalletState> {
                 navigator.clipboard.writeText(this.props.wallet.address)
             } else {
                 chainInfo.style.display = "none"
-                address.innerText = this.props.wallet.address.substring(0, 12) + "..."
+                address.innerText = this.props.wallet.address.substring(4, 12) + "..."
             }
         }
     }
@@ -58,7 +58,7 @@ class Wallet extends React.Component<IWalletProps, IWalletState> {
                 <table>
                     <td>
                         <CreditCardOutlined />
-                        <span id="wallet_address" style={{marginLeft: "8px"}}>{this.props.wallet.address.substring(0, 12)}...</span>
+                        <span id="wallet_address" style={{marginLeft: "8px"}}>{this.props.wallet.address.substring(4, 12)}...</span>
                         <p style={{textAlign: "right", fontWeight: "bold", marginBottom: "0px"}}>
                             {this.props.wallet.balance.toString()} ROOK
                         </p>

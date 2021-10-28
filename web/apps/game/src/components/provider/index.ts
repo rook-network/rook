@@ -1,9 +1,9 @@
-import { BroadcastTxResponse, SigningStargateClient, StdFee, QueryClient, createProtobufRpcClient } from "@cosmjs/stargate"
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc'
+import { BroadcastTxResponse, SigningStargateClient, StdFee, QueryClient, createProtobufRpcClient, isBroadcastTxSuccess, BroadcastTxSuccess } from "@cosmjs/stargate"
+import { Tendermint34Client, Event } from '@cosmjs/tendermint-rpc'
 import config from "../../config"
 import { Registry } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing'
 import { 
-    MsgFind, MsgHost, MsgJoin, MsgLeave, MsgAddMode, MsgRemoveMode, Msg as IMatchmakerMsgClient,
+    MsgFind, MsgHost, MsgJoin, MsgLeave, MsgAddMode, MsgRemoveMode, Msg as IMatchmakerMsgClient, 
     MsgFindResponse, MsgHostResponse, MsgJoinResponse, MsgLeaveResponse, MsgAddModeResponse, MsgRemoveModeResponse
 } from '../../codec/rook/matchmaker/tx'
 import { QueryClientImpl as MatchmakerQueryClient} from '../../codec/rook/matchmaker/query'
@@ -59,6 +59,8 @@ export class MatchmakerProvider {
     constructor(querier: QueryClient, client: SigningStargateClient, address: string) {
         const protoRpcClient = createProtobufRpcClient(querier)
         this.query = new MatchmakerQueryClient(protoRpcClient)
+        // FIXME: The msg client sends a query instead of broadcasting a tx
+        // this.tx = new MsgClientImpl(protoRpcClient)
         this.tx = new MatchmakerMsgClient(client, address)
     }
 }
@@ -66,14 +68,16 @@ export class MatchmakerProvider {
 export class MatchmakerMsgClient implements IMatchmakerMsgClient {
     private client: SigningStargateClient
     private address: string
+    private updateHeight?: (height: number) => void
 
-    constructor(client: SigningStargateClient, address: string) {
+    constructor(client: SigningStargateClient, address: string, updateHeight?: (height:number) => void) {
         this.client = client
         this.address = address
+        this.updateHeight = updateHeight
     }
 
-    private async send(request: any, typeUrl: string): Promise<BroadcastTxResponse> {
-        return await this.client.signAndBroadcast(
+    private async send(request: any, typeUrl: string): Promise<BroadcastTxSuccess> {
+        const resp = await this.client.signAndBroadcast(
             this.address,
             [{
                 typeUrl: typeUrl,
@@ -81,54 +85,87 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
             }], 
             defaultFee 
         )
+        if (this.updateHeight)
+            this.updateHeight(resp.height)
+
+        if (!isBroadcastTxSuccess(resp))
+            throw new Error(`Transaction failed with code (${resp.code}): ${resp.rawLog}`)
+
+        return resp
     }
 
     async Host(request: MsgHost): Promise<MsgHostResponse> {
         const resp = await this.send(request, typeMsgHost)
-        console.log(resp.data)
-        if (resp.data === undefined)
-            throw new Error(resp.rawLog)
-        return MsgHostResponse.decode(new _m0.Reader(resp.data[0]!.data))
+        
+        // FIXME: resp.data is always nil when we should be getting the response from
+        // th msg server. Instead we parse the events and build the response from them.
+        if (resp.data !== undefined) {
+            return MsgHostResponse.decode(new _m0.Reader(resp.data[0]!.data))
+        }
+
+        if (resp.rawLog !== undefined) {
+            const events = JSON.parse(resp.rawLog)[0].events as Event[]
+            for (const event of events) {
+                if (event.type === "joining_room") {
+                    if (event.attributes[0].value.toString() === this.address) {
+                        return {
+                            roomId: Long.fromString(event.attributes[1].value.toString())
+                        } as MsgHostResponse
+                    }
+                }
+            }
+            throw new Error("emmitted transaction events didn't include roomID for sender")
+        }
+        throw new Error("Unable to parse transaction response: " + JSON.stringify(resp))
     }
 
     async Join(request: MsgJoin): Promise<MsgJoinResponse> {
-        const resp = await this.send(request, typeMsgJoin)
-        console.log(resp.data)
-        if (resp.data === undefined)
-            throw new Error(resp.rawLog)
-        return MsgJoinResponse.decode(new _m0.Reader(resp.data[0]?.data))
+        await this.send(request, typeMsgJoin)
+        return {}
     }
 
     async Find(request: MsgFind): Promise<MsgFindResponse> {
         const resp = await this.send(request, typeMsgFind)
-        console.log(resp.data)
-        if (resp.data === undefined)
-            throw new Error(resp.rawLog)
-        return MsgFindResponse.decode(new _m0.Reader(resp.data[0]!.data))
+
+        // FIXME: resp.data is always nil when we should be getting the response from
+        // th msg server. Instead we parse the events and build the response from them.
+        if (resp.data !== undefined) { 
+            return MsgFindResponse.decode(new _m0.Reader(resp.data[0]!.data))
+        }
+
+        if (resp.rawLog !== undefined) {
+            const events = JSON.parse(resp.rawLog)[0].events as Event[]
+            for (const event of events) {
+                if (event.type === "joining_room") {
+                    if (event.attributes[0].value.toString() === this.address) {
+                        return {
+                            roomId: Long.fromString(event.attributes[1].value.toString())
+                        } as MsgHostResponse
+                    }
+                }
+            }
+            throw new Error("emmitted transaction events didn't include roomID for sender")
+        }
+        throw new Error("Unable to parse transaction response: " + JSON.stringify(resp))
     }
 
     async Leave(request: MsgLeave): Promise<MsgLeaveResponse> {
-        const resp = await this.send(request, typeMsgLeave)
-        console.log(resp.data)
-        if (resp.data === undefined)
-            throw new Error(resp.rawLog)
-        return MsgLeaveResponse.decode(new _m0.Reader(resp.data[0]!.data))
+        await this.send(request, typeMsgLeave)
+        return {}
     }
 
     async AddMode(request: MsgAddMode): Promise<MsgAddModeResponse> {
-        const resp = await this.send(request, typeMsgAddMode)
-        console.log(resp.data)
-        if (resp.data === undefined)
-            throw new Error(resp.rawLog)
-        return MsgAddModeResponse.decode(new _m0.Reader(resp.data[0]!.data))
+        await this.send(request, typeMsgAddMode)
+        // TODO: we should emit an event and parse it correct to have a return value.
+        // We will return a hard-coded value for now 
+        return { 
+            id: 0,
+        }
     }
 
     async RemoveMode(request: MsgRemoveMode): Promise<MsgRemoveModeResponse> {
-        const resp = await this.send(request, typeMsgRemoveMode)
-        console.log(resp.data)
-        if (resp.data === undefined)
-            throw new Error(resp.rawLog)
-        return MsgRemoveModeResponse.decode(new _m0.Reader(resp.data[0]!.data))
+        await this.send(request, typeMsgRemoveMode)
+        return {}
     }
 }
 
