@@ -27,6 +27,12 @@ const typeMsgBuild = "/rook.game.MsgBuild"
 const typeMsgMove = "/rook.game.MsgMove"
 const typeMsgChangeParams = "/rook.game.MsgChamgeParams"
 
+
+const eventTypeNewRoom     = "new_room"
+const eventTypeRoomReady   = "room_ready"
+const eventTypeClosingRoom = "closing_room"
+const eventTypeJoinedRoom  = "joined_room"
+
 const rookRegistry = new Registry([
     // matchmaker types
     [typeMsgFind, MsgFind],
@@ -106,7 +112,7 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
         if (resp.rawLog !== undefined) {
             const events = JSON.parse(resp.rawLog)[0].events as Event[]
             for (const event of events) {
-                if (event.type === "joining_room") {
+                if (event.type === eventTypeJoinedRoom) {
                     if (event.attributes[0].value.toString() === this.address) {
                         return {
                             roomId: Long.fromString(event.attributes[1].value.toString())
@@ -135,8 +141,9 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
 
         if (resp.rawLog !== undefined) {
             const events = JSON.parse(resp.rawLog)[0].events as Event[]
+            console.log(events)
             for (const event of events) {
-                if (event.type === "joining_room") {
+                if (event.type === eventTypeJoinedRoom) {
                     if (event.attributes[0].value.toString() === this.address) {
                         return {
                             roomId: Long.fromString(event.attributes[1].value.toString())
