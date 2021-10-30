@@ -2,6 +2,9 @@
 
 set -eo pipefail
 
+test_accounts=$(cat accounts.json | jq -c)
+echo "${test_accounts}" | jq -r '.[] | @base64'
+
 # move to home directory
 cd $HOME
 
@@ -17,10 +20,14 @@ rook keys add my-account
 # create a genesis account
 rook add-genesis-account $(rook keys show my-account -a) 1000000000urook
 
-if [[ ${ROOK_TEST_ACCOUNT} != "" ]]; then
-    echo "creating test account ${ROOK_TEST_ACCOUNT}"
-    rook add-genesis-account ${ROOK_TEST_ACCOUNT} 1000000000urook
-fi
+# create test accounts from accounts.json
+for account in $(echo "${test_accounts}" | jq -r '.[] | @base64'); do 
+    _info() { 
+        echo $account | base64 --decode | jq -r ${1}
+    }
+    echo "creating test account"
+    rook add-genesis-account $(_info '.address') $(_info '.amount')
+done
 
 # Generate the transaction that creates your validator
 rook gentx my-account 100000000urook --chain-id rook-single
