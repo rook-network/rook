@@ -31,14 +31,21 @@ class App extends React.Component<any, AppState> {
   }
 
   async componentDidMount() {
-    try {
-      await this.connectWallet()
-    } catch (err) {
-      console.log(err)
-    }
+    // NOTE: we need to add a timeout because else this fails if we do this straight away
+    setTimeout(async () => {
+      try {
+        await this.connectWallet()
+      } catch (err) {
+        console.log(err)
+      }
+      if (this.provider)
+        await this.provider.socket.send('{"jsonrpc": "2.0", "method": "subscribe", "id": 0, "params": {"query": "joined_room.room_id=\'1\'"}}')
+    }, 100)
   }
 
   async connectWallet() {
+    if (this.provider) 
+      return
     this.provider = await Provider.connect()
     const resp = await this.provider.matchmaker.query.Modes({})
     const address = this.provider.getAddress()

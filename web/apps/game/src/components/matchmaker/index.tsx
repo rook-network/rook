@@ -49,13 +49,21 @@ class Matchmaker extends React.Component<MMProps, MMState> {
         creator: this.props.address,
         mode: this.props.modes[0].id
       } as MsgFind)
+      // console.log(resp)
+      const roomResp = await this.props.provider.query.Room({ id: resp.roomId })
+      // console.log(roomResp.room)
       this.setState({
         mode: this.props.modes[0].mode,
-        roomID: resp.roomId
+        roomID: resp.roomId,
+        status: 'room',
+        room: roomResp.room,
+      })
+    } else {
+      // throw new Error("not yet implemented")
+      this.setState({
+        status: 'mode',
       })
     }
-    
-    alert("finding game")
   }
 
   render() {
@@ -69,7 +77,7 @@ class Matchmaker extends React.Component<MMProps, MMState> {
       case 'room':
         return (
           <Card>
-            <RoomComponent id={this.state.roomID} />
+            <RoomComponent id={this.state.roomID} room={this.state.room!} />
           </Card>
         )
       default:
@@ -115,15 +123,26 @@ export const HomeComponent = (props: HomeProps) => {
 
 interface RoomProps {
   id: Long
-  // count: number,
-  // total: number,
-  // quorum: number
+  room: Room
 }
 
 export const RoomComponent = (props: RoomProps) => {
+  const minSpots = props.room.quorum - props.room.players.length
   return (
     <div>
-      Room {props.id}
+      <h3>{ props.room.public ? "Public" : "Private" } Room {props.id.toString()}</h3>
+      <p style={{ textAlign: "left" }}>Players:</p>
+      <ul>
+        { props.room.players.map((player, index) => 
+          <li className={styles.player}>{player}</li>
+        )}
+      </ul>
+      { minSpots === 1 &&
+       <p className={styles.footer}>Waiting for 1 more player...</p>
+      }
+      { minSpots > 1 &&
+       <p className={styles.footer}>Waiting for {minSpots} players...</p>
+      }
     </div>
   )
 }

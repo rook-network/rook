@@ -26,8 +26,8 @@ export class NotConnectedCard extends Component<NotConnectedCardProps> {
   render() {
     return (
       <Card>
-        <h3>No Account Connected</h3>
-        <p>Please install the Keplr extension and login to an account to continue</p>
+        <h3 style={{ marginTop: "30px" }}>No Account Connected</h3>
+        <p>Please install the Keplr extension and login to an account to continue. If you have Keplr installed and are connected than press retry.</p>
         <button className={styles.button} onClick={this.props.connectFn}>Retry</button>
       </Card>
     )

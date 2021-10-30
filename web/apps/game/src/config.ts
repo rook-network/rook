@@ -3,6 +3,7 @@ const config = {
     chainID: "rook-single",
     rpcEndpoint: "http://localhost:26657",
     restEndpoint: "http://localhost:1317",
+    wsEndpoint: "ws://localhost:26657/websocket",
     bech32prefix: "rook",
     displayedDenom: "ROOK",
     coinDenom: "urook",

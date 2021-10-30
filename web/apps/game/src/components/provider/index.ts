@@ -1,4 +1,5 @@
 import { BroadcastTxResponse, SigningStargateClient, StdFee, QueryClient, createProtobufRpcClient, isBroadcastTxSuccess, BroadcastTxSuccess } from "@cosmjs/stargate"
+import { SocketWrapper, SocketWrapperMessageEvent, SocketWrapperErrorEvent } from '@cosmjs/socket'
 import { Tendermint34Client, Event } from '@cosmjs/tendermint-rpc'
 import config from "../../config"
 import { Registry } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing'
@@ -240,10 +241,12 @@ export class GameMsgClient implements IGameMsgClient {
 export class Provider {
     private client: SigningStargateClient
     private querier: QueryClient
+    private address: string
+
+    public socket: SocketWrapper
     public readonly matchmaker: MatchmakerProvider
     public readonly game: GameProvider
     public readonly chainID: string
-    private address: string
 
     constructor(client: SigningStargateClient, querier: QueryClient, address: string) {
         this.client = client
@@ -252,6 +255,16 @@ export class Provider {
         this.chainID = config.chainID
         this.matchmaker = new MatchmakerProvider(this.querier, this.client, this.address)
         this.game = new GameProvider(this.querier, this.client, this.address)
+        this.socket = new SocketWrapper(
+            config.wsEndpoint, 
+            (event: SocketWrapperMessageEvent) => { 
+                const parsedEvent = JSON.parse(event.data)
+                console.log(parsedEvent)
+            },
+            (event: SocketWrapperErrorEvent) => { console.error(event)}
+        )
+        // connect the socket
+        this.socket.connect()
     }
 
     public static async connect(): Promise<Provider> {
@@ -283,6 +296,7 @@ export class Provider {
         const accounts = await offlineSigner.getAccounts()
         if (accounts.length === 0)
             throw new Error("keplr has no accounts")
+
         return new Provider(client, querier, accounts[0].address)
     }
 
