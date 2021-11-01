@@ -2,7 +2,7 @@ import React from 'react';
 import './app.module.less';
 import Matchmaker from '../components/matchmaker';
 import { Provider } from '../components/provider';
-import { IndexedMode } from '../codec/rook/matchmaker/matchmaker'
+import { IndexedMode, Room } from '../codec/rook/matchmaker/matchmaker'
 import { Account } from '../components/account'
 import { NotConnectedCard } from '../components/card'
 
@@ -38,8 +38,6 @@ class App extends React.Component<any, AppState> {
       } catch (err) {
         console.log(err)
       }
-      if (this.provider)
-        await this.provider.socket.send('{"jsonrpc": "2.0", "method": "subscribe", "id": 0, "params": {"query": "joined_room.room_id=\'1\'"}}')
     }, 100)
   }
 

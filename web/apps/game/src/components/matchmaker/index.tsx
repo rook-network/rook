@@ -49,17 +49,19 @@ class Matchmaker extends React.Component<MMProps, MMState> {
         creator: this.props.address,
         mode: this.props.modes[0].id
       } as MsgFind)
-      // console.log(resp)
-      const roomResp = await this.props.provider.query.Room({ id: resp.roomId })
+      console.log(resp)
+      this.props.provider.subscribeToRoom(resp.roomId, (room: Room): void => {
+        this.setState({
+          room: room,
+        })
+      })
       // console.log(roomResp.room)
       this.setState({
         mode: this.props.modes[0].mode,
         roomID: resp.roomId,
-        status: 'room',
-        room: roomResp.room,
+        status: "room"
       })
     } else {
-      // throw new Error("not yet implemented")
       this.setState({
         status: 'mode',
       })
@@ -67,19 +69,18 @@ class Matchmaker extends React.Component<MMProps, MMState> {
   }
 
   render() {
+    if (this.props.modes.length === 0) {
+      return (
+          <Card>
+            Loading possible game modes...
+          </Card>
+      )
+    }
     switch (this.state.status) {
       case 'home':
-        return (
-          <Card>
-            <HomeComponent find={this.findGame} host={this.hostGame} join={this.joinGame} />
-          </Card>
-        )
+        return <HomeComponent find={this.findGame} host={this.hostGame} join={this.joinGame} />
       case 'room':
-        return (
-          <Card>
-            <RoomComponent id={this.state.roomID} room={this.state.room!} />
-          </Card>
-        )
+        return <RoomComponent id={this.state.roomID} room={this.state.room} />
       default:
         return (
           <Card>
@@ -100,49 +101,61 @@ interface HomeProps {
 
 export const HomeComponent = (props: HomeProps) => {
   return (
-    <table className={styles.table}>
-      <tbody>
-        <tr>
-          <td className={styles.cell} onClick={props.find}>
-            Find
-            <p style={{fontSize: "14px", fontWeight: 400}}>a public game</p>
-          </td>
-          <td className={styles.cell} onClick={props.host}>
-            Host
-            <p style={{fontSize: "14px", fontWeight: 400}}>your own game</p>
-          </td>
-          <td className={styles.cell} onClick={props.join}>
-            Join
-            <p style={{fontSize: "14px", fontWeight: 400}}>a selected game</p>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <Card>
+      <table className={styles.table}>
+        <tbody>
+          <tr>
+            <td className={styles.cell} onClick={props.find}>
+              Find
+              <p style={{fontSize: "14px", fontWeight: 400}}>a public game</p>
+            </td>
+            <td className={styles.cell} onClick={props.host}>
+              Host
+              <p style={{fontSize: "14px", fontWeight: 400}}>your own game</p>
+            </td>
+            <td className={styles.cell} onClick={props.join}>
+              Join
+              <p style={{fontSize: "14px", fontWeight: 400}}>a selected game</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </Card>
   )
 }
 
 interface RoomProps {
   id: Long
-  room: Room
+  room?: Room
 }
 
 export const RoomComponent = (props: RoomProps) => {
+  if (!props.room) {
+    return (
+      <Card>
+        Loading Room...
+      </Card>
+    )
+  }
+
   const minSpots = props.room.quorum - props.room.players.length
   return (
-    <div>
-      <h3>{ props.room.public ? "Public" : "Private" } Room {props.id.toString()}</h3>
-      <p style={{ textAlign: "left" }}>Players:</p>
-      <ul>
-        { props.room.players.map((player, index) => 
-          <li className={styles.player}>{player}</li>
-        )}
-      </ul>
-      { minSpots === 1 &&
-       <p className={styles.footer}>Waiting for 1 more player...</p>
-      }
-      { minSpots > 1 &&
-       <p className={styles.footer}>Waiting for {minSpots} players...</p>
-      }
-    </div>
+    <Card>
+      <div>
+        <h3>{ props.room.public ? "Public" : "Private" } Room {props.id.toString()}</h3>
+        <p style={{ textAlign: "left" }}>Players:</p>
+        <ul>
+          { props.room.players.map((player, index) => 
+            <li className={styles.player}>{player}</li>
+          )}
+        </ul>
+        { minSpots === 1 &&
+        <p className={styles.footer}>Waiting for 1 more player...</p>
+        }
+        { minSpots > 1 &&
+        <p className={styles.footer}>Waiting for {minSpots} players...</p>
+        }
+      </div>
+    </Card>
   )
 }
