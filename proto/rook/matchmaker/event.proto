@@ -1,0 +1,10 @@
+syntax = "proto3";
+package rook.matchmaker;
+
+option go_package = "github.com/arcane-systems/rook/x/matchmaker/types";
+
+message EventRoomUpdated {
+    uint64 room_id = 1;
+    repeated string added_players = 2;
+    repeated string removed_players = 3;
+}

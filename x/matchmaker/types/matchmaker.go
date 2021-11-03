@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	game "github.com/arcane-systems/rook/x/game/types"
@@ -81,7 +82,11 @@ func (r Room) HasExpired(now time.Time, lifespan time.Duration) bool {
 	return ok && time.Created.Add(lifespan).After(now)
 }
 
-func (r Room) MsgCreate() *game.MsgCreate {
+func (r Room) MsgCreate(randSource int64) *game.MsgCreate {
+	// If no seed has been set then set it using a deterministic random source
+	if r.Config.Map.Seed == 0 {
+		r.Config.Map.Seed = rand.NewSource(randSource).Int63()
+	}
 	return &game.MsgCreate{
 		Players: r.Players,
 		Config:  r.Config,
@@ -139,7 +144,7 @@ func (m Mode) ValidateBasic() error {
 	}
 
 	if m.Quorum > m.Capacity {
-		return fmt.Errorf("quorum (%d) must be less than equat to capacity (%d)", m.Quorum, m.Capacity)
+		return fmt.Errorf("quorum (%d) must be less than or equal to capacity (%d)", m.Quorum, m.Capacity)
 	}
 
 	return nil

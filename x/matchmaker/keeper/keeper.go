@@ -45,7 +45,10 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 func (k Keeper) CreateGame(ctx sdk.Context, room types.Room) {
-	msg := room.MsgCreate()
+	// NOTE: we use the block time as a deterministic source of randomness for generating
+	// game maps. We may in the future want a better source of randomness but this suffices
+	// for now.
+	msg := room.MsgCreate(ctx.BlockTime().Unix())
 
 	handler := k.router.Handler(msg)
 	if handler == nil {

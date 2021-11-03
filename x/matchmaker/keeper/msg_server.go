@@ -60,13 +60,10 @@ func (m msgServer) Host(goCtx context.Context, msg *types.MsgHost) (*types.MsgHo
 
 	m.Keeper.IncrementNextModeID(ctx)
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventTypeJoinedRoom,
-			sdk.NewAttribute(types.AttributeKeyPlayer, msg.Creator),
-			sdk.NewAttribute(types.AttributeKeyRoomID, fmt.Sprintf("%d", roomID)),
-		),
-	)
+	ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
+		RoomId: roomID,
+		AddedPlayers: []string{msg.Creator},
+	})
 
 	return &types.MsgHostResponse{RoomId: roomID}, nil
 }
@@ -88,13 +85,10 @@ func (m msgServer) Join(goCtx context.Context, msg *types.MsgJoin) (*types.MsgJo
 	// persist changes to that room
 	m.Keeper.SetRoom(ctx, msg.RoomId, room)
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventTypeJoinedRoom,
-			sdk.NewAttribute(types.AttributeKeyPlayer, msg.Creator),
-			sdk.NewAttribute(types.AttributeKeyRoomID, fmt.Sprintf("%d", msg.RoomId)),
-		),
-	)
+	ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
+		RoomId: msg.RoomId,
+		AddedPlayers: []string{msg.Creator},
+	})
 
 	return &types.MsgJoinResponse{}, nil
 }
@@ -146,13 +140,10 @@ func (m msgServer) Find(goCtx context.Context, msg *types.MsgFind) (*types.MsgFi
 	// persist changes to that room
 	m.Keeper.SetRoom(ctx, roomID, room)
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventTypeJoinedRoom,
-			sdk.NewAttribute(types.AttributeKeyPlayer, msg.Creator),
-			sdk.NewAttribute(types.AttributeKeyRoomID, fmt.Sprintf("%d", roomID)),
-		),
-	)
+	ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
+		RoomId: roomID,
+		AddedPlayers: []string{msg.Creator},
+	})
 
 	return &types.MsgFindResponse{RoomId: roomID}, nil
 }
