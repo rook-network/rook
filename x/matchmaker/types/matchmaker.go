@@ -2,7 +2,6 @@ package types
 
 import (
 	"fmt"
-	"math/rand"
 	"time"
 
 	game "github.com/arcane-systems/rook/x/game/types"
@@ -10,10 +9,10 @@ import (
 
 const MaxRoomCapacity = 64
 
-func NewCustomRoom(config *game.Config, players, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
+func NewCustomRoom(config game.Config, players, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
 	return Room{
 		Game: &Room_Config{
-			Config: config,
+			Config: &config,
 		},
 		Players:  players,
 		Pending:  pending,
@@ -86,8 +85,8 @@ func (r *Room) RemovePlayer(player string) {
 	}
 }
 
-func (r Room) IsFull(mode Mode) bool {
-	return len(r.Players) == int(mode.Mode.Capacity)
+func (r Room) IsFull() bool {
+	return len(r.Players) == int(r.Capacity)
 }
 
 func (r Room) IsEmpty() bool {
@@ -107,37 +106,16 @@ func (r Room) HasExpired(now time.Time, lifespan time.Duration) bool {
 	return ok && time.Created.Add(lifespan).After(now)
 }
 
-func (r Room) MsgCreate(randSource int64) *game.MsgCreate {
-	// If no seed has been set then set it using a deterministic random source
-	if r.Config.Map.Seed == 0 {
-		r.Config.Map.Seed = rand.NewSource(randSource).Int63()
-	}
-	return &game.MsgCreate{
-		Players: r.Players,
-		Config:  r.Config,
-	}
-}
-
-func NewRoomSet(ids []uint64) Rooms {
-	return Rooms{Ids: ids}
-}
-
-func (r *Rooms) Remove(id uint64) {
-	removeIdx := -1
-	for idx, roomID := range r.Ids {
-		if roomID == id {
-			removeIdx = idx
-			break
-		}
-	}
-	if removeIdx >= 0 {
-		r.Ids = append(r.Ids[:removeIdx], r.Ids[removeIdx+1:]...)
-	}
-}
-
-func (r *Rooms) Add(id uint64) {
-	r.Ids = append(r.Ids, id)
-}
+// func (r Room) MsgCreate(randSource int64, mode *Mode) *game.MsgCreate {
+// 	// If no seed has been set then set it using a deterministic random source
+// 	if r.Config.Map.Seed == 0 {
+// 		r.Config.Map.Seed = rand.NewSource(randSource).Int63()
+// 	}
+// 	return &game.MsgCreate{
+// 		Players: r.Players,
+// 		Config:  r.Config,
+// 	}
+// }
 
 func NewMode(config game.Config, quorum, capacity uint32) Mode {
 	return Mode{
@@ -166,6 +144,10 @@ func (m Mode) ValidateBasic() error {
 
 	if m.Quorum < 2 {
 		return fmt.Errorf("quorum must be at least two got %d", m.Quorum)
+	}
+
+	if m.Capacity > MaxRoomCapacity {
+		return fmt.Errorf("capacity (%d) exceeds max room capacity", m.Capacity)
 	}
 
 	if m.Quorum > m.Capacity {
