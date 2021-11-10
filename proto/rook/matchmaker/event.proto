@@ -4,7 +4,12 @@ package rook.matchmaker;
 option go_package = "github.com/arcane-systems/rook/x/matchmaker/types";
 
 message EventRoomUpdated {
-    uint64 room_id = 1;
-    repeated string added_players = 2;
-    repeated string removed_players = 3;
+  uint64 room_id = 1;
+  repeated string added_players = 2;
+  repeated string removed_players = 3;
+}
+
+message EventGameStarted {
+  uint64 room_id = 1;
+  uint64 game_id = 2;
 }

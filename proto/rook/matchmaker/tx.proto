@@ -9,18 +9,28 @@ option go_package = "github.com/arcane-systems/rook/x/matchmaker/types";
 
 // Msg defines the Msg service.
 service Msg {
+  // Host creates a room for a custom game
   rpc Host(MsgHost) returns (MsgHostResponse);
+
+  // Join adds a player to a room
   rpc Join(MsgJoin) returns (MsgJoinResponse);
+
+  // Find adds a player to a room based of a mode
   rpc Find(MsgFind) returns (MsgFindResponse);
+
+  // Leave removes a player from the room they are in.
   rpc Leave(MsgLeave) returns (MsgLeaveResponse);
 
+  // AddMode adds a new mode
   rpc AddMode(MsgAddMode) returns (MsgAddModeResponse);
+
+  // RemoveMode removes an existing mode
   rpc RemoveMode(MsgRemoveMode) returns (MsgRemoveModeResponse);
 }
 
 message MsgHost {
   // The host of the room
-  string creator = 1;
+  string host = 1;
 
   oneof game {
     // Mode defines the game config, the quorum and capacity of players
@@ -43,21 +53,21 @@ message MsgHost {
 message MsgHostResponse { uint64 room_id = 1; }
 
 message MsgJoin {
-  string creator = 1;
+  string player = 1;
   uint64 room_id = 2;
 }
 
 message MsgJoinResponse {}
 
 message MsgFind {
-  string creator = 1;
+  string player = 1;
   uint32 mode = 2;
 }
 
 message MsgFindResponse { uint64 room_id = 1; }
 
 message MsgLeave {
-  string creator = 1;
+  string player = 1;
   uint64 room_id = 2;
 }
 
@@ -68,7 +78,7 @@ message MsgAddMode {
   Mode mode = 2 [ (gogoproto.nullable) = false ];
 }
 
-message MsgAddModeResponse { uint32 id = 1; }
+message MsgAddModeResponse { uint32 mode_id = 1; }
 
 message MsgRemoveMode {
   string authority = 1;

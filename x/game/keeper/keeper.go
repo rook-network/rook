@@ -148,7 +148,7 @@ func (k Keeper) UpdateGames(ctx sdk.Context) {
 		// emit the events for the updated state
 		ctx.EventManager().EmitTypedEvent(&types.EventUpdateGame{
 			GameId: id,
-			State: game.State(),
+			State:  game.State(),
 		})
 		memStore.Set(types.GameStateKey(id), k.cdc.MustMarshal(game.State()))
 	}

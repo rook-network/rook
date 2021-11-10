@@ -20,10 +20,7 @@ export const typeMsgLeave = "/rook.matchmaker.MsgLeave"
 export const typeMsgAddMode = "/rook.matchmaker.MsgAddMode"
 export const typeMsgRemoveMode = "/rook.matchmaker.MsgRemoveMode" 
 
-export const eventTypeNewRoom     = "new_room"
-export const eventTypeRoomReady   = "room_ready"
-export const eventTypeClosingRoom = "closing_room"
-export const eventTypeJoinedRoom  = "joined_room"
+export const eventRoomUpdated = "rook.matchmaker.EventRoomUpdated"
 
 export function registerMatchmakerMsgs(registry: Registry) {
     registry.register(typeMsgFind, MsgFind)
@@ -46,6 +43,7 @@ export class MatchmakerProvider {
 
     // we can only subscribe to a single room at a time
     private onUpdate?: (room: Room) => void
+    private onGameStart?: (id: number) => void
     private room?: Room
 
     constructor(querier: QueryClient, client: SigningStargateClient, address: string) {
@@ -59,22 +57,13 @@ export class MatchmakerProvider {
             (event: SocketWrapperMessageEvent) => { 
                 const parsedEvent = JSON.parse(event.data)
                 console.log(parsedEvent)
-                if (!this.room || !this.onUpdate) {
-                    console.error("received room event but subscription not set")
-                    return
-                } 
-                if (!parsedEvent.result.events) {
-                    console.log("no events")
+                if (parsedEvent.query === undefined) {
                     return
                 }
-                if (!parsedEvent.result.events["joined_room.player"]) {
-                    console.log("no joined room")
-                    return
-                }
-
-                if (parsedEvent.result.events["joined_room.player"]) {
-                    this.room.players.push(parsedEvent.result.events["joined_room.player"][0])
-                    this.onUpdate(this.room)
+                if (parsedEvent.query.contains("joined_room")) {
+                    this.parseJoinedRoomEvent(parsedEvent)
+                } else if (parsedEvent.query.contains("game_started")) {
+                    this.parseGameStartedEvent(parsedEvent)
                 }
             },
             (event: SocketWrapperErrorEvent) => { console.error(event)}
@@ -88,7 +77,7 @@ export class MatchmakerProvider {
             method: "subscribe",
             id: "0",
             params: {
-                query: `joined_room.room_id='${id}'`
+                query: `event_room_updated.room_id='${id}'`
             }
         } 
         this.onUpdate = onUpdate
@@ -113,6 +102,64 @@ export class MatchmakerProvider {
         this.socket.send(JSON.stringify(unsubscribeMsg))
         this.onUpdate = undefined
     }
+
+    subscribeToGameStart(player: string, onGameStart: (id: number) => void): void {
+        const subscribeMsg = {
+            jsonrpc: "2.0",
+            method: "subscribe",
+            id: "0",
+            params: {
+                query: `event_new_game.players='${player}'`
+            }
+        }
+        this.socket.send(JSON.stringify(subscribeMsg))
+        this.onGameStart = onGameStart
+    }
+
+    unsubscribeToGameStart(): void {
+        return
+    }
+
+    private parseJoinedRoomEvent(event: any): void {
+        if (!this.room || !this.onUpdate) {
+            console.error("received room event but subscription not set")
+            return
+        } 
+        if (!event.result.events) {
+            console.log("no events")
+            return
+        }
+        if (!event.result.events["joined_room.player"]) {
+            console.log("no joined room")
+            return
+        }
+
+        if (event.result.events["joined_room.player"]) {
+            this.room.players.push(event.result.events["joined_room.player"][0])
+            this.onUpdate(this.room)
+        }
+    }
+
+    private parseGameStartedEvent(event: any): void {
+        if (!this.onGameStart) {
+            console.error("received game started event but subscription not sent")
+        }
+        if (!event.result.events) {
+            console.log("no events")
+            return
+        }
+        if (!event.result.events["joined_room.player"]) {
+            console.log("no joined room")
+            return
+        }
+
+        // if (event.result.events["joined_room.player"]) {
+        //     this.room.players.push(event.result.events["joined_room.player"][0])
+        //     this.onUpdate(this.room)
+        // }
+    }
+
+
 }
 
 export class MatchmakerMsgClient implements IMatchmakerMsgClient {
@@ -156,15 +203,13 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
         if (resp.rawLog !== undefined) {
             const events = JSON.parse(resp.rawLog)[0].events as Event[]
             for (const event of events) {
-                if (event.type === eventTypeJoinedRoom) {
-                    if (event.attributes[0].value.toString() === this.address) {
-                        return {
-                            roomId: Long.fromString(event.attributes[1].value.toString())
-                        } as MsgHostResponse
-                    }
+                if (event.type === eventRoomUpdated) {
+                    return {
+                        roomId: Long.fromString(event.attributes[0].value.toString())
+                    } as MsgHostResponse
                 }
             }
-            throw new Error("emmitted transaction events didn't include roomID for sender")
+            throw new Error("no room events were emitted after transaction")
         }
         throw new Error("Unable to parse transaction response: " + JSON.stringify(resp))
     }
@@ -187,15 +232,14 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
             const events = JSON.parse(resp.rawLog)[0].events as Event[]
             console.log(events)
             for (const event of events) {
-                if (event.type === eventTypeJoinedRoom) {
-                    if (event.attributes[0].value.toString() === this.address) {
-                        return {
-                            roomId: Long.fromString(event.attributes[1].value.toString())
-                        } as MsgHostResponse
-                    }
+                if (event.type === eventRoomUpdated) {
+                    console.log("room id: " + event.attributes[0].value.toString())
+                    return {
+                        roomId: Long.fromString(event.attributes[0].value.toString())
+                    } as MsgHostResponse
                 }
             }
-            throw new Error("emmitted transaction events didn't include roomID for sender")
+            throw new Error("no room events were emitted after transaction")
         }
         throw new Error("Unable to parse transaction response: " + JSON.stringify(resp))
     }

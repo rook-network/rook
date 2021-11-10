@@ -9,18 +9,18 @@ import (
 
 var _ sdk.Msg = &MsgHost{}
 
-func NewMsgHost(creator string, invitees []string, mode *Mode, public bool) *MsgHost {
+func NewMsgHost(host string, invitees []string, mode *Mode, public bool) *MsgHost {
 	return &MsgHost{
-		Creator:  creator,
+		Host:     host,
 		Invitees: invitees,
 		Game:     &MsgHost_Mode{Mode: mode},
 		Public:   public,
 	}
 }
 
-func NewMsgHostByModeID(creator string, invitees []string, modeID uint32, public bool) *MsgHost {
+func NewMsgHostByModeID(host string, invitees []string, modeID uint32, public bool) *MsgHost {
 	return &MsgHost{
-		Creator:  creator,
+		Host:     host,
 		Invitees: invitees,
 		Game:     &MsgHost_ModeId{ModeId: modeID},
 		Public:   public,
@@ -36,7 +36,7 @@ func (msg *MsgHost) Type() string {
 }
 
 func (msg *MsgHost) GetSigners() []sdk.AccAddress {
-	signer, err := sdk.AccAddressFromBech32(msg.Creator)
+	signer, err := sdk.AccAddressFromBech32(msg.Host)
 	if err != nil {
 		panic(err)
 	}
@@ -49,9 +49,9 @@ func (msg *MsgHost) GetSignBytes() []byte {
 }
 
 func (msg *MsgHost) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	_, err := sdk.AccAddressFromBech32(msg.Host)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid host address (%s): %v", msg.Creator, err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid host address (%s): %v", msg.Host, err)
 	}
 
 	for _, invitee := range msg.Invitees {
@@ -60,11 +60,16 @@ func (msg *MsgHost) ValidateBasic() error {
 		}
 	}
 
+	if len(msg.Invitees) >= MaxRoomCapacity {
+		return errors.New("invited players exceeds max room capacity")
+	}
+
 	switch m := msg.Game.(type) {
 	case *MsgHost_Mode:
 		if err := m.Mode.ValidateBasic(); err != nil {
 			return err
 		}
+
 	case *MsgHost_ModeId:
 		if m.ModeId == 0 {
 			return errors.New("modeID must be non zero")
@@ -78,10 +83,10 @@ func (msg *MsgHost) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgJoin{}
 
-func NewMsgJoin(creator string, roomID uint64) *MsgJoin {
+func NewMsgJoin(player string, roomID uint64) *MsgJoin {
 	return &MsgJoin{
-		Creator: creator,
-		RoomId:  roomID,
+		Player: player,
+		RoomId: roomID,
 	}
 }
 
@@ -94,7 +99,7 @@ func (msg *MsgJoin) Type() string {
 }
 
 func (msg *MsgJoin) GetSigners() []sdk.AccAddress {
-	signer, err := sdk.AccAddressFromBech32(msg.Creator)
+	signer, err := sdk.AccAddressFromBech32(msg.Player)
 	if err != nil {
 		panic(err)
 	}
@@ -107,9 +112,9 @@ func (msg *MsgJoin) GetSignBytes() []byte {
 }
 
 func (msg *MsgJoin) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	_, err := sdk.AccAddressFromBech32(msg.Player)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s): %v", msg.Creator, err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s): %v", msg.Player, err)
 	}
 
 	return nil
@@ -117,10 +122,10 @@ func (msg *MsgJoin) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgFind{}
 
-func NewMsgFind(creator string, mode uint32) *MsgFind {
+func NewMsgFind(player string, mode uint32) *MsgFind {
 	return &MsgFind{
-		Creator: creator,
-		Mode:    mode,
+		Player: player,
+		Mode:   mode,
 	}
 }
 
@@ -133,7 +138,7 @@ func (msg *MsgFind) Type() string {
 }
 
 func (msg *MsgFind) GetSigners() []sdk.AccAddress {
-	signer, err := sdk.AccAddressFromBech32(msg.Creator)
+	signer, err := sdk.AccAddressFromBech32(msg.Player)
 	if err != nil {
 		panic(err)
 	}
@@ -146,9 +151,9 @@ func (msg *MsgFind) GetSignBytes() []byte {
 }
 
 func (msg *MsgFind) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	_, err := sdk.AccAddressFromBech32(msg.Player)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s): %v", msg.Creator, err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s): %v", msg.Player, err)
 	}
 
 	return nil
@@ -156,10 +161,10 @@ func (msg *MsgFind) ValidateBasic() error {
 
 var _ sdk.Msg = &MsgLeave{}
 
-func NewMsgLeave(creator string, roomID uint64) *MsgLeave {
+func NewMsgLeave(player string, roomID uint64) *MsgLeave {
 	return &MsgLeave{
-		Creator: creator,
-		RoomId:  roomID,
+		Player: player,
+		RoomId: roomID,
 	}
 }
 
@@ -172,7 +177,7 @@ func (msg *MsgLeave) Type() string {
 }
 
 func (msg *MsgLeave) GetSigners() []sdk.AccAddress {
-	signer, err := sdk.AccAddressFromBech32(msg.Creator)
+	signer, err := sdk.AccAddressFromBech32(msg.Player)
 	if err != nil {
 		panic(err)
 	}
@@ -185,9 +190,9 @@ func (msg *MsgLeave) GetSignBytes() []byte {
 }
 
 func (msg *MsgLeave) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	_, err := sdk.AccAddressFromBech32(msg.Player)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s): %v", msg.Creator, err)
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid address (%s): %v", msg.Player, err)
 	}
 
 	return nil

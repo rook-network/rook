@@ -11,6 +11,11 @@ option go_package = "github.com/arcane-systems/rook/x/matchmaker/types";
 
 // Query defines the gRPC querier service.
 service Query {
+  // Rooms returns all the public rooms that a player can join
+  rpc Rooms(QueryGetRoomsRequest) returns (QueryGetRoomsResponse) {
+    option (google.api.http).get = "/matchmaker/rooms";
+  }
+
   // Room returns the current state of a specific room
   rpc Room(QueryGetRoomRequest) returns (QueryGetRoomResponse) {
     option (google.api.http).get = "/matchmaker/room/{id}";
@@ -22,7 +27,7 @@ service Query {
     option (google.api.http).get = "/matchmaker/invitations/{player}";
   }
 
-  // Modes lists all the publicly available modes
+  // Modes lists all the publicly available modes and their respective room ids
   rpc Modes(QueryGetModesRequest) returns (QueryGetModesResponse) {
     option (google.api.http).get = "/matchmaker/modes";
   }
@@ -33,18 +38,30 @@ service Query {
   }
 }
 
+message QueryGetRoomsRequest {}
+
+message QueryGetRoomsResponse {
+  repeated IndexedRoom rooms = 1 [ (gogoproto.nullable) = false ];
+}
+
 message QueryGetRoomRequest { uint64 id = 1; }
 
 message QueryGetRoomResponse { Room room = 1; }
 
 message QueryGetInvitationsRequest { string player = 1; }
 
-message QueryGetInvitationsResponse { repeated IndexedRoom rooms = 1 [(gogoproto.nullable) = false]; }
+message QueryGetInvitationsResponse {
+  repeated IndexedRoom rooms = 1 [ (gogoproto.nullable) = false ];
+}
 
 message QueryGetModesRequest {}
 
-message QueryGetModesResponse { repeated IndexedMode modes = 1 [(gogoproto.nullable) = false]; }
+message QueryGetModesResponse {
+  repeated IndexedMode modes = 1 [ (gogoproto.nullable) = false ];
+}
 
 message QueryGetParamsRequest {}
 
-message QueryGetParamsResponse { Params params = 1 [(gogoproto.nullable) = false]; }
+message QueryGetParamsResponse {
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}

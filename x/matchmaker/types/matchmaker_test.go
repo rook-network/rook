@@ -2,27 +2,50 @@ package types
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/arcane-systems/rook/x/game/types"
 )
 
-func TestRemoveRoomIDFromRoom(t *testing.T) {
-	room := NewRoomSet([]uint64{1, 2, 3})
+var (
+	config  = types.DefaultConfig()
+	players = []string{"alice", "bob", "charlie", "david", "emily"}
+)
 
-	room.Remove(4)
-	require.Len(t, room.Ids, 3)
+func TestRoomAddingPlayers(t *testing.T) {
+	room := NewCustomRoom(config, players[:2], []string{}, true, 2, 4, time.Now())
 
-	room.Remove(3)
-	require.Len(t, room.Ids, 2)
-	require.Equal(t, []uint64{1, 2}, room.Ids)
+	require.True(t, room.HasQuorum())
+	require.False(t, room.IsFull())
+	require.False(t, room.IsEmpty())
 
-	room.Add(5)
-	require.Len(t, room.Ids, 3)
-	require.Equal(t, uint64(5), room.Ids[2])
+	err := room.TryAddPlayer(players[2])
+	require.NoError(t, err)
 
-	room.Remove(1)
-	require.Len(t, room.Ids, 2)
-	require.Equal(t, []uint64{2, 5}, room.Ids)
+	err = room.TryAddPlayer(players[3])
+	require.NoError(t, err)
+	require.True(t, room.IsFull())
+
+	err = room.TryAddPlayer(players[4])
+	require.Error(t, err)
+}
+
+func TestRoomRemovePlayers(t *testing.T) {
+	room := NewCustomRoom(config, players[:2], []string{}, true, 2, 4, time.Now())
+
+	require.True(t, room.HasQuorum())
+
+	room.RemovePlayer(players[3])
+	require.True(t, room.HasQuorum())
+
+	room.RemovePlayer(players[1])
+	require.False(t, room.HasQuorum())
+	require.False(t, room.IsEmpty())
+
+	room.RemovePlayer(players[0])
+	require.True(t, room.IsEmpty())
 }
 
 func TestKeys(t *testing.T) {

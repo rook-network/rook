@@ -120,6 +120,34 @@ func (k Keeper) UpdateRooms(ctx sdk.Context) {
 	}
 }
 
+// FindPlayer performs a range scan returning the room that the player is currently in,
+// if any. CONTRACT: a player can never be in more than one room.
+// TODO: This process is performed often and could be made a lot more efficient if we used
+// a secondary key.
+func (k Keeper) FindPlayer(ctx sdk.Context, player string) (bool, types.IndexedRoom) {
+	store := ctx.KVStore(k.storeKey)
+
+	roomIter := store.Iterator(
+		types.RoomKey(0),
+		types.RoomKey(1<<63-1),
+	)
+	for ; roomIter.Valid(); roomIter.Next() {
+		var room types.Room
+		k.cdc.MustUnmarshal(roomIter.Value(), &room)
+
+		for _, roomPlayer := range room.Players {
+			if roomPlayer == player {
+				return true, types.IndexedRoom{
+					Id:   types.ParseRoomID(roomIter.Key()),
+					Room: room,
+				}
+			}
+		}
+	}
+
+	return false, types.IndexedRoom{}
+}
+
 func (k Keeper) GetRoom(ctx sdk.Context, roomID uint64) (types.Room, bool) {
 	room := types.Room{}
 	store := ctx.KVStore(k.storeKey)
@@ -222,6 +250,8 @@ func (k Keeper) DeleteMode(ctx sdk.Context, modeID uint32) {
 	store.Delete(types.RoomsByModeKey(modeID))
 }
 
+// NOTE: We return multiple rooms but I think it's not possible for there to be more than one room
+// for a mode at a time.
 func (k Keeper) GetRoomsByMode(ctx sdk.Context, modeID uint32) (types.Rooms, bool) {
 	store := ctx.KVStore(k.storeKey)
 	var rooms types.Rooms

@@ -29,6 +29,26 @@ func (m msgServer) Host(goCtx context.Context, msg *types.MsgHost) (*types.MsgHo
 		time = *msg.Scheduled
 	}
 
+	// Check if the host is already in a room. If so, remove them from the existing room
+	if ok, ir := m.Keeper.FindPlayer(ctx, msg.Creator); ok {
+		ir.Room.RemovePlayer(msg.Creator)
+
+		if ir.Room.IsEmpty() {
+			m.Keeper.DeleteRoom(ctx, ir.Id)
+			if ir.Room.Public && ir.Room.ModeId != 0 {
+				panic(fmt.Sprintf("deleting room %d", ir.Id))
+				m.Keeper.RemoveRoomFromModePool(ctx, ir.Room.ModeId, ir.Id)
+			}
+		} else {
+			m.Keeper.SetRoom(ctx, ir.Id, ir.Room)
+		}
+
+		ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
+			RoomId:         ir.Id,
+			RemovedPlayers: []string{msg.Creator},
+		})
+	}
+
 	roomID := m.Keeper.GetNextRoomID(ctx)
 
 	var room types.Room
@@ -58,10 +78,10 @@ func (m msgServer) Host(goCtx context.Context, msg *types.MsgHost) (*types.MsgHo
 
 	m.Keeper.SetRoom(ctx, roomID, room)
 
-	m.Keeper.IncrementNextModeID(ctx)
+	m.Keeper.IncrementNextRoomID(ctx)
 
 	ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
-		RoomId: roomID,
+		RoomId:       roomID,
 		AddedPlayers: []string{msg.Creator},
 	})
 
@@ -82,11 +102,30 @@ func (m msgServer) Join(goCtx context.Context, msg *types.MsgJoin) (*types.MsgJo
 		return nil, err
 	}
 
+	// Check if the player is already in a room. If so, remove them from the existing room
+	if ok, ir := m.Keeper.FindPlayer(ctx, msg.Creator); ok {
+		ir.Room.RemovePlayer(msg.Creator)
+
+		if ir.Room.IsEmpty() {
+			m.Keeper.DeleteRoom(ctx, ir.Id)
+			if ir.Room.Public && ir.Room.ModeId != 0 {
+				m.Keeper.RemoveRoomFromModePool(ctx, ir.Room.ModeId, ir.Id)
+			}
+		} else {
+			m.Keeper.SetRoom(ctx, ir.Id, ir.Room)
+		}
+
+		ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
+			RoomId:         ir.Id,
+			RemovedPlayers: []string{msg.Creator},
+		})
+	}
+
 	// persist changes to that room
 	m.Keeper.SetRoom(ctx, msg.RoomId, room)
 
 	ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
-		RoomId: msg.RoomId,
+		RoomId:       msg.RoomId,
 		AddedPlayers: []string{msg.Creator},
 	})
 
@@ -103,10 +142,11 @@ func (m msgServer) Find(goCtx context.Context, msg *types.MsgFind) (*types.MsgFi
 		return nil, sdkerrors.Wrapf(types.ErrModeNotFound, "modeID: %d", msg.Mode)
 	}
 
+	// if no room exists using that mode then we need to create a new one
 	if len(rooms.Ids) == 0 {
 		mode, exists := m.Keeper.GetMode(ctx, msg.Mode)
 		if !exists {
-			panic("expected mode but found none")
+			panic(fmt.Sprintf("expected mode %d but found none", msg.Mode))
 		}
 
 		msgHost := types.NewMsgHost(msg.Creator, []string{}, &mode, true)
@@ -121,15 +161,34 @@ func (m msgServer) Find(goCtx context.Context, msg *types.MsgFind) (*types.MsgFi
 		return &types.MsgFindResponse{RoomId: res.RoomId}, nil
 	}
 
+	// Check if the player is already in a room. If so, remove them from the existing room
+	if ok, ir := m.Keeper.FindPlayer(ctx, msg.Creator); ok {
+		ir.Room.RemovePlayer(msg.Creator)
+
+		if ir.Room.IsEmpty() {
+			m.Keeper.DeleteRoom(ctx, ir.Id)
+			if ir.Room.Public && ir.Room.ModeId != 0 {
+				m.Keeper.RemoveRoomFromModePool(ctx, ir.Room.ModeId, ir.Id)
+			}
+		} else {
+			m.Keeper.SetRoom(ctx, ir.Id, ir.Room)
+		}
+
+		ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
+			RoomId:         ir.Id,
+			RemovedPlayers: []string{msg.Creator},
+		})
+	}
+
 	roomID := rooms.Ids[0]
 	room, exists := m.Keeper.GetRoom(ctx, roomID)
 	if !exists {
-		panic("expected room but found none")
+		panic(fmt.Sprintf("expected room %d but found none", roomID))
 	}
 
 	err := room.TryAddPlayer(msg.Creator)
 	if err != nil {
-		panic(fmt.Sprintf("unexpected error adding player to room: %v", err))
+		return nil, fmt.Errorf("error adding player to room: %w", err)
 	}
 
 	if room.IsFull() {
@@ -141,15 +200,36 @@ func (m msgServer) Find(goCtx context.Context, msg *types.MsgFind) (*types.MsgFi
 	m.Keeper.SetRoom(ctx, roomID, room)
 
 	ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
-		RoomId: roomID,
+		RoomId:       roomID,
 		AddedPlayers: []string{msg.Creator},
 	})
 
 	return &types.MsgFindResponse{RoomId: roomID}, nil
 }
 
-// Leave is currently a NoOp
+// Leave removes the player from their current room if they are in one
 func (m msgServer) Leave(goCtx context.Context, msg *types.MsgLeave) (*types.MsgLeaveResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if ok, ir := m.Keeper.FindPlayer(ctx, msg.Creator); ok {
+		ir.Room.RemovePlayer(msg.Creator)
+
+		// if the room is now empty we can delete it
+		if ir.Room.IsEmpty() {
+			m.Keeper.DeleteRoom(ctx, ir.Id)
+			if ir.Room.Public && ir.Room.ModeId != 0 {
+				m.Keeper.RemoveRoomFromModePool(ctx, ir.Room.ModeId, ir.Id)
+			}
+		} else {
+			m.Keeper.SetRoom(ctx, ir.Id, ir.Room)
+		}
+
+		ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
+			RoomId:         ir.Id,
+			RemovedPlayers: []string{msg.Creator},
+		})
+	}
+
 	return &types.MsgLeaveResponse{}, nil
 }
 

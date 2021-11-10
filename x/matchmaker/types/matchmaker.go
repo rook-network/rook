@@ -8,9 +8,13 @@ import (
 	game "github.com/arcane-systems/rook/x/game/types"
 )
 
-func NewRoom(config game.Config, players, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
+const MaxRoomCapacity = 64
+
+func NewCustomRoom(config *game.Config, players, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
 	return Room{
-		Config:   config,
+		Game: &Room_Config{
+			Config: config,
+		},
 		Players:  players,
 		Pending:  pending,
 		Public:   public,
@@ -20,16 +24,22 @@ func NewRoom(config game.Config, players, pending []string, public bool, quorum,
 	}
 }
 
-func NewScheduledRoom(config game.Config, players, pending []string, public bool, quorum, capacity uint32, scheduled time.Time) Room {
+func NewStandardRoom(modeID uint32, players, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
 	return Room{
-		Config:   config,
+		Game: &Room_ModeId{
+			ModeId: modeID,
+		},
 		Players:  players,
 		Pending:  pending,
 		Public:   public,
 		Quorum:   quorum,
 		Capacity: capacity,
-		Time:     &Room_Scheduled{Scheduled: &scheduled},
+		Time:     &Room_Created{Created: &created},
 	}
+}
+
+func (r *Room) Schedule(scheduled time.Time) {
+	r.Time = &Room_Scheduled{Scheduled: &scheduled}
 }
 
 func (r *Room) TryAddPlayer(player string) error {
@@ -44,29 +54,44 @@ func (r *Room) TryAddPlayer(player string) error {
 	}
 
 	pendingIdx := -1
-	if !r.Public {
-		exists := false
-		for i, p := range r.Pending {
-			if p == player {
-				exists = true
-				pendingIdx = i
-				break
-			}
+	for i, p := range r.Pending {
+		if p == player {
+			pendingIdx = i
+			break
 		}
-		if !exists {
-			return ErrPlayerNotInvited
-		}
+	}
+	// if it's a private game and the player hasn't been invited then return an error
+	if !r.Public && pendingIdx == -1 {
+		return ErrPlayerNotInvited
+	}
 
+	// if pending index was modified then update the pending. Note that this means that if
+	// a player joins a room and then leaves they are unable to join again.
+	if pendingIdx != -1 {
 		r.Pending = append(r.Pending[:pendingIdx], r.Pending[pendingIdx+1:]...)
 	}
 
+	// update the player set
 	r.Players = append(r.Players, player)
 
 	return nil
 }
 
-func (r Room) IsFull() bool {
-	return len(r.Players) == int(r.Capacity)
+func (r *Room) RemovePlayer(player string) {
+	for idx, p := range r.Players {
+		if p == player {
+			r.Players = append(r.Players[:idx], r.Players[idx+1:]...)
+			return
+		}
+	}
+}
+
+func (r Room) IsFull(mode Mode) bool {
+	return len(r.Players) == int(mode.Mode.Capacity)
+}
+
+func (r Room) IsEmpty() bool {
+	return len(r.Players) == 0
 }
 
 func (r Room) HasQuorum() bool {

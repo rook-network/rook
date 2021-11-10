@@ -6,13 +6,13 @@ import "rook/game/game.proto";
 option go_package = "github.com/arcane-systems/rook/x/game/types";
 
 message EventNewGame {
-    uint64 game_id = 1;
-    repeated string players = 2;
-    Config config = 3;
-    uint32 params_version = 4;
+  uint64 game_id = 1;
+  repeated string players = 2;
+  Config config = 3;
+  uint32 params_version = 4;
 }
 
 message EventUpdateGame {
-    uint64 game_id = 1;
-    State state = 2;
+  uint64 game_id = 1;
+  State state = 2;
 }

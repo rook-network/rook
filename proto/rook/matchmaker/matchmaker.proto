@@ -9,52 +9,54 @@ import "rook/game/game.proto";
 option go_package = "github.com/arcane-systems/rook/x/matchmaker/types";
 
 message Room {
-  // the config to be used for the game
-  rook.game.Config config = 1 [ (gogoproto.nullable) = false ];
+
+  oneof game {
+    // Add a custom config
+    rook.game.Config config = 1;
+
+    // Or you can use a predefined mode
+    uint32 mode_id = 2;
+  }
 
   // the current players in the room
-  repeated string players = 2;
+  repeated string players = 3;
 
   // pending invitations for players that can join (like a whitelist)
-  repeated string pending = 3;
+  repeated string pending = 4;
+
+  // if the room has started the game_id is shown here.
+  uint32 game_id = 5;
 
   // anyone can join
-  bool public = 4;
+  bool public = 6;
 
   // the minimum amount of players needed to start a game
-  uint32 quorum = 5;
+  uint32 quorum = 7;
 
   // the max amount of players that can join the room
-  uint32 capacity = 6;
-
-  // if this is part of the standard mode pools it will have a corresponding
-  // mode id
-  uint32 mode_id = 7;
+  uint32 capacity = 8;
 
   oneof time {
     // when the room was created. Rooms get garbage collected after a while
-    google.protobuf.Timestamp created = 8 [ (gogoproto.stdtime) = true ];
+    google.protobuf.Timestamp created = 9 [ (gogoproto.stdtime) = true ];
 
     // when quorum is reached and we are locked in to starting the game.
     // The prestart_wait_period gives a bufer for more people to join if they
     // want.
-    google.protobuf.Timestamp ready = 9 [ (gogoproto.stdtime) = true ];
+    google.protobuf.Timestamp ready = 10 [ (gogoproto.stdtime) = true ];
 
     // the time that the game is scheduled to start. Participants have until
     // then to join. The game only starts if the quorum is met. This is good
     // for tournament games
-    google.protobuf.Timestamp scheduled = 10 [ (gogoproto.stdtime) = true ];
+    google.protobuf.Timestamp scheduled = 11 [ (gogoproto.stdtime) = true ];
   }
 }
 
 // IndexedRoom pins an id to the room
 message IndexedRoom {
-  uint64 id = 1;
-  Room room = 2 [(gogoproto.nullable) = false];
+  uint64 room_id = 1;
+  Room room = 2 [ (gogoproto.nullable) = false ];
 }
-
-// Rooms represents a set of rooms by id
-message Rooms { repeated uint64 ids = 1; }
 
 // Modes are a way of accumulating a small set of possible games that people can
 // choose between
@@ -71,8 +73,9 @@ message Mode {
 
 // IndexedMode pins an id to the mode
 message IndexedMode {
-  uint32 id = 1;
-  Mode mode = 2 [(gogoproto.nullable) = false];
+  uint32 mode_id = 1;
+  Mode mode = 2 [ (gogoproto.nullable) = false ];
+  uint64 game_id = 3;
 }
 
 message Params {

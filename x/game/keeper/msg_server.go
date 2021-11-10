@@ -47,9 +47,9 @@ func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 
 	// emit the events for the new game
 	ctx.EventManager().EmitTypedEvent(&types.EventNewGame{
-		GameId: gameID,
-		Players: msg.Players,
-		Config: &msg.Config,
+		GameId:        gameID,
+		Players:       msg.Players,
+		Config:        &msg.Config,
 		ParamsVersion: params,
 	})
 
