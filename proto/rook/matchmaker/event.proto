@@ -9,6 +9,11 @@ message EventRoomUpdated {
   repeated string removed_players = 3;
 }
 
+message EventRoomError {
+  uint64 room_id = 1;
+  string error = 2;
+}
+
 message EventGameStarted {
   uint64 room_id = 1;
   uint64 game_id = 2;

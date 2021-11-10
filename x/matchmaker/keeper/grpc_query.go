@@ -11,6 +11,11 @@ import (
 
 var _ types.QueryServer = Keeper{}
 
+func (q Keeper) Rooms(goCtx context.Context, req *types.QueryGetRoomsRequest) (*types.QueryGetRoomsResponse, error) {
+	rooms := q.GetAvailableGames(sdk.UnwrapSDKContext(goCtx))
+	return &types.QueryGetRoomsResponse{Rooms: rooms}, nil
+}
+
 func (q Keeper) Room(goCtx context.Context, req *types.QueryGetRoomRequest) (*types.QueryGetRoomResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	room, exists := q.GetRoom(ctx, req.Id)
@@ -38,8 +43,8 @@ func (q Keeper) Modes(goCtx context.Context, req *types.QueryGetModesRequest) (*
 		var mode types.Mode
 		q.cdc.MustUnmarshal(iter.Value(), &mode)
 		modes = append(modes, types.IndexedMode{
-			Id:   modeID,
-			Mode: mode,
+			ModeId: modeID,
+			Mode:   mode,
 		})
 	}
 

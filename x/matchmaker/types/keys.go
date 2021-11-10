@@ -30,19 +30,19 @@ func KeyPrefix(p string) []byte {
 }
 
 var (
-	RoomIDKey         = []byte{0x00}
-	RoomPrefixKey     = []byte{0x01}
-	RoomsByModePrefix = []byte{0x02}
-	ModeIDKey         = []byte{0x03}
-	ModePrefixKey     = []byte{0x04}
+	RoomIDKey        = []byte{0x00}
+	RoomPrefixKey    = []byte{0x01}
+	CommonRoomPrefix = []byte{0x02}
+	ModeIDKey        = []byte{0x03}
+	ModePrefixKey    = []byte{0x04}
 )
 
 func RoomKey(id uint64) []byte {
 	return append(RoomPrefixKey, RoomIDBytes(id)...)
 }
 
-func RoomsByModeKey(mode uint32) []byte {
-	return append(RoomsByModePrefix, ModeIDBytes(mode)...)
+func CommonRoomKey(mode uint32) []byte {
+	return append(CommonRoomPrefix, ModeIDBytes(mode)...)
 }
 
 func ParseRoomID(key []byte) uint64 {

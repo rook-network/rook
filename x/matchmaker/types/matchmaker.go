@@ -23,7 +23,7 @@ func NewCustomRoom(config game.Config, players, pending []string, public bool, q
 	}
 }
 
-func NewStandardRoom(modeID uint32, players, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
+func NewCommonRoom(modeID uint32, players, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
 	return Room{
 		Game: &Room_ModeId{
 			ModeId: modeID,
@@ -39,6 +39,19 @@ func NewStandardRoom(modeID uint32, players, pending []string, public bool, quor
 
 func (r *Room) Schedule(scheduled time.Time) {
 	r.Time = &Room_Scheduled{Scheduled: &scheduled}
+}
+
+func (r Room) IsCommon() bool {
+	_, ok := r.Game.(*Room_ModeId)
+	return ok && r.Public
+}
+
+func (r Room) ModeID() uint32 {
+	mode, ok := r.Game.(*Room_ModeId)
+	if !ok {
+		return 0
+	}
+	return mode.ModeId
 }
 
 func (r *Room) TryAddPlayer(player string) error {

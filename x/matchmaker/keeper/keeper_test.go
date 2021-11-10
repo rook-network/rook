@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -16,6 +15,7 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmdb "github.com/tendermint/tm-db"
 
+	gameKeeper "github.com/arcane-systems/rook/x/game/keeper"
 	game "github.com/arcane-systems/rook/x/game/types"
 	"github.com/arcane-systems/rook/x/matchmaker/types"
 )
@@ -28,10 +28,12 @@ var (
 
 func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
+	memKey := sdk.NewMemoryStoreKeys(game.MemStoreKey)
 
 	db := tmdb.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db)
 	stateStore.MountStoreWithDB(storeKey, sdk.StoreTypeIAVL, db)
+	stateStore.MountStoreWithDB(memKey[game.MemStoreKey], sdk.StoreTypeMemory, db)
 	stateStore.MountStoreWithDB(paramskey, sdk.StoreTypeIAVL, db)
 	stateStore.MountStoreWithDB(paramstkey, sdk.StoreTypeTransient, db)
 	require.NoError(t, stateStore.LoadLatestVersion())
@@ -40,7 +42,9 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	params := paramtypes.NewSubspace(encCfg.Marshaler, encCfg.Amino, paramskey, paramstkey, "testsubspace")
 
 	registry := codectypes.NewInterfaceRegistry()
-	keeper := NewKeeper(codec.NewProtoCodec(registry), storeKey, params, baseapp.NewMsgServiceRouter())
+	gk := gameKeeper.NewKeeper(codec.NewProtoCodec(registry), storeKey, memKey[types.MemStoreKey])
+	gameServer := gameKeeper.NewMsgServerImpl(gk)
+	keeper := NewKeeper(codec.NewProtoCodec(registry), storeKey, params, gameServer)
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 	keeper.InitGenesis(ctx, *types.DefaultGenesis())
@@ -50,7 +54,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 func TestCreateRoom(t *testing.T) {
 	keeper, ctx := setupKeeper(t)
 
-	room := types.NewRoom(game.DefaultConfig(), []string{"a", "b", "c"}, []string{"d"}, true, 5, 6, blockTime)
+	room := types.NewCustomRoom(game.DefaultConfig(), []string{"a", "b", "c"}, []string{"d"}, true, 5, 6, blockTime)
 
 	roomID := keeper.GetNextRoomID(ctx)
 	require.Equal(t, uint64(1), roomID)
@@ -71,7 +75,6 @@ func TestCreateRoom(t *testing.T) {
 
 func TestCreateModes(t *testing.T) {
 	keeper, ctx := setupKeeper(t)
-	var roomID uint64 = 1
 
 	mode := types.NewMode(game.DefaultConfig(), 3, 4)
 	require.NoError(t, mode.ValidateBasic())
@@ -92,16 +95,8 @@ func TestCreateModes(t *testing.T) {
 	_, exists = keeper.GetMode(ctx, nextModeID)
 	require.False(t, exists)
 
-	rooms, exists := keeper.GetRoomsByMode(ctx, modeID)
+	_, _, exists = keeper.GetCommonRoom(ctx, modeID)
 	require.False(t, exists)
-	require.Empty(t, rooms.Ids)
-
-	rooms.Add(roomID)
-
-	keeper.SetRooms(ctx, modeID, rooms)
-	rooms, exists = keeper.GetRoomsByMode(ctx, modeID)
-	require.True(t, exists)
-	require.NotEmpty(t, rooms.Ids)
 }
 
 func TestParams(t *testing.T) {

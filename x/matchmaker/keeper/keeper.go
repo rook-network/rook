@@ -5,38 +5,36 @@ import (
 
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/arcane-systems/rook/x/matchmaker/types"
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	// this line is used by starport scaffolding # ibc/keeper/import
+
+	game "github.com/arcane-systems/rook/x/game/types"
+	"github.com/arcane-systems/rook/x/matchmaker/types"
 )
 
-type (
-	Keeper struct {
-		cdc      codec.Codec
-		params   paramtypes.Subspace
-		storeKey sdk.StoreKey
-		router   *baseapp.MsgServiceRouter
-	}
-)
+type Keeper struct {
+	cdc        codec.Codec
+	params     paramtypes.Subspace
+	storeKey   sdk.StoreKey
+	gameServer game.MsgServer
+}
 
 func NewKeeper(
 	cdc codec.Codec,
 	storeKey sdk.StoreKey,
 	paramSpace paramtypes.Subspace,
-	router *baseapp.MsgServiceRouter,
+	gameServer game.MsgServer,
 ) Keeper {
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
 	}
 
 	return Keeper{
-		cdc:      cdc,
-		storeKey: storeKey,
-		params:   paramSpace,
-		router:   router,
+		cdc:        cdc,
+		storeKey:   storeKey,
+		params:     paramSpace,
+		gameServer: gameServer,
 	}
 }
 
@@ -44,29 +42,47 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) CreateGame(ctx sdk.Context, room types.Room) {
+func (k Keeper) CreateGameWithEvents(ctx sdk.Context, roomID uint64, room types.Room) {
+	gameID, err := k.CreateGame(ctx, roomID, room)
+	if err != nil {
+		ctx.EventManager().EmitTypedEvent(&types.EventRoomError{
+			RoomId: roomID,
+			Error:  err.Error(),
+		})
+	}
+
+	ctx.EventManager().EmitTypedEvent(&types.EventGameStarted{
+		RoomId: roomID,
+		GameId: gameID,
+	})
+}
+
+func (k Keeper) CreateGame(ctx sdk.Context, roomID uint64, room types.Room) (uint64, error) {
 	// NOTE: we use the block time as a deterministic source of randomness for generating
 	// game maps. We may in the future want a better source of randomness but this suffices
 	// for now.
-	msg := room.MsgCreate(ctx.BlockTime().Unix())
-
-	handler := k.router.Handler(msg)
-	if handler == nil {
-		panic(fmt.Sprintf("unrecognized message route to create game: %s", sdk.MsgTypeURL(msg)))
+	var config game.Config
+	switch g := room.Game.(type) {
+	case *types.Room_Config:
+		config = *g.Config
+	case *types.Room_ModeId:
+		mode, ok := k.GetMode(ctx, g.ModeId)
+		if !ok {
+			return 0, fmt.Errorf("game mode %d does not exist", g.ModeId)
+		}
+		config = mode.Config
+	default:
+		return 0, fmt.Errorf("unknown room game type %T", g)
 	}
 
-	res, err := handler(ctx, msg)
+	msg := game.NewMsgCreate(room.Players, config)
+
+	resp, err := k.gameServer.Create(sdk.WrapSDKContext(ctx), msg)
 	if err != nil {
-		panic(err)
+		return 0, fmt.Errorf("failed to start game: %w", err)
 	}
 
-	// emit the events from creating the game
-	events := res.Events
-	sdkEvents := make([]sdk.Event, 0, len(events))
-	for i := 0; i < len(events); i++ {
-		sdkEvents = append(sdkEvents, sdk.Event(events[i]))
-	}
-	ctx.EventManager().EmitEvents(sdkEvents)
+	return resp.GameId, nil
 }
 
 // UpdateRooms loops through all rooms and performs the following:
@@ -91,29 +107,40 @@ func (k Keeper) UpdateRooms(ctx sdk.Context) {
 
 		switch t := room.Time.(type) {
 		case *types.Room_Created:
-			if room.IsFull() {
-				k.CreateGame(ctx, room)
-				k.DeleteRoom(ctx, roomID)
-				k.RemoveRoomFromModePool(ctx, room.ModeId, roomID)
-			} else if room.HasQuorum() {
+			switch {
+			case room.IsFull():
+				k.CreateGameWithEvents(ctx, roomID, room)
+				k.DeleteRoomWithEvents(ctx, roomID, room)
+				if room.IsCommon() {
+					k.DetachCommonRoom(ctx, room.ModeID())
+				}
+
+			case room.HasQuorum():
 				room.ReadyUp(now)
-			} else if room.HasExpired(now, params.RoomLifespan) {
-				k.DeleteRoom(ctx, roomID)
-				k.RemoveRoomFromModePool(ctx, room.ModeId, roomID)
+
+			case room.HasExpired(now, params.RoomLifespan):
+				k.DeleteRoomWithEvents(ctx, roomID, room)
+				if room.IsCommon() {
+					k.DetachCommonRoom(ctx, room.ModeID())
+				}
 			}
 		case *types.Room_Ready:
 			if now.After(t.Ready.Add(params.PrestartWaitPeriod)) {
-				k.CreateGame(ctx, room)
-				k.DeleteRoom(ctx, roomID)
-				k.RemoveRoomFromModePool(ctx, room.ModeId, roomID)
+				k.CreateGameWithEvents(ctx, roomID, room)
+				k.DeleteRoomWithEvents(ctx, roomID, room)
+				if room.IsCommon() {
+					k.DetachCommonRoom(ctx, room.ModeID())
+				}
 			}
 		case *types.Room_Scheduled:
 			if now.After(*t.Scheduled) {
 				if room.HasQuorum() {
-					k.CreateGame(ctx, room)
+					k.CreateGameWithEvents(ctx, roomID, room)
 				}
-				k.DeleteRoom(ctx, roomID)
-				k.RemoveRoomFromModePool(ctx, room.ModeId, roomID)
+				k.DeleteRoomWithEvents(ctx, roomID, room)
+				if room.IsCommon() {
+					k.DetachCommonRoom(ctx, room.ModeID())
+				}
 			}
 		}
 
@@ -138,14 +165,35 @@ func (k Keeper) FindPlayer(ctx sdk.Context, player string) (bool, types.IndexedR
 		for _, roomPlayer := range room.Players {
 			if roomPlayer == player {
 				return true, types.IndexedRoom{
-					Id:   types.ParseRoomID(roomIter.Key()),
-					Room: room,
+					RoomId: types.ParseRoomID(roomIter.Key()),
+					Room:   room,
 				}
 			}
 		}
 	}
 
 	return false, types.IndexedRoom{}
+}
+
+// RemovePlayerFromRoom checks if a player is in any room and removes that player from the room
+func (k Keeper) RemovePlayerFromCurrentRoom(ctx sdk.Context, player string) {
+	if ok, ir := k.FindPlayer(ctx, player); ok {
+		ir.Room.RemovePlayer(player)
+
+		if ir.Room.IsEmpty() {
+			k.DeleteRoom(ctx, ir.RoomId)
+			if ir.Room.IsCommon() {
+				k.DetachCommonRoom(ctx, ir.Room.ModeID())
+			}
+		} else {
+			k.SetRoom(ctx, ir.RoomId, ir.Room)
+		}
+
+		ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
+			RoomId:         ir.RoomId,
+			RemovedPlayers: []string{player},
+		})
+	}
 }
 
 func (k Keeper) GetRoom(ctx sdk.Context, roomID uint64) (types.Room, bool) {
@@ -167,6 +215,14 @@ func (k Keeper) SetRoom(ctx sdk.Context, roomID uint64, room types.Room) {
 	bz := k.cdc.MustMarshal(&room)
 
 	store.Set(types.RoomKey(roomID), bz)
+}
+
+func (k Keeper) DeleteRoomWithEvents(ctx sdk.Context, roomID uint64, room types.Room) {
+	k.DeleteRoom(ctx, roomID)
+	ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
+		RoomId:         roomID,
+		RemovedPlayers: room.Players,
+	})
 }
 
 func (k Keeper) DeleteRoom(ctx sdk.Context, roomID uint64) {
@@ -194,6 +250,29 @@ func (k Keeper) GetNextModeID(ctx sdk.Context) uint32 {
 	store := ctx.KVStore(k.storeKey)
 
 	return types.ParseModeID(store.Get(types.ModeIDKey))
+}
+
+func (k Keeper) GetAvailableGames(ctx sdk.Context) []types.IndexedRoom {
+	store := ctx.KVStore(k.storeKey)
+	rooms := make([]types.IndexedRoom, 0)
+	roomIter := store.Iterator(
+		types.RoomKey(0),
+		types.RoomKey(1<<63-1),
+	)
+
+	for ; roomIter.Valid(); roomIter.Next() {
+		var room types.Room
+		k.cdc.MustUnmarshal(roomIter.Value(), &room)
+
+		if room.Public && !room.IsFull() {
+			rooms = append(rooms, types.IndexedRoom{
+				RoomId: types.ParseRoomID(roomIter.Key()),
+				Room:   room,
+			})
+		}
+	}
+
+	return rooms
 }
 
 func (k Keeper) GetAllModes(ctx sdk.Context) []types.Mode {
@@ -247,35 +326,25 @@ func (k Keeper) GetMode(ctx sdk.Context, modeID uint32) (types.Mode, bool) {
 func (k Keeper) DeleteMode(ctx sdk.Context, modeID uint32) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.ModeKey(modeID))
-	store.Delete(types.RoomsByModeKey(modeID))
+	store.Delete(types.CommonRoomKey(modeID))
 }
 
-// NOTE: We return multiple rooms but I think it's not possible for there to be more than one room
-// for a mode at a time.
-func (k Keeper) GetRoomsByMode(ctx sdk.Context, modeID uint32) (types.Rooms, bool) {
+func (k Keeper) GetCommonRoom(ctx sdk.Context, modeID uint32) (uint64, types.Room, bool) {
 	store := ctx.KVStore(k.storeKey)
-	var rooms types.Rooms
-	bz := store.Get(types.RoomsByModeKey(modeID))
-	if bz == nil {
-		return types.Rooms{}, false
-	}
-	k.cdc.MustUnmarshal(bz, &rooms)
-	return rooms, true
+	roomID := types.ParseRoomID(store.Get(types.CommonRoomKey(modeID)))
+	room, exists := k.GetRoom(ctx, roomID)
+	return roomID, room, exists
 }
 
-func (k Keeper) SetRooms(ctx sdk.Context, modeID uint32, rooms types.Rooms) {
+func (k Keeper) SetCommonRoom(ctx sdk.Context, modeID uint32, roomID uint64) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.RoomsByModeKey(modeID), k.cdc.MustMarshal(&rooms))
+	store.Set(types.CommonRoomKey(modeID), types.RoomIDBytes(roomID))
 }
 
-func (k Keeper) RemoveRoomFromModePool(ctx sdk.Context, modeID uint32, roomID uint64) {
+func (k Keeper) DetachCommonRoom(ctx sdk.Context, modeID uint32) {
 	if modeID > 0 {
-		rooms, exists := k.GetRoomsByMode(ctx, modeID)
-		if !exists {
-			panic("tried to remove a room from the mode pool that doesn't exist")
-		}
-		rooms.Remove(roomID)
-		k.SetRooms(ctx, modeID, rooms)
+		store := ctx.KVStore(k.storeKey)
+		store.Delete(types.CommonRoomKey(modeID))
 	}
 }
 
@@ -294,7 +363,6 @@ func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 	k.SetParams(ctx, genState.Params)
 	for _, mode := range genState.InitialModes {
 		k.SetMode(ctx, genState.NextModeId, mode)
-		k.SetRooms(ctx, genState.NextModeId, types.Rooms{})
 		genState.NextModeId++
 	}
 	store.Set(types.ModeIDKey, types.ModeIDBytes(genState.NextModeId))

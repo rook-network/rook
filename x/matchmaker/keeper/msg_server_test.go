@@ -36,7 +36,7 @@ func TestMatchmakerHostAndJoinPublicRoom(t *testing.T) {
 	require.Len(t, queryModesResp.Modes, 1)
 
 	// create host message and submit it to the server
-	msgHost := types.NewMsgHostByModeID(bob, []string{alice, charles}, queryModesResp.Modes[0].Id, true)
+	msgHost := types.NewMsgHostByModeID(bob, []string{alice, charles}, queryModesResp.Modes[0].ModeId, true)
 	require.NoError(t, msgHost.ValidateBasic())
 
 	hostResp, err := server.Host(goCtx, msgHost)
@@ -85,7 +85,7 @@ func TestMatchmakerHostAndJoinPublicRoom(t *testing.T) {
 	require.Contains(t, err.Error(), types.ErrPlayerAlreadyInRoom.Error())
 
 	// emma tries to find a game with the same mode.
-	msgFind := types.NewMsgFind(emma, queryModesResp.Modes[0].Id)
+	msgFind := types.NewMsgFind(emma, queryModesResp.Modes[0].ModeId)
 	findResp, err := server.Find(goCtx, msgFind)
 	require.NoError(t, err)
 	require.Equal(t, hostResp2.RoomId, findResp.RoomId)
@@ -150,7 +150,7 @@ func TestMatchmakerAddAndRemoveModes(t *testing.T) {
 	require.NoError(t, err)
 	// There should just be a single mode from genesis
 	require.Equal(t, genState.InitialModes[0], getModeResp.Modes[0].Mode)
-	require.Equal(t, genState.NextModeId, getModeResp.Modes[0].Id+1)
+	require.Equal(t, genState.NextModeId, getModeResp.Modes[0].ModeId+1)
 
 	newMode := types.NewMode(game.DefaultConfig(), 3, 4)
 	require.NoError(t, newMode.ValidateBasic())
@@ -160,10 +160,10 @@ func TestMatchmakerAddAndRemoveModes(t *testing.T) {
 	addModeResp, err := server.AddMode(goCtx, msgAddMode)
 	require.NoError(t, err)
 	require.NotNil(t, addModeResp)
-	require.Equal(t, uint32(2), addModeResp.Id)
+	require.Equal(t, uint32(2), addModeResp.ModeId)
 
 	// gets the recently added mode
-	m, exists := querier.GetMode(ctx, addModeResp.Id)
+	m, exists := querier.GetMode(ctx, addModeResp.ModeId)
 	require.True(t, exists)
 	require.Equal(t, newMode, m) // check that it is the same
 
@@ -175,14 +175,14 @@ func TestMatchmakerAddAndRemoveModes(t *testing.T) {
 
 	msgRemoveMode := &types.MsgRemoveMode{
 		Authority: alice, // TODO: In the future this should be the governance module only
-		Id:        queryModesResp.Modes[0].Id,
+		Id:        queryModesResp.Modes[0].ModeId,
 	}
 
 	// Remove the first mode
 	_, err = server.RemoveMode(goCtx, msgRemoveMode)
 	require.NoError(t, err)
 	// check thta the mode no longer exists
-	_, exists = querier.GetMode(ctx, queryModesResp.Modes[0].Id)
+	_, exists = querier.GetMode(ctx, queryModesResp.Modes[0].ModeId)
 	require.False(t, exists)
 
 }
