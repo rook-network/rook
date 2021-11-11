@@ -6,37 +6,46 @@ import { State, Overview, Params } from "../../rook/game/game";
 export const protobufPackage = "rook.game";
 
 /** this line is used by starport scaffolding # 3 */
-export interface QueryGetGameStateRequest {
+export interface QueryGameStateRequest {
   id: Long;
 }
 
-export interface QueryGetGameStateResponse {
+export interface QueryGameStateResponse {
   state?: State;
 }
 
-export interface QueryGetGameRequest {
+export interface QueryGameByIDRequest {
   id: Long;
 }
 
-export interface QueryGetGameResponse {
+export interface QueryGameByIDResponse {
   overview?: Overview;
   id: Long;
 }
 
-export interface QueryGetParamsRequest {
+export interface QueryGameByPlayerRequest {
+  player: string;
+}
+
+export interface QueryGameByPlayerResponse {
+  overview?: Overview;
+  id: Long;
+}
+
+export interface QueryParamsRequest {
   version: number;
 }
 
-export interface QueryGetParamsResponse {
+export interface QueryParamsResponse {
   params?: Params;
   version: number;
 }
 
-const baseQueryGetGameStateRequest: object = { id: Long.UZERO };
+const baseQueryGameStateRequest: object = { id: Long.UZERO };
 
-export const QueryGetGameStateRequest = {
+export const QueryGameStateRequest = {
   encode(
-    message: QueryGetGameStateRequest,
+    message: QueryGameStateRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (!message.id.isZero()) {
@@ -48,12 +57,10 @@ export const QueryGetGameStateRequest = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): QueryGetGameStateRequest {
+  ): QueryGameStateRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetGameStateRequest,
-    } as QueryGetGameStateRequest;
+    const message = { ...baseQueryGameStateRequest } as QueryGameStateRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -68,10 +75,8 @@ export const QueryGetGameStateRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetGameStateRequest {
-    const message = {
-      ...baseQueryGetGameStateRequest,
-    } as QueryGetGameStateRequest;
+  fromJSON(object: any): QueryGameStateRequest {
+    const message = { ...baseQueryGameStateRequest } as QueryGameStateRequest;
     if (object.id !== undefined && object.id !== null) {
       message.id = Long.fromString(object.id);
     } else {
@@ -80,7 +85,7 @@ export const QueryGetGameStateRequest = {
     return message;
   },
 
-  toJSON(message: QueryGetGameStateRequest): unknown {
+  toJSON(message: QueryGameStateRequest): unknown {
     const obj: any = {};
     message.id !== undefined &&
       (obj.id = (message.id || Long.UZERO).toString());
@@ -88,11 +93,9 @@ export const QueryGetGameStateRequest = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetGameStateRequest>
-  ): QueryGetGameStateRequest {
-    const message = {
-      ...baseQueryGetGameStateRequest,
-    } as QueryGetGameStateRequest;
+    object: DeepPartial<QueryGameStateRequest>
+  ): QueryGameStateRequest {
+    const message = { ...baseQueryGameStateRequest } as QueryGameStateRequest;
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id as Long;
     } else {
@@ -102,11 +105,11 @@ export const QueryGetGameStateRequest = {
   },
 };
 
-const baseQueryGetGameStateResponse: object = {};
+const baseQueryGameStateResponse: object = {};
 
-export const QueryGetGameStateResponse = {
+export const QueryGameStateResponse = {
   encode(
-    message: QueryGetGameStateResponse,
+    message: QueryGameStateResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.state !== undefined) {
@@ -118,12 +121,10 @@ export const QueryGetGameStateResponse = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): QueryGetGameStateResponse {
+  ): QueryGameStateResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = {
-      ...baseQueryGetGameStateResponse,
-    } as QueryGetGameStateResponse;
+    const message = { ...baseQueryGameStateResponse } as QueryGameStateResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -138,10 +139,8 @@ export const QueryGetGameStateResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetGameStateResponse {
-    const message = {
-      ...baseQueryGetGameStateResponse,
-    } as QueryGetGameStateResponse;
+  fromJSON(object: any): QueryGameStateResponse {
+    const message = { ...baseQueryGameStateResponse } as QueryGameStateResponse;
     if (object.state !== undefined && object.state !== null) {
       message.state = State.fromJSON(object.state);
     } else {
@@ -150,7 +149,7 @@ export const QueryGetGameStateResponse = {
     return message;
   },
 
-  toJSON(message: QueryGetGameStateResponse): unknown {
+  toJSON(message: QueryGameStateResponse): unknown {
     const obj: any = {};
     message.state !== undefined &&
       (obj.state = message.state ? State.toJSON(message.state) : undefined);
@@ -158,11 +157,9 @@ export const QueryGetGameStateResponse = {
   },
 
   fromPartial(
-    object: DeepPartial<QueryGetGameStateResponse>
-  ): QueryGetGameStateResponse {
-    const message = {
-      ...baseQueryGetGameStateResponse,
-    } as QueryGetGameStateResponse;
+    object: DeepPartial<QueryGameStateResponse>
+  ): QueryGameStateResponse {
+    const message = { ...baseQueryGameStateResponse } as QueryGameStateResponse;
     if (object.state !== undefined && object.state !== null) {
       message.state = State.fromPartial(object.state);
     } else {
@@ -172,11 +169,11 @@ export const QueryGetGameStateResponse = {
   },
 };
 
-const baseQueryGetGameRequest: object = { id: Long.UZERO };
+const baseQueryGameByIDRequest: object = { id: Long.UZERO };
 
-export const QueryGetGameRequest = {
+export const QueryGameByIDRequest = {
   encode(
-    message: QueryGetGameRequest,
+    message: QueryGameByIDRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (!message.id.isZero()) {
@@ -185,10 +182,13 @@ export const QueryGetGameRequest = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetGameRequest {
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryGameByIDRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryGetGameRequest } as QueryGetGameRequest;
+    const message = { ...baseQueryGameByIDRequest } as QueryGameByIDRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -203,8 +203,8 @@ export const QueryGetGameRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetGameRequest {
-    const message = { ...baseQueryGetGameRequest } as QueryGetGameRequest;
+  fromJSON(object: any): QueryGameByIDRequest {
+    const message = { ...baseQueryGameByIDRequest } as QueryGameByIDRequest;
     if (object.id !== undefined && object.id !== null) {
       message.id = Long.fromString(object.id);
     } else {
@@ -213,15 +213,15 @@ export const QueryGetGameRequest = {
     return message;
   },
 
-  toJSON(message: QueryGetGameRequest): unknown {
+  toJSON(message: QueryGameByIDRequest): unknown {
     const obj: any = {};
     message.id !== undefined &&
       (obj.id = (message.id || Long.UZERO).toString());
     return obj;
   },
 
-  fromPartial(object: DeepPartial<QueryGetGameRequest>): QueryGetGameRequest {
-    const message = { ...baseQueryGetGameRequest } as QueryGetGameRequest;
+  fromPartial(object: DeepPartial<QueryGameByIDRequest>): QueryGameByIDRequest {
+    const message = { ...baseQueryGameByIDRequest } as QueryGameByIDRequest;
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id as Long;
     } else {
@@ -231,11 +231,11 @@ export const QueryGetGameRequest = {
   },
 };
 
-const baseQueryGetGameResponse: object = { id: Long.UZERO };
+const baseQueryGameByIDResponse: object = { id: Long.UZERO };
 
-export const QueryGetGameResponse = {
+export const QueryGameByIDResponse = {
   encode(
-    message: QueryGetGameResponse,
+    message: QueryGameByIDResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.overview !== undefined) {
@@ -250,10 +250,10 @@ export const QueryGetGameResponse = {
   decode(
     input: _m0.Reader | Uint8Array,
     length?: number
-  ): QueryGetGameResponse {
+  ): QueryGameByIDResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryGetGameResponse } as QueryGetGameResponse;
+    const message = { ...baseQueryGameByIDResponse } as QueryGameByIDResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -271,8 +271,8 @@ export const QueryGetGameResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetGameResponse {
-    const message = { ...baseQueryGetGameResponse } as QueryGetGameResponse;
+  fromJSON(object: any): QueryGameByIDResponse {
+    const message = { ...baseQueryGameByIDResponse } as QueryGameByIDResponse;
     if (object.overview !== undefined && object.overview !== null) {
       message.overview = Overview.fromJSON(object.overview);
     } else {
@@ -286,7 +286,7 @@ export const QueryGetGameResponse = {
     return message;
   },
 
-  toJSON(message: QueryGetGameResponse): unknown {
+  toJSON(message: QueryGameByIDResponse): unknown {
     const obj: any = {};
     message.overview !== undefined &&
       (obj.overview = message.overview
@@ -297,8 +297,10 @@ export const QueryGetGameResponse = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<QueryGetGameResponse>): QueryGetGameResponse {
-    const message = { ...baseQueryGetGameResponse } as QueryGetGameResponse;
+  fromPartial(
+    object: DeepPartial<QueryGameByIDResponse>
+  ): QueryGameByIDResponse {
+    const message = { ...baseQueryGameByIDResponse } as QueryGameByIDResponse;
     if (object.overview !== undefined && object.overview !== null) {
       message.overview = Overview.fromPartial(object.overview);
     } else {
@@ -313,11 +315,170 @@ export const QueryGetGameResponse = {
   },
 };
 
-const baseQueryGetParamsRequest: object = { version: 0 };
+const baseQueryGameByPlayerRequest: object = { player: "" };
 
-export const QueryGetParamsRequest = {
+export const QueryGameByPlayerRequest = {
   encode(
-    message: QueryGetParamsRequest,
+    message: QueryGameByPlayerRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.player !== "") {
+      writer.uint32(10).string(message.player);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryGameByPlayerRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGameByPlayerRequest,
+    } as QueryGameByPlayerRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.player = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGameByPlayerRequest {
+    const message = {
+      ...baseQueryGameByPlayerRequest,
+    } as QueryGameByPlayerRequest;
+    if (object.player !== undefined && object.player !== null) {
+      message.player = String(object.player);
+    } else {
+      message.player = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGameByPlayerRequest): unknown {
+    const obj: any = {};
+    message.player !== undefined && (obj.player = message.player);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGameByPlayerRequest>
+  ): QueryGameByPlayerRequest {
+    const message = {
+      ...baseQueryGameByPlayerRequest,
+    } as QueryGameByPlayerRequest;
+    if (object.player !== undefined && object.player !== null) {
+      message.player = object.player;
+    } else {
+      message.player = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryGameByPlayerResponse: object = { id: Long.UZERO };
+
+export const QueryGameByPlayerResponse = {
+  encode(
+    message: QueryGameByPlayerResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.overview !== undefined) {
+      Overview.encode(message.overview, writer.uint32(10).fork()).ldelim();
+    }
+    if (!message.id.isZero()) {
+      writer.uint32(16).uint64(message.id);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryGameByPlayerResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryGameByPlayerResponse,
+    } as QueryGameByPlayerResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.overview = Overview.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.id = reader.uint64() as Long;
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGameByPlayerResponse {
+    const message = {
+      ...baseQueryGameByPlayerResponse,
+    } as QueryGameByPlayerResponse;
+    if (object.overview !== undefined && object.overview !== null) {
+      message.overview = Overview.fromJSON(object.overview);
+    } else {
+      message.overview = undefined;
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = Long.fromString(object.id);
+    } else {
+      message.id = Long.UZERO;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGameByPlayerResponse): unknown {
+    const obj: any = {};
+    message.overview !== undefined &&
+      (obj.overview = message.overview
+        ? Overview.toJSON(message.overview)
+        : undefined);
+    message.id !== undefined &&
+      (obj.id = (message.id || Long.UZERO).toString());
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGameByPlayerResponse>
+  ): QueryGameByPlayerResponse {
+    const message = {
+      ...baseQueryGameByPlayerResponse,
+    } as QueryGameByPlayerResponse;
+    if (object.overview !== undefined && object.overview !== null) {
+      message.overview = Overview.fromPartial(object.overview);
+    } else {
+      message.overview = undefined;
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id as Long;
+    } else {
+      message.id = Long.UZERO;
+    }
+    return message;
+  },
+};
+
+const baseQueryParamsRequest: object = { version: 0 };
+
+export const QueryParamsRequest = {
+  encode(
+    message: QueryParamsRequest,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.version !== 0) {
@@ -326,13 +487,10 @@ export const QueryGetParamsRequest = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryGetParamsRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryParamsRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryGetParamsRequest } as QueryGetParamsRequest;
+    const message = { ...baseQueryParamsRequest } as QueryParamsRequest;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -347,8 +505,8 @@ export const QueryGetParamsRequest = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetParamsRequest {
-    const message = { ...baseQueryGetParamsRequest } as QueryGetParamsRequest;
+  fromJSON(object: any): QueryParamsRequest {
+    const message = { ...baseQueryParamsRequest } as QueryParamsRequest;
     if (object.version !== undefined && object.version !== null) {
       message.version = Number(object.version);
     } else {
@@ -357,16 +515,14 @@ export const QueryGetParamsRequest = {
     return message;
   },
 
-  toJSON(message: QueryGetParamsRequest): unknown {
+  toJSON(message: QueryParamsRequest): unknown {
     const obj: any = {};
     message.version !== undefined && (obj.version = message.version);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<QueryGetParamsRequest>
-  ): QueryGetParamsRequest {
-    const message = { ...baseQueryGetParamsRequest } as QueryGetParamsRequest;
+  fromPartial(object: DeepPartial<QueryParamsRequest>): QueryParamsRequest {
+    const message = { ...baseQueryParamsRequest } as QueryParamsRequest;
     if (object.version !== undefined && object.version !== null) {
       message.version = object.version;
     } else {
@@ -376,11 +532,11 @@ export const QueryGetParamsRequest = {
   },
 };
 
-const baseQueryGetParamsResponse: object = { version: 0 };
+const baseQueryParamsResponse: object = { version: 0 };
 
-export const QueryGetParamsResponse = {
+export const QueryParamsResponse = {
   encode(
-    message: QueryGetParamsResponse,
+    message: QueryParamsResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.params !== undefined) {
@@ -392,13 +548,10 @@ export const QueryGetParamsResponse = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): QueryGetParamsResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryParamsResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseQueryGetParamsResponse } as QueryGetParamsResponse;
+    const message = { ...baseQueryParamsResponse } as QueryParamsResponse;
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -416,8 +569,8 @@ export const QueryGetParamsResponse = {
     return message;
   },
 
-  fromJSON(object: any): QueryGetParamsResponse {
-    const message = { ...baseQueryGetParamsResponse } as QueryGetParamsResponse;
+  fromJSON(object: any): QueryParamsResponse {
+    const message = { ...baseQueryParamsResponse } as QueryParamsResponse;
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromJSON(object.params);
     } else {
@@ -431,7 +584,7 @@ export const QueryGetParamsResponse = {
     return message;
   },
 
-  toJSON(message: QueryGetParamsResponse): unknown {
+  toJSON(message: QueryParamsResponse): unknown {
     const obj: any = {};
     message.params !== undefined &&
       (obj.params = message.params ? Params.toJSON(message.params) : undefined);
@@ -439,10 +592,8 @@ export const QueryGetParamsResponse = {
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<QueryGetParamsResponse>
-  ): QueryGetParamsResponse {
-    const message = { ...baseQueryGetParamsResponse } as QueryGetParamsResponse;
+  fromPartial(object: DeepPartial<QueryParamsResponse>): QueryParamsResponse {
+    const message = { ...baseQueryParamsResponse } as QueryParamsResponse;
     if (object.params !== undefined && object.params !== null) {
       message.params = Params.fromPartial(object.params);
     } else {
@@ -459,45 +610,55 @@ export const QueryGetParamsResponse = {
 
 /** Query defines the gRPC querier service. */
 export interface Query {
+  FindByID(request: QueryGameByIDRequest): Promise<QueryGameByIDResponse>;
+  FindByPlayer(
+    request: QueryGameByPlayerRequest
+  ): Promise<QueryGameByPlayerResponse>;
   /** Queries a game state by id. */
-  GameState(
-    request: QueryGetGameStateRequest
-  ): Promise<QueryGetGameStateResponse>;
-  Game(request: QueryGetGameRequest): Promise<QueryGetGameResponse>;
-  Params(request: QueryGetParamsRequest): Promise<QueryGetParamsResponse>;
+  State(request: QueryGameStateRequest): Promise<QueryGameStateResponse>;
+  Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
 }
 
 export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   constructor(rpc: Rpc) {
     this.rpc = rpc;
-    this.GameState = this.GameState.bind(this);
-    this.Game = this.Game.bind(this);
+    this.FindByID = this.FindByID.bind(this);
+    this.FindByPlayer = this.FindByPlayer.bind(this);
+    this.State = this.State.bind(this);
     this.Params = this.Params.bind(this);
   }
-  GameState(
-    request: QueryGetGameStateRequest
-  ): Promise<QueryGetGameStateResponse> {
-    const data = QueryGetGameStateRequest.encode(request).finish();
-    const promise = this.rpc.request("rook.game.Query", "GameState", data);
+  FindByID(request: QueryGameByIDRequest): Promise<QueryGameByIDResponse> {
+    const data = QueryGameByIDRequest.encode(request).finish();
+    const promise = this.rpc.request("rook.game.Query", "FindByID", data);
     return promise.then((data) =>
-      QueryGetGameStateResponse.decode(new _m0.Reader(data))
+      QueryGameByIDResponse.decode(new _m0.Reader(data))
     );
   }
 
-  Game(request: QueryGetGameRequest): Promise<QueryGetGameResponse> {
-    const data = QueryGetGameRequest.encode(request).finish();
-    const promise = this.rpc.request("rook.game.Query", "Game", data);
+  FindByPlayer(
+    request: QueryGameByPlayerRequest
+  ): Promise<QueryGameByPlayerResponse> {
+    const data = QueryGameByPlayerRequest.encode(request).finish();
+    const promise = this.rpc.request("rook.game.Query", "FindByPlayer", data);
     return promise.then((data) =>
-      QueryGetGameResponse.decode(new _m0.Reader(data))
+      QueryGameByPlayerResponse.decode(new _m0.Reader(data))
     );
   }
 
-  Params(request: QueryGetParamsRequest): Promise<QueryGetParamsResponse> {
-    const data = QueryGetParamsRequest.encode(request).finish();
+  State(request: QueryGameStateRequest): Promise<QueryGameStateResponse> {
+    const data = QueryGameStateRequest.encode(request).finish();
+    const promise = this.rpc.request("rook.game.Query", "State", data);
+    return promise.then((data) =>
+      QueryGameStateResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
+    const data = QueryParamsRequest.encode(request).finish();
     const promise = this.rpc.request("rook.game.Query", "Params", data);
     return promise.then((data) =>
-      QueryGetParamsResponse.decode(new _m0.Reader(data))
+      QueryParamsResponse.decode(new _m0.Reader(data))
     );
   }
 }

@@ -21,6 +21,9 @@ export const typeMsgAddMode = "/rook.matchmaker.MsgAddMode"
 export const typeMsgRemoveMode = "/rook.matchmaker.MsgRemoveMode" 
 
 export const eventRoomUpdated = "rook.matchmaker.EventRoomUpdated"
+export const eventGameStarted = "rook.matchmaker.EventGameStarted"
+
+export const attributeRoomID = "room_id"
 
 export function registerMatchmakerMsgs(registry: Registry) {
     registry.register(typeMsgFind, MsgFind)
@@ -43,7 +46,7 @@ export class MatchmakerProvider {
 
     // we can only subscribe to a single room at a time
     private onUpdate?: (room: Room) => void
-    private onGameStart?: (id: number) => void
+    private onGameStart?: (id: Long) => void
     private room?: Room
 
     constructor(querier: QueryClient, client: SigningStargateClient, address: string) {
@@ -60,65 +63,78 @@ export class MatchmakerProvider {
                 if (parsedEvent.query === undefined) {
                     return
                 }
-                if (parsedEvent.query.contains("joined_room")) {
+                if (parsedEvent.query.contains(eventRoomUpdated)) {
                     this.parseJoinedRoomEvent(parsedEvent)
-                } else if (parsedEvent.query.contains("game_started")) {
+                } else if (parsedEvent.query.contains(eventGameStarted)) {
                     this.parseGameStartedEvent(parsedEvent)
                 }
             },
             (event: SocketWrapperErrorEvent) => { console.error(event)}
         )
+
+        // open websocket connection
         this.socket.connect()
     }
 
-    async subscribeToRoom(id: Long, onUpdate: (room: Room) => void): Promise<void> {
-        const subscribeMsg = {
+    async subscribeToRoom(id: Long, onUpdate: (room: Room) => void, onGameStart: (id: Long) => void): Promise<void> {
+        this.socket.connect()
+
+        if (this.room !== undefined) {
+            throw new Error("already subscribed to room events")
+        }
+
+        // fetch current room
+        const resp = await this.query.Room({id: id})
+        if (!resp.room) {
+            throw new Error("failed to subscribe to room events")
+        }
+
+        console.log("updating room")
+        console.log(resp.room)
+
+        // set up callbacks and fire the first one for the room update
+        this.onUpdate = onUpdate
+        this.onUpdate(resp.room)
+        this.onGameStart = onGameStart
+        this.room = resp.room
+
+        // await for the socket to be connected
+        await this.socket.connected
+        // open subscription for room updates
+        await this.socket.send(JSON.stringify({
             jsonrpc: "2.0",
             method: "subscribe",
             id: "0",
             params: {
-                query: `event_room_updated.room_id='${id}'`
+                query: `${eventRoomUpdated}.room_id='${id.toString()}'`
             }
-        } 
-        this.onUpdate = onUpdate
-        const resp = await this.query.Room({id: id})
-        if (resp.room) {
-            console.log("updating room")
-            console.log(resp.room)
-            this.onUpdate(resp.room)
-            this.room = resp.room
-            await this.socket.send(JSON.stringify(subscribeMsg))
-            console.log("subscribed to room")
-        } else {
-            throw new Error("failed to subscribe to room events")
-        }
+        }))
+        // open a subscription for when the game starts
+        await this.socket.send(JSON.stringify({
+            jsonrpc: "2.0",
+            method: "subscribe",
+            id: "0",
+            params: {
+                query: `${eventGameStarted}.room_id='${id}'`
+            }
+        }))
+        console.log("subscribed to room " + id)
     }
 
-    unsubscribeToRoom(id: Long): void {
-        const unsubscribeMsg = {
+    async unsubscribeToRoom(id: Long): Promise<void> {
+        // unsubscribe (this is perhaps not necessary)
+        await this.socket.send(JSON.stringify({
             jsonrpc: "2.0",
             method: "unsubscribe",
             id: "0"
-        }
-        this.socket.send(JSON.stringify(unsubscribeMsg))
+        }))
+        // clear callbacks
         this.onUpdate = undefined
-    }
+        this.onGameStart = undefined
+        this.room = undefined
 
-    subscribeToGameStart(player: string, onGameStart: (id: number) => void): void {
-        const subscribeMsg = {
-            jsonrpc: "2.0",
-            method: "subscribe",
-            id: "0",
-            params: {
-                query: `event_new_game.players='${player}'`
-            }
-        }
-        this.socket.send(JSON.stringify(subscribeMsg))
-        this.onGameStart = onGameStart
-    }
-
-    unsubscribeToGameStart(): void {
-        return
+        // disconnect socket
+        this.socket.disconnect()
     }
 
     private parseJoinedRoomEvent(event: any): void {
@@ -205,6 +221,7 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
             const events = JSON.parse(resp.rawLog)[0].events as Event[]
             for (const event of events) {
                 if (event.type === eventRoomUpdated) {
+                    
                     return {
                         roomId: Long.fromString(event.attributes[0].value.toString())
                     } as MsgHostResponse
@@ -232,17 +249,17 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
         if (resp.rawLog !== undefined) {
             const events = JSON.parse(resp.rawLog)[0].events as Event[]
             console.log(events)
-            for (const event of events) {
-                if (event.type === eventRoomUpdated) {
-                    // FIXME: we need to do some weird trimming of the "" in the string response
-                    let roomIDString = event.attributes[0].value.toString()
-                    roomIDString = roomIDString.substring(1, roomIDString.length - 1)
+            const event = findFirstEventType(events, eventRoomUpdated)
+            if (event) {
+                const roomIDStr = findValueFromEventKey(event, attributeRoomID)
+                if (roomIDStr) {
                     return {
-                        roomId: Long.fromString(roomIDString),
+                        roomId: Long.fromString(roomIDStr),
                     } as MsgHostResponse
                 }
+                throw new Error("could not find " + attributeRoomID + " attribute key.")
             }
-            throw new Error("no room events were emitted after transaction")
+            throw new Error("could not find " + eventRoomUpdated + " event.")
         }
         throw new Error("Unable to parse transaction response: " + JSON.stringify(resp))
     }
@@ -265,4 +282,29 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
         await this.send(request, typeMsgRemoveMode)
         return {}
     }
+}
+
+function findFirstEventType(events: Event[], type: string): Event | null {
+    for (const event of events) {
+        if (event.type === type) {
+            return event
+        }
+    }
+    return null
+}
+
+function findValueFromEventKey(event: Event, key: string): string | null {
+    for (const attribute of event.attributes) {
+        if (attribute.key.toString() === key) {
+            return parseAttributeString(attribute.value)
+        }
+    }
+    return null
+}
+
+function parseAttributeString(input: Uint8Array): string {
+    let str = input.toString()
+    // slice off the first and last value as they are ""
+    str = str.substring(1, input.length - 1)
+    return str
 }

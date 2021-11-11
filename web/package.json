@@ -9,6 +9,7 @@
   },
   "private": true,
   "dependencies": {
+    "@ant-design/icons": "^4.7.0",
     "@cosmjs/proto-signing": "^0.26.2",
     "@cosmjs/stargate": "^0.26.1",
     "antd": "^4.16.13",

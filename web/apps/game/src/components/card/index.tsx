@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import Loader from "react-loader-spinner"
+import { WarningOutlined } from '@ant-design/icons'
 
 import styles from  './card.module.less';
 
@@ -26,7 +27,7 @@ export interface NotConnectedCardProps {
 export const NotConnectedCard = (props: NotConnectedCardProps) => {
   return (
     <Card>
-      <h3 style={{ marginTop: "30px" }}>No Account Connected</h3>
+      <h3 style={{ marginTop: "20vh" }}>No Account Connected</h3>
       <p>Please install the Keplr extension and login to an account to continue. If you have Keplr installed and are connected than press retry.</p>
       <button className={styles.button} onClick={props.connectFn}>Retry</button>
     </Card>
@@ -40,14 +41,34 @@ export interface LoadingProps {
 export const LoadingCard = (props: LoadingProps) => {
   return (
     <Card>
-      <Loader
-        type="Puff"
-        color="#00BFFF"
-        height={100}
-        width={100}
-        timeout={3000} //3 secs
-      />
-      { props.message ? "Loading..." : props.message }
+      <div style={{marginTop: "15vh"}}> 
+        <Loader
+          type="Rings"
+          color="black"
+          height={100}
+          width={100}
+        />
+        <p>
+          { props.message ? props.message : "Loading..." }
+        </p>
+      </div>
+    </Card>
+  )
+}
+
+export interface ErrorProps {
+  error: string 
+}
+
+export const ErrorCard = (props: ErrorProps) => {
+  return (
+    <Card>
+      <div style={{marginTop: "20vh"}}>
+        <WarningOutlined className={styles.errorIcon} />
+        <p>
+          {props.error}
+        </p>
+      </div>
     </Card>
   )
 }

@@ -4,7 +4,8 @@ import Matchmaker from '../components/matchmaker';
 import { Provider } from '../components/provider';
 import { IndexedMode, Room } from '../codec/rook/matchmaker/matchmaker'
 import { Account } from '../components/account'
-import { NotConnectedCard } from '../components/card'
+import { NotConnectedCard, ErrorCard } from '../components/card'
+import { ErrKeplrNotEnabled } from '../components/provider/errors';
 
 
 declare global {
@@ -15,6 +16,8 @@ export interface AppState {
   modes: IndexedMode[]
   address: string
   balance: number
+  error?: Error
+  viewMode: boolean
 }
 
 class App extends React.Component<any, AppState> {
@@ -26,6 +29,7 @@ class App extends React.Component<any, AppState> {
       modes: [],
       address: "",
       balance: 0,
+      viewMode: false
     }
     this.connectWallet = this.connectWallet.bind(this)
   }
@@ -44,7 +48,13 @@ class App extends React.Component<any, AppState> {
   async connectWallet() {
     if (this.provider) 
       return
-    this.provider = await Provider.connect()
+    try {
+      this.provider = await Provider.connect()
+    } catch (err) {
+      console.error(err)
+      this.setState({ error: err as Error })
+      return
+    }
     const resp = await this.provider.matchmaker.query.Modes({})
     const address = this.provider.getAddress()
     const balance = await this.provider.getBalance()
@@ -56,6 +66,12 @@ class App extends React.Component<any, AppState> {
   }
 
   render() {
+    if (this.state.error) {
+      return (
+        <ErrorCard error={this.state.error.message} />
+      )
+    }
+
     const isConnected = this.provider !== null
     return (
       <div>

@@ -5,6 +5,12 @@ import { Registry } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing'
 import { GameProvider, registerGameMsgs } from './game'
 import _m0 from "protobufjs/minimal";
 import { MatchmakerProvider, registerMatchmakerMsgs } from './matchmaker'
+import { 
+  ErrKeplrNotEnabled,
+  ErrNodeNotConnected,
+  ErrUnableToSuggestChain,
+  ErrNoAccount
+} from './errors'
 
 export class Provider {
     private client: SigningStargateClient
@@ -26,15 +32,24 @@ export class Provider {
 
     public static async connect(): Promise<Provider> {
         if (!keplrEnabled() || !window.keplr.experimentalSuggestChain) {
-            throw new Error("keplr is not connected. Please install the extension first")
+            throw ErrKeplrNotEnabled
         }
 
         console.log("attempting to connect with keplr wallet")
 
         try { 
-            suggestChainToKeplr()
-        } catch {
-            throw new Error("unable to suggest rook chain to keplr")
+          suggestChainToKeplr()
+        } catch (err) {
+          console.error(err)
+          throw ErrUnableToSuggestChain(err as string)
+        }
+
+        let tmClient: Tendermint34Client
+        try {
+          tmClient = await Tendermint34Client.connect(config.rpcEndpoint)
+        } catch (err) {
+          console.error(err)
+          throw ErrNodeNotConnected(config.rpcEndpoint)
         }
 
         window.keplr.enable(config.chainID)
@@ -51,12 +66,11 @@ export class Provider {
             { registry: registry }
         )
 
-        const tmClient = await Tendermint34Client.connect(config.rpcEndpoint)
         const querier = QueryClient.withExtensions(tmClient)
 
         const accounts = await offlineSigner.getAccounts()
         if (accounts.length === 0)
-            throw new Error("keplr has no accounts")
+            throw ErrNoAccount
 
         return new Provider(client, querier, accounts[0].address)
     }

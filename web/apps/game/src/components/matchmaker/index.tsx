@@ -17,6 +17,7 @@ export interface MMState {
   roomID: Long
   room?: Room
   mode?: Mode
+  loading?: string
 }
 
 type Status = 'home' | 'find' | 'host' | 'join' | 'room' | 'mode'
@@ -46,6 +47,7 @@ class Matchmaker extends React.Component<MMProps, MMState> {
     // if there is only one mode then we use that one
     if (this.props.modes.length === 1) {
       try {
+        this.setState({ loading: "Finding Game..."})
         const resp = await this.props.provider.tx.Find({
           player: this.props.address,
           mode: this.props.modes[0].modeId
@@ -53,13 +55,16 @@ class Matchmaker extends React.Component<MMProps, MMState> {
         this.setState({
           mode: this.props.modes[0].mode,
           roomID: resp.roomId,
-          status: "room"
+          status: "room",
+          loading: undefined
         })
         console.log(resp)
         await this.props.provider.subscribeToRoom(resp.roomId, (room: Room): void => {
           this.setState({
             room: room,
           })
+        }, (id: Long) => {
+          console.log("starting game: " + id)
         })
       } catch (err) {
         console.error(err)
@@ -74,13 +79,14 @@ class Matchmaker extends React.Component<MMProps, MMState> {
   }
 
   render() {
-    if (this.props.modes.length === 0) {
-      return (
-          <LoadingCard
-            message="Loading modes..."
-          />
-      )
+    if (this.state.loading) {
+      return <LoadingCard message={this.state.loading} />
     }
+
+    if (this.props.modes.length === 0) {
+      return <LoadingCard message="Loading modes..."/>
+    }
+
     switch (this.state.status) {
       case 'home':
         return <HomeComponent find={this.findGame} host={this.hostGame} join={this.joinGame} />

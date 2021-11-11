@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -32,24 +33,65 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 
 func CmdQueryGame() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "find [id]",
-		Short: "finds a game by id",
+		Use:   "find [id|player]",
+		Short: "Find a game by id or by player",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
+			queryClient := types.NewQueryClient(clientCtx)
+
+			if strings.Contains(args[0], "rook") {
+				req := &types.QueryGameByPlayerRequest{
+					Player: args[0],
+				}
+
+				res, err := queryClient.FindByPlayer(context.Background(), req)
+				if err != nil {
+					return err
+				}
+
+				return clientCtx.PrintProto(res)
+			}
 
 			id, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
 
-			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGameByIDRequest{
+			req := &types.QueryGameByIDRequest{
 				Id: id,
 			}
 
-			res, err := queryClient.FindByID(context.Background(), params)
+			res, err := queryClient.FindByID(context.Background(), req)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// func CmdQueryAllGames() *cobra.Command {
+
+// }
+
+func CmdQueryParams() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "params",
+		Short: "Query the current game params",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			queryClient := types.NewQueryClient(clientCtx)
+
+			req := &types.QueryParamsRequest{Version: 0}
+			res, err := queryClient.Params(context.Background(), req)
 			if err != nil {
 				return err
 			}
