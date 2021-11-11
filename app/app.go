@@ -357,21 +357,20 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
-	// this line is used by starport scaffolding # stargate/app/keeperDefinition
-	app.MatchmakerKeeper = matchmakerkeeper.NewKeeper(
-		appCodec,
-		keys[matchmakertypes.StoreKey],
-		app.GetSubspace(matchmakertypes.ModuleName),
-		app.BaseApp.MsgServiceRouter(),
-	)
-	matchmakerModule := matchmaker.NewAppModule(appCodec, app.MatchmakerKeeper)
-
 	app.GameKeeper = gamekeeper.NewKeeper(
 		appCodec,
 		keys[gametypes.StoreKey],
 		memKeys[gametypes.MemStoreKey],
 	)
 	gameModule := game.NewAppModule(appCodec, app.GameKeeper)
+
+	app.MatchmakerKeeper = matchmakerkeeper.NewKeeper(
+		appCodec,
+		keys[matchmakertypes.StoreKey],
+		app.GetSubspace(matchmakertypes.ModuleName),
+		gamekeeper.NewMsgServerImpl(app.GameKeeper),
+	)
+	matchmakerModule := matchmaker.NewAppModule(appCodec, app.MatchmakerKeeper)
 
 	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,

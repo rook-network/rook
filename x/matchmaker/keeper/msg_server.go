@@ -21,6 +21,11 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = msgServer{}
 
+// Host creates a new game, either a custom or common one, where the host is the only player.
+// Games can be public or private. In the case of private, the host needs to specify which accounts
+// are allowed to join. Hosting a game will remove the player from any account they might currently be in.
+//
+// TODO: Hosts can start a room whilst already participating in a game. We should also add a check that prevents this
 func (m msgServer) Host(goCtx context.Context, msg *types.MsgHost) (*types.MsgHostResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -47,6 +52,12 @@ func (m msgServer) Host(goCtx context.Context, msg *types.MsgHost) (*types.MsgHo
 		}
 		room = types.NewCommonRoom(g.ModeId, []string{msg.Host}, msg.Invitees,
 			msg.Public, mode.Quorum, mode.Capacity, time)
+
+		// if the host is hosting a public common room and none already
+		// exists then we declare it as a common room so other participants can find it
+		if msg.Public && !m.Keeper.HasCommonRoom(ctx, g.ModeId) {
+			m.Keeper.SetCommonRoom(ctx, g.ModeId, roomID)
+		}
 	}
 
 	m.Keeper.SetRoom(ctx, roomID, room)
@@ -152,6 +163,14 @@ func (m msgServer) Leave(goCtx context.Context, msg *types.MsgLeave) (*types.Msg
 // a new mode. There's also no checks for equality of existing modes.
 func (m msgServer) AddMode(goCtx context.Context, msg *types.MsgAddMode) (*types.MsgAddModeResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	existingMode, counter := m.Keeper.CheckForMode(ctx, msg.Mode)
+	if existingMode != 0 {
+		return &types.MsgAddModeResponse{ModeId: existingMode}, nil
+	}
+	if counter >= types.MaxModes {
+		return nil, types.ErrModeCapacityReached
+	}
 
 	modeID := m.Keeper.GetNextModeID(ctx)
 

@@ -7,7 +7,11 @@ import (
 	game "github.com/arcane-systems/rook/x/game/types"
 )
 
-const MaxRoomCapacity = 64
+// Set some hard-coded caps on size of rooms and amount of different modes
+const (
+	MaxRoomCapacity = 64
+	MaxModes        = 16
+)
 
 func NewCustomRoom(config game.Config, players, pending []string, public bool, quorum, capacity uint32, created time.Time) Room {
 	return Room{

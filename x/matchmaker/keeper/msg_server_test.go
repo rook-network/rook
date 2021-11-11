@@ -126,7 +126,56 @@ func TestMatchmakerHostAndJoinPublicRoom(t *testing.T) {
 }
 
 func TestMatchmakerInvitationsToPrivateGame(t *testing.T) {
+	dir := t.TempDir()
+	app := simapp.New(dir)
+	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+	goCtx := sdk.WrapSDKContext(ctx)
+	addrs := simapp.AddTestAddrsIncremental(app, ctx, 4, sdk.NewInt(30000000))
+	alice, bob, charles, david := addrs[0].String(), addrs[1].String(), addrs[2].String(), addrs[3].String()
 
+	server := keeper.NewMsgServerImpl(app.MatchmakerKeeper)
+	querier := app.MatchmakerKeeper
+
+	mode := types.DefaultMode()
+	msgHost := types.NewMsgHost(bob, []string{alice, charles}, &mode, false)
+	require.NoError(t, msgHost.ValidateBasic())
+
+	hostResp, err := server.Host(goCtx, msgHost)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), hostResp.RoomId)
+
+	roomResp, err := querier.Room(goCtx, &types.QueryGetRoomRequest{Id: hostResp.RoomId})
+	require.NoError(t, err)
+	require.False(t, roomResp.Room.Public)
+	require.Equal(t, []string{bob}, roomResp.Room.Players)
+
+	// When we query for rooms the new room should not be shown as it is private
+	roomsResp, err := querier.Rooms(goCtx, &types.QueryGetRoomsRequest{})
+	require.NoError(t, err)
+	require.Empty(t, roomsResp.Rooms)
+
+	// Alice should be able to join the room
+	_, err = server.Join(goCtx, types.NewMsgJoin(alice, hostResp.RoomId))
+	require.NoError(t, err)
+
+	// David should not be able to join the room
+	_, err = server.Join(goCtx, types.NewMsgJoin(david, hostResp.RoomId))
+	require.Error(t, err)
+
+	// Bob then decides to find another game. This should create a new room
+	findResp, err := server.Find(goCtx, types.NewMsgFind(bob, 1))
+	require.NoError(t, err)
+	require.Equal(t, uint64(2), findResp.RoomId)
+
+	// alice should be the only player in room 1
+	roomResp, err = querier.Room(goCtx, &types.QueryGetRoomRequest{Id: hostResp.RoomId})
+	require.NoError(t, err)
+	require.Equal(t, []string{alice}, roomResp.Room.Players)
+
+	// bob should be the only player in room 2
+	roomResp, err = querier.Room(goCtx, &types.QueryGetRoomRequest{Id: findResp.RoomId})
+	require.NoError(t, err)
+	require.Equal(t, []string{bob}, roomResp.Room.Players)
 }
 
 func TestMatchmakerAddAndRemoveModes(t *testing.T) {

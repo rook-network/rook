@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/tendermint/tendermint/libs/log"
-
+	"github.com/tendermint/tendermint/crypto/tmhash"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -165,7 +165,7 @@ func (k Keeper) FindPlayer(ctx sdk.Context, player string) (bool, types.IndexedR
 		for _, roomPlayer := range room.Players {
 			if roomPlayer == player {
 				return true, types.IndexedRoom{
-					RoomId: types.ParseRoomID(roomIter.Key()),
+					RoomId: types.ParseRoomKey(roomIter.Key()),
 					Room:   room,
 				}
 			}
@@ -292,6 +292,29 @@ func (k Keeper) GetAllModes(ctx sdk.Context) []types.Mode {
 	return modes
 }
 
+// CheckForMode uses hashes to check that a mode is unique. If it is not it returns the
+// modeID of the existing mode. CheckForMode also keeps a count of the amount of current modes there are
+func (k Keeper) CheckForMode(ctx sdk.Context, mode types.Mode) (uint32, int) {
+	store := ctx.KVStore(k.storeKey)
+
+	modeHashMap := make(map[string]struct{})
+	counter := 0
+
+	modeIter := store.Iterator(
+		types.ModeKey(0),
+		types.ModeKey(1<<31-1),
+	)
+	for ; modeIter.Valid(); modeIter.Next() {
+		counter++
+		modeHash := tmhash.Sum(modeIter.Value())
+		if _, exists := modeHashMap[string(modeHash)]; exists {
+			return types.ParseModeKey(modeIter.Key()), 0
+		}		
+		modeHashMap[string(modeHash)] = struct{}{}
+	}
+	return 0, counter
+}
+
 func (k Keeper) IncrementNextModeID(ctx sdk.Context) {
 	store := ctx.KVStore(k.storeKey)
 
@@ -331,9 +354,18 @@ func (k Keeper) DeleteMode(ctx sdk.Context, modeID uint32) {
 
 func (k Keeper) GetCommonRoom(ctx sdk.Context, modeID uint32) (uint64, types.Room, bool) {
 	store := ctx.KVStore(k.storeKey)
-	roomID := types.ParseRoomID(store.Get(types.CommonRoomKey(modeID)))
+	bz := store.Get(types.CommonRoomKey(modeID))
+	if len(bz) == 0 {
+		return 0, types.Room{}, false
+	}
+	roomID := types.ParseRoomID(bz)
 	room, exists := k.GetRoom(ctx, roomID)
 	return roomID, room, exists
+}
+
+func (k Keeper) HasCommonRoom(ctx sdk.Context, modeID uint32) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.CommonRoomKey(modeID))
 }
 
 func (k Keeper) SetCommonRoom(ctx sdk.Context, modeID uint32, roomID uint64) {

@@ -13,5 +13,6 @@ var (
 	ErrPlayerNotInvited    = sdkerrors.Register(ModuleName, 3, "player has not been invited to this room")
 	ErrRoomIsFull          = sdkerrors.Register(ModuleName, 4, "room is full")
 	ErrModeNotFound        = sdkerrors.Register(ModuleName, 5, "mode not found")
-	// this line is used by starport scaffolding # ibc/errors
+	ErrModeAlreadyExists   = sdkerrors.Register(ModuleName, 6, "mode already exists")
+	ErrModeCapacityReached = sdkerrors.Register(ModuleName, 7, "max capacity of diffennt modes has been reached")
 )

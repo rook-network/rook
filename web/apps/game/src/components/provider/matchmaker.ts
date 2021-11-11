@@ -233,9 +233,11 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
             console.log(events)
             for (const event of events) {
                 if (event.type === eventRoomUpdated) {
-                    console.log("room id: " + event.attributes[0].value.toString())
+                    // FIXME: we need to do some weird trimming of the "" in the string response
+                    let roomIDString = event.attributes[0].value.toString()
+                    roomIDString = roomIDString.substring(1, roomIDString.length - 1)
                     return {
-                        roomId: Long.fromString(event.attributes[0].value.toString())
+                        roomId: Long.fromString(roomIDString),
                     } as MsgHostResponse
                 }
             }
