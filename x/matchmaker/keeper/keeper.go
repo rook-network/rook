@@ -346,6 +346,11 @@ func (k Keeper) GetMode(ctx sdk.Context, modeID uint32) (types.Mode, bool) {
 	return mode, true
 }
 
+func (k Keeper) HasMode(ctx sdk.Context, modeID uint32) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.ModeKey(modeID))
+}
+
 func (k Keeper) DeleteMode(ctx sdk.Context, modeID uint32) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.ModeKey(modeID))

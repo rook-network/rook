@@ -11,37 +11,49 @@ option go_package = "github.com/arcane-systems/rook/x/game/types";
 service Query {
   // this line is used by starport scaffolding # 2
 
-  // Queries a game state by id.
-  rpc GameState(QueryGetGameStateRequest) returns (QueryGetGameStateResponse) {
-    option (google.api.http).get = "/game/state/{id}";
-  }
-
-  rpc Game(QueryGetGameRequest) returns (QueryGetGameResponse) {
+  rpc FindByID(QueryGameByIDRequest) returns (QueryGameByIDResponse) {
     option (google.api.http).get = "/game/game/{id}";
   }
 
-  rpc Params(QueryGetParamsRequest) returns (QueryGetParamsResponse) {
+  rpc FindByPlayer(QueryGameByPlayerRequest)
+      returns (QueryGameByPlayerResponse) {
+    option (google.api.http).get = "/game/game/{player}";
+  }
+
+  // Queries a game state by id.
+  rpc State(QueryGameStateRequest) returns (QueryGameStateResponse) {
+    option (google.api.http).get = "/game/state/{id}";
+  }
+
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/game/params/{version}";
   }
 }
 
 // this line is used by starport scaffolding # 3
-message QueryGetGameStateRequest { uint64 id = 1; }
+message QueryGameStateRequest { uint64 id = 1; }
 
-message QueryGetGameStateResponse {
+message QueryGameStateResponse {
   State state = 1 [ (gogoproto.nullable) = false ];
 }
 
-message QueryGetGameRequest { uint64 id = 1; }
+message QueryGameByIDRequest { uint64 id = 1; }
 
-message QueryGetGameResponse {
+message QueryGameByIDResponse {
   Overview overview = 1 [ (gogoproto.nullable) = false ];
   uint64 id = 2;
 }
 
-message QueryGetParamsRequest { uint32 version = 1; }
+message QueryGameByPlayerRequest { string player = 1; }
 
-message QueryGetParamsResponse {
+message QueryGameByPlayerResponse {
+  Overview overview = 1 [ (gogoproto.nullable) = false ];
+  uint64 id = 2;
+}
+
+message QueryParamsRequest { uint32 version = 1; }
+
+message QueryParamsResponse {
   Params params = 1 [ (gogoproto.nullable) = false ];
   uint32 version = 2;
 }

@@ -30,22 +30,22 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // this line is used by starport scaffolding # 3
-type QueryGetGameStateRequest struct {
+type QueryGameStateRequest struct {
 	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
-func (m *QueryGetGameStateRequest) Reset()         { *m = QueryGetGameStateRequest{} }
-func (m *QueryGetGameStateRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetGameStateRequest) ProtoMessage()    {}
-func (*QueryGetGameStateRequest) Descriptor() ([]byte, []int) {
+func (m *QueryGameStateRequest) Reset()         { *m = QueryGameStateRequest{} }
+func (m *QueryGameStateRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGameStateRequest) ProtoMessage()    {}
+func (*QueryGameStateRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7f1203146315805f, []int{0}
 }
-func (m *QueryGetGameStateRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryGameStateRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetGameStateRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGameStateRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetGameStateRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGameStateRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -55,41 +55,41 @@ func (m *QueryGetGameStateRequest) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-func (m *QueryGetGameStateRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetGameStateRequest.Merge(m, src)
+func (m *QueryGameStateRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGameStateRequest.Merge(m, src)
 }
-func (m *QueryGetGameStateRequest) XXX_Size() int {
+func (m *QueryGameStateRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetGameStateRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetGameStateRequest.DiscardUnknown(m)
+func (m *QueryGameStateRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGameStateRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetGameStateRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryGameStateRequest proto.InternalMessageInfo
 
-func (m *QueryGetGameStateRequest) GetId() uint64 {
+func (m *QueryGameStateRequest) GetId() uint64 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
-type QueryGetGameStateResponse struct {
+type QueryGameStateResponse struct {
 	State State `protobuf:"bytes,1,opt,name=state,proto3" json:"state"`
 }
 
-func (m *QueryGetGameStateResponse) Reset()         { *m = QueryGetGameStateResponse{} }
-func (m *QueryGetGameStateResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetGameStateResponse) ProtoMessage()    {}
-func (*QueryGetGameStateResponse) Descriptor() ([]byte, []int) {
+func (m *QueryGameStateResponse) Reset()         { *m = QueryGameStateResponse{} }
+func (m *QueryGameStateResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGameStateResponse) ProtoMessage()    {}
+func (*QueryGameStateResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7f1203146315805f, []int{1}
 }
-func (m *QueryGetGameStateResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryGameStateResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetGameStateResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGameStateResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetGameStateResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGameStateResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -99,41 +99,41 @@ func (m *QueryGetGameStateResponse) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
-func (m *QueryGetGameStateResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetGameStateResponse.Merge(m, src)
+func (m *QueryGameStateResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGameStateResponse.Merge(m, src)
 }
-func (m *QueryGetGameStateResponse) XXX_Size() int {
+func (m *QueryGameStateResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetGameStateResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetGameStateResponse.DiscardUnknown(m)
+func (m *QueryGameStateResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGameStateResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetGameStateResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryGameStateResponse proto.InternalMessageInfo
 
-func (m *QueryGetGameStateResponse) GetState() State {
+func (m *QueryGameStateResponse) GetState() State {
 	if m != nil {
 		return m.State
 	}
 	return State{}
 }
 
-type QueryGetGameRequest struct {
+type QueryGameByIDRequest struct {
 	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
-func (m *QueryGetGameRequest) Reset()         { *m = QueryGetGameRequest{} }
-func (m *QueryGetGameRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetGameRequest) ProtoMessage()    {}
-func (*QueryGetGameRequest) Descriptor() ([]byte, []int) {
+func (m *QueryGameByIDRequest) Reset()         { *m = QueryGameByIDRequest{} }
+func (m *QueryGameByIDRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGameByIDRequest) ProtoMessage()    {}
+func (*QueryGameByIDRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7f1203146315805f, []int{2}
 }
-func (m *QueryGetGameRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryGameByIDRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetGameRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGameByIDRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetGameRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGameByIDRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -143,42 +143,42 @@ func (m *QueryGetGameRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *QueryGetGameRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetGameRequest.Merge(m, src)
+func (m *QueryGameByIDRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGameByIDRequest.Merge(m, src)
 }
-func (m *QueryGetGameRequest) XXX_Size() int {
+func (m *QueryGameByIDRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetGameRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetGameRequest.DiscardUnknown(m)
+func (m *QueryGameByIDRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGameByIDRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetGameRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryGameByIDRequest proto.InternalMessageInfo
 
-func (m *QueryGetGameRequest) GetId() uint64 {
+func (m *QueryGameByIDRequest) GetId() uint64 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
-type QueryGetGameResponse struct {
+type QueryGameByIDResponse struct {
 	Overview Overview `protobuf:"bytes,1,opt,name=overview,proto3" json:"overview"`
 	Id       uint64   `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
 }
 
-func (m *QueryGetGameResponse) Reset()         { *m = QueryGetGameResponse{} }
-func (m *QueryGetGameResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetGameResponse) ProtoMessage()    {}
-func (*QueryGetGameResponse) Descriptor() ([]byte, []int) {
+func (m *QueryGameByIDResponse) Reset()         { *m = QueryGameByIDResponse{} }
+func (m *QueryGameByIDResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGameByIDResponse) ProtoMessage()    {}
+func (*QueryGameByIDResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7f1203146315805f, []int{3}
 }
-func (m *QueryGetGameResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryGameByIDResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetGameResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGameByIDResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetGameResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGameByIDResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -188,48 +188,48 @@ func (m *QueryGetGameResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte
 		return b[:n], nil
 	}
 }
-func (m *QueryGetGameResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetGameResponse.Merge(m, src)
+func (m *QueryGameByIDResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGameByIDResponse.Merge(m, src)
 }
-func (m *QueryGetGameResponse) XXX_Size() int {
+func (m *QueryGameByIDResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetGameResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetGameResponse.DiscardUnknown(m)
+func (m *QueryGameByIDResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGameByIDResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetGameResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryGameByIDResponse proto.InternalMessageInfo
 
-func (m *QueryGetGameResponse) GetOverview() Overview {
+func (m *QueryGameByIDResponse) GetOverview() Overview {
 	if m != nil {
 		return m.Overview
 	}
 	return Overview{}
 }
 
-func (m *QueryGetGameResponse) GetId() uint64 {
+func (m *QueryGameByIDResponse) GetId() uint64 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
-type QueryGetParamsRequest struct {
-	Version uint32 `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
+type QueryGameByPlayerRequest struct {
+	Player string `protobuf:"bytes,1,opt,name=player,proto3" json:"player,omitempty"`
 }
 
-func (m *QueryGetParamsRequest) Reset()         { *m = QueryGetParamsRequest{} }
-func (m *QueryGetParamsRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetParamsRequest) ProtoMessage()    {}
-func (*QueryGetParamsRequest) Descriptor() ([]byte, []int) {
+func (m *QueryGameByPlayerRequest) Reset()         { *m = QueryGameByPlayerRequest{} }
+func (m *QueryGameByPlayerRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGameByPlayerRequest) ProtoMessage()    {}
+func (*QueryGameByPlayerRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7f1203146315805f, []int{4}
 }
-func (m *QueryGetParamsRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryGameByPlayerRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetParamsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGameByPlayerRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetParamsRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGameByPlayerRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -239,42 +239,138 @@ func (m *QueryGetParamsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *QueryGetParamsRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetParamsRequest.Merge(m, src)
+func (m *QueryGameByPlayerRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGameByPlayerRequest.Merge(m, src)
 }
-func (m *QueryGetParamsRequest) XXX_Size() int {
+func (m *QueryGameByPlayerRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetParamsRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetParamsRequest.DiscardUnknown(m)
+func (m *QueryGameByPlayerRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGameByPlayerRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetParamsRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryGameByPlayerRequest proto.InternalMessageInfo
 
-func (m *QueryGetParamsRequest) GetVersion() uint32 {
+func (m *QueryGameByPlayerRequest) GetPlayer() string {
+	if m != nil {
+		return m.Player
+	}
+	return ""
+}
+
+type QueryGameByPlayerResponse struct {
+	Overview Overview `protobuf:"bytes,1,opt,name=overview,proto3" json:"overview"`
+	Id       uint64   `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *QueryGameByPlayerResponse) Reset()         { *m = QueryGameByPlayerResponse{} }
+func (m *QueryGameByPlayerResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGameByPlayerResponse) ProtoMessage()    {}
+func (*QueryGameByPlayerResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7f1203146315805f, []int{5}
+}
+func (m *QueryGameByPlayerResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryGameByPlayerResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryGameByPlayerResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryGameByPlayerResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGameByPlayerResponse.Merge(m, src)
+}
+func (m *QueryGameByPlayerResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryGameByPlayerResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGameByPlayerResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryGameByPlayerResponse proto.InternalMessageInfo
+
+func (m *QueryGameByPlayerResponse) GetOverview() Overview {
+	if m != nil {
+		return m.Overview
+	}
+	return Overview{}
+}
+
+func (m *QueryGameByPlayerResponse) GetId() uint64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+type QueryParamsRequest struct {
+	Version uint32 `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
+}
+
+func (m *QueryParamsRequest) Reset()         { *m = QueryParamsRequest{} }
+func (m *QueryParamsRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryParamsRequest) ProtoMessage()    {}
+func (*QueryParamsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7f1203146315805f, []int{6}
+}
+func (m *QueryParamsRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryParamsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryParamsRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryParamsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryParamsRequest.Merge(m, src)
+}
+func (m *QueryParamsRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryParamsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryParamsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryParamsRequest proto.InternalMessageInfo
+
+func (m *QueryParamsRequest) GetVersion() uint32 {
 	if m != nil {
 		return m.Version
 	}
 	return 0
 }
 
-type QueryGetParamsResponse struct {
+type QueryParamsResponse struct {
 	Params  Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
 	Version uint32 `protobuf:"varint,2,opt,name=version,proto3" json:"version,omitempty"`
 }
 
-func (m *QueryGetParamsResponse) Reset()         { *m = QueryGetParamsResponse{} }
-func (m *QueryGetParamsResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetParamsResponse) ProtoMessage()    {}
-func (*QueryGetParamsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7f1203146315805f, []int{5}
+func (m *QueryParamsResponse) Reset()         { *m = QueryParamsResponse{} }
+func (m *QueryParamsResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryParamsResponse) ProtoMessage()    {}
+func (*QueryParamsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7f1203146315805f, []int{7}
 }
-func (m *QueryGetParamsResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryParamsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetParamsResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryParamsResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -284,26 +380,26 @@ func (m *QueryGetParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-func (m *QueryGetParamsResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetParamsResponse.Merge(m, src)
+func (m *QueryParamsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryParamsResponse.Merge(m, src)
 }
-func (m *QueryGetParamsResponse) XXX_Size() int {
+func (m *QueryParamsResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetParamsResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetParamsResponse.DiscardUnknown(m)
+func (m *QueryParamsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryParamsResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetParamsResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryParamsResponse proto.InternalMessageInfo
 
-func (m *QueryGetParamsResponse) GetParams() Params {
+func (m *QueryParamsResponse) GetParams() Params {
 	if m != nil {
 		return m.Params
 	}
 	return Params{}
 }
 
-func (m *QueryGetParamsResponse) GetVersion() uint32 {
+func (m *QueryParamsResponse) GetVersion() uint32 {
 	if m != nil {
 		return m.Version
 	}
@@ -311,47 +407,53 @@ func (m *QueryGetParamsResponse) GetVersion() uint32 {
 }
 
 func init() {
-	proto.RegisterType((*QueryGetGameStateRequest)(nil), "rook.game.QueryGetGameStateRequest")
-	proto.RegisterType((*QueryGetGameStateResponse)(nil), "rook.game.QueryGetGameStateResponse")
-	proto.RegisterType((*QueryGetGameRequest)(nil), "rook.game.QueryGetGameRequest")
-	proto.RegisterType((*QueryGetGameResponse)(nil), "rook.game.QueryGetGameResponse")
-	proto.RegisterType((*QueryGetParamsRequest)(nil), "rook.game.QueryGetParamsRequest")
-	proto.RegisterType((*QueryGetParamsResponse)(nil), "rook.game.QueryGetParamsResponse")
+	proto.RegisterType((*QueryGameStateRequest)(nil), "rook.game.QueryGameStateRequest")
+	proto.RegisterType((*QueryGameStateResponse)(nil), "rook.game.QueryGameStateResponse")
+	proto.RegisterType((*QueryGameByIDRequest)(nil), "rook.game.QueryGameByIDRequest")
+	proto.RegisterType((*QueryGameByIDResponse)(nil), "rook.game.QueryGameByIDResponse")
+	proto.RegisterType((*QueryGameByPlayerRequest)(nil), "rook.game.QueryGameByPlayerRequest")
+	proto.RegisterType((*QueryGameByPlayerResponse)(nil), "rook.game.QueryGameByPlayerResponse")
+	proto.RegisterType((*QueryParamsRequest)(nil), "rook.game.QueryParamsRequest")
+	proto.RegisterType((*QueryParamsResponse)(nil), "rook.game.QueryParamsResponse")
 }
 
 func init() { proto.RegisterFile("rook/game/query.proto", fileDescriptor_7f1203146315805f) }
 
 var fileDescriptor_7f1203146315805f = []byte{
-	// 454 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x93, 0xdf, 0x8a, 0xd3, 0x40,
-	0x18, 0xc5, 0x93, 0xd0, 0xad, 0xee, 0x27, 0xea, 0xee, 0x6c, 0x77, 0x8d, 0x41, 0x66, 0xd7, 0xa8,
-	0x20, 0xfe, 0xc9, 0xe0, 0x8a, 0x2f, 0xb0, 0x20, 0x8b, 0x57, 0x6a, 0xbc, 0x13, 0x04, 0x67, 0xdb,
-	0x21, 0x0e, 0x9a, 0x4c, 0x36, 0x33, 0xad, 0x96, 0xa5, 0x37, 0x3e, 0x81, 0xe0, 0x4b, 0x15, 0xaf,
-	0x0a, 0xde, 0x78, 0x25, 0xd2, 0xfa, 0x20, 0x92, 0x99, 0x49, 0x9a, 0x4a, 0xd3, 0x9b, 0x90, 0x9c,
-	0x39, 0x39, 0xbf, 0xc3, 0x37, 0x33, 0xb0, 0x5f, 0x08, 0xf1, 0x91, 0x24, 0x34, 0x65, 0xe4, 0x7c,
-	0xc8, 0x8a, 0x71, 0x94, 0x17, 0x42, 0x09, 0xb4, 0x5d, 0xca, 0x51, 0x29, 0x07, 0xbd, 0x44, 0x24,
-	0x42, 0xab, 0xa4, 0x7c, 0x33, 0x86, 0xe0, 0x56, 0x22, 0x44, 0xf2, 0x89, 0x11, 0x9a, 0x73, 0x42,
-	0xb3, 0x4c, 0x28, 0xaa, 0xb8, 0xc8, 0xa4, 0x5d, 0xed, 0x2d, 0x53, 0xcb, 0x87, 0x51, 0xc3, 0x07,
-	0xe0, 0xbf, 0x2e, 0x19, 0xa7, 0x4c, 0x9d, 0xd2, 0x94, 0xbd, 0x51, 0x54, 0xb1, 0x98, 0x9d, 0x0f,
-	0x99, 0x54, 0xe8, 0x1a, 0x78, 0x7c, 0xe0, 0xbb, 0x47, 0xee, 0xfd, 0x4e, 0xec, 0xf1, 0x41, 0xf8,
-	0x02, 0x6e, 0xae, 0xf1, 0xca, 0x5c, 0x64, 0x92, 0xa1, 0x47, 0xb0, 0x25, 0x4b, 0x41, 0xfb, 0xaf,
-	0x1c, 0xef, 0x44, 0x75, 0xdb, 0x48, 0x1b, 0x4f, 0x3a, 0xd3, 0xdf, 0x87, 0x4e, 0x6c, 0x4c, 0xe1,
-	0x3d, 0xd8, 0x6b, 0x46, 0xb5, 0x11, 0xdf, 0x41, 0x6f, 0xd5, 0x66, 0x61, 0xcf, 0xe0, 0xb2, 0x18,
-	0xb1, 0x62, 0xc4, 0xd9, 0x67, 0xcb, 0xdb, 0x6b, 0xf0, 0x5e, 0xda, 0x25, 0x8b, 0xac, 0xad, 0x36,
-	0xde, 0xab, 0xe3, 0x9f, 0xc0, 0x7e, 0x15, 0xff, 0x8a, 0x16, 0x34, 0x95, 0x55, 0x0f, 0x1f, 0x2e,
-	0x8d, 0x58, 0x21, 0xb9, 0xc8, 0x74, 0xfc, 0xd5, 0xb8, 0xfa, 0x0c, 0xfb, 0x70, 0xf0, 0xff, 0x2f,
-	0xb6, 0x13, 0x81, 0x6e, 0xae, 0x15, 0xdb, 0x68, 0xb7, 0xd1, 0xc8, 0x58, 0x6d, 0x1f, 0x6b, 0x6b,
-	0x42, 0xbc, 0x15, 0xc8, 0xf1, 0x0f, 0x0f, 0xb6, 0x34, 0x05, 0xe5, 0xb0, 0x5d, 0x8f, 0x1a, 0xdd,
-	0x69, 0x24, 0xb6, 0x6d, 0x5a, 0x70, 0x77, 0xb3, 0xc9, 0x94, 0x0d, 0xfd, 0xaf, 0x3f, 0xff, 0x7e,
-	0xf7, 0x10, 0xda, 0x31, 0x07, 0x42, 0x6f, 0x0a, 0xb9, 0xe0, 0x83, 0x09, 0x7a, 0x0f, 0x9d, 0xd2,
-	0x8e, 0x70, 0x4b, 0x4e, 0xc5, 0x39, 0x6c, 0x5d, 0xb7, 0x88, 0x1b, 0x1a, 0xb1, 0x8b, 0xae, 0x2f,
-	0xcf, 0x9c, 0x21, 0xa4, 0xd0, 0x35, 0xf3, 0x40, 0x47, 0x6b, 0x32, 0x56, 0x36, 0x22, 0xb8, 0xbd,
-	0xc1, 0x61, 0x39, 0x58, 0x73, 0x7c, 0x74, 0x60, 0x10, 0x66, 0xb8, 0xe4, 0xc2, 0xce, 0x72, 0x72,
-	0xf2, 0x7c, 0x3a, 0xc7, 0xee, 0x6c, 0x8e, 0xdd, 0x3f, 0x73, 0xec, 0x7e, 0x5b, 0x60, 0x67, 0xb6,
-	0xc0, 0xce, 0xaf, 0x05, 0x76, 0xde, 0x3e, 0x4c, 0xb8, 0xfa, 0x30, 0x3c, 0x8b, 0xfa, 0x22, 0x25,
-	0xb4, 0xe8, 0xd3, 0x8c, 0x3d, 0x96, 0x63, 0xa9, 0x58, 0x2a, 0x89, 0xbe, 0x2b, 0x5f, 0x4c, 0xa2,
-	0x1a, 0xe7, 0x4c, 0x9e, 0x75, 0xf5, 0x7d, 0x79, 0xfa, 0x2f, 0x00, 0x00, 0xff, 0xff, 0xf7, 0xa5,
-	0x77, 0x67, 0x9d, 0x03, 0x00, 0x00,
+	// 520 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0x4d, 0x6f, 0xd3, 0x30,
+	0x1c, 0xc6, 0x9b, 0xb0, 0x96, 0xed, 0xcf, 0xdb, 0xe6, 0xbe, 0x10, 0x02, 0x64, 0x23, 0x20, 0x40,
+	0x02, 0x62, 0xa9, 0x88, 0x2f, 0x50, 0xc1, 0x10, 0x27, 0x46, 0xb8, 0x71, 0x40, 0xb8, 0xab, 0x17,
+	0x2c, 0x96, 0x38, 0x8b, 0xdd, 0x42, 0x34, 0xf5, 0xc2, 0x27, 0x40, 0xe2, 0xcb, 0xf0, 0x11, 0x76,
+	0x9c, 0xc4, 0x85, 0x13, 0x42, 0x2d, 0x1f, 0x04, 0xc5, 0x76, 0xbb, 0x74, 0x4a, 0x7b, 0xe2, 0x52,
+	0xd5, 0x7f, 0x3f, 0x7d, 0x7e, 0x4f, 0xf3, 0x38, 0x86, 0x76, 0xc6, 0xf9, 0x27, 0x1c, 0x91, 0x98,
+	0xe2, 0xa3, 0x21, 0xcd, 0xf2, 0x20, 0xcd, 0xb8, 0xe4, 0x68, 0xa3, 0x18, 0x07, 0xc5, 0xd8, 0x6d,
+	0x45, 0x3c, 0xe2, 0x6a, 0x8a, 0x8b, 0x6f, 0x5a, 0xe0, 0xde, 0x8a, 0x38, 0x8f, 0x0e, 0x29, 0x26,
+	0x29, 0xc3, 0x24, 0x49, 0xb8, 0x24, 0x92, 0xf1, 0x44, 0x98, 0xdd, 0xd6, 0x99, 0x6b, 0xf1, 0xa1,
+	0xa7, 0xfe, 0x03, 0x68, 0xbf, 0x29, 0x18, 0x2f, 0x49, 0x4c, 0xdf, 0x4a, 0x22, 0x69, 0x48, 0x8f,
+	0x86, 0x54, 0x48, 0x74, 0x15, 0x6c, 0x36, 0x70, 0xac, 0x1d, 0xeb, 0xe1, 0x5a, 0x68, 0xb3, 0x81,
+	0xbf, 0x0b, 0x9d, 0xf3, 0x42, 0x91, 0xf2, 0x44, 0x50, 0xf4, 0x18, 0xea, 0xa2, 0x18, 0x28, 0xf1,
+	0xa5, 0xee, 0x66, 0x30, 0xcf, 0x19, 0x28, 0x61, 0x6f, 0xed, 0xe4, 0xf7, 0x76, 0x2d, 0xd4, 0x22,
+	0xff, 0x3e, 0xb4, 0xe6, 0x3e, 0xbd, 0xfc, 0xd5, 0xf3, 0x65, 0xbc, 0xf7, 0xa5, 0x60, 0x5a, 0x67,
+	0x70, 0xcf, 0x60, 0x9d, 0x8f, 0x68, 0x36, 0x62, 0xf4, 0xb3, 0x21, 0x36, 0x4b, 0xc4, 0xd7, 0x66,
+	0xcb, 0x40, 0xe7, 0x52, 0xe3, 0x6f, 0xcf, 0xfd, 0xbb, 0xe0, 0x94, 0xfc, 0xf7, 0x0e, 0x49, 0x4e,
+	0xb3, 0x59, 0x96, 0x0e, 0x34, 0x52, 0x35, 0x50, 0x80, 0x8d, 0xd0, 0xac, 0xfc, 0x3e, 0xdc, 0xa8,
+	0xf8, 0xcd, 0xff, 0xcd, 0x15, 0x00, 0x52, 0x8c, 0x3d, 0x92, 0x91, 0x58, 0xcc, 0x12, 0x39, 0x70,
+	0x71, 0x44, 0x33, 0xc1, 0x78, 0xa2, 0xbc, 0xaf, 0x84, 0xb3, 0xa5, 0xff, 0x01, 0x9a, 0x0b, 0x7a,
+	0x93, 0x06, 0x43, 0x23, 0x55, 0x13, 0x93, 0x65, 0xab, 0x94, 0x45, 0x4b, 0x4d, 0x12, 0x23, 0x2b,
+	0x13, 0xec, 0x05, 0x42, 0xf7, 0xc7, 0x05, 0xa8, 0x2b, 0x04, 0x3a, 0x80, 0xf5, 0x5d, 0x96, 0x0c,
+	0x8a, 0x3a, 0xd0, 0x76, 0xc9, 0xb0, 0xaa, 0x50, 0x77, 0x67, 0xb9, 0x40, 0x67, 0xf4, 0xaf, 0x7f,
+	0xfd, 0xf9, 0xf7, 0xbb, 0xbd, 0x85, 0xae, 0x9d, 0x9d, 0x4a, 0x7c, 0xcc, 0x06, 0x63, 0x34, 0x82,
+	0xcb, 0x9a, 0xa3, 0x1f, 0x31, 0xba, 0x5b, 0x6d, 0xb5, 0x50, 0x9a, 0x7b, 0x6f, 0xb5, 0xc8, 0x30,
+	0x6f, 0x2a, 0x66, 0x1b, 0x35, 0xcb, 0x4c, 0x5d, 0xef, 0x18, 0x1d, 0x40, 0x5d, 0x9d, 0x58, 0x54,
+	0x99, 0xbd, 0xfc, 0x7a, 0xb8, 0x77, 0x56, 0x28, 0x0c, 0xca, 0x51, 0x28, 0x84, 0x36, 0x35, 0x45,
+	0x1d, 0x7f, 0xfd, 0xff, 0x22, 0x68, 0xe8, 0x0e, 0xd0, 0xed, 0xf3, 0x36, 0x0b, 0xb5, 0xbb, 0xde,
+	0xb2, 0x6d, 0x83, 0xf0, 0x14, 0xc2, 0x41, 0x1d, 0x8d, 0xd0, 0x55, 0xe2, 0x63, 0xd3, 0xdc, 0xb8,
+	0xf7, 0xe2, 0x64, 0xe2, 0x59, 0xa7, 0x13, 0xcf, 0xfa, 0x33, 0xf1, 0xac, 0x6f, 0x53, 0xaf, 0x76,
+	0x3a, 0xf5, 0x6a, 0xbf, 0xa6, 0x5e, 0xed, 0xdd, 0xa3, 0x88, 0xc9, 0x8f, 0xc3, 0x7e, 0xb0, 0xcf,
+	0x63, 0x4c, 0xb2, 0x7d, 0x92, 0xd0, 0x27, 0x22, 0x17, 0x92, 0xc6, 0x02, 0xab, 0x7b, 0xe2, 0x8b,
+	0x76, 0x94, 0x79, 0x4a, 0x45, 0xbf, 0xa1, 0xee, 0x8a, 0xa7, 0xff, 0x02, 0x00, 0x00, 0xff, 0xff,
+	0x41, 0xd4, 0x56, 0xce, 0x99, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -366,10 +468,11 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type QueryClient interface {
+	FindByID(ctx context.Context, in *QueryGameByIDRequest, opts ...grpc.CallOption) (*QueryGameByIDResponse, error)
+	FindByPlayer(ctx context.Context, in *QueryGameByPlayerRequest, opts ...grpc.CallOption) (*QueryGameByPlayerResponse, error)
 	// Queries a game state by id.
-	GameState(ctx context.Context, in *QueryGetGameStateRequest, opts ...grpc.CallOption) (*QueryGetGameStateResponse, error)
-	Game(ctx context.Context, in *QueryGetGameRequest, opts ...grpc.CallOption) (*QueryGetGameResponse, error)
-	Params(ctx context.Context, in *QueryGetParamsRequest, opts ...grpc.CallOption) (*QueryGetParamsResponse, error)
+	State(ctx context.Context, in *QueryGameStateRequest, opts ...grpc.CallOption) (*QueryGameStateResponse, error)
+	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 }
 
 type queryClient struct {
@@ -380,26 +483,35 @@ func NewQueryClient(cc grpc1.ClientConn) QueryClient {
 	return &queryClient{cc}
 }
 
-func (c *queryClient) GameState(ctx context.Context, in *QueryGetGameStateRequest, opts ...grpc.CallOption) (*QueryGetGameStateResponse, error) {
-	out := new(QueryGetGameStateResponse)
-	err := c.cc.Invoke(ctx, "/rook.game.Query/GameState", in, out, opts...)
+func (c *queryClient) FindByID(ctx context.Context, in *QueryGameByIDRequest, opts ...grpc.CallOption) (*QueryGameByIDResponse, error) {
+	out := new(QueryGameByIDResponse)
+	err := c.cc.Invoke(ctx, "/rook.game.Query/FindByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) Game(ctx context.Context, in *QueryGetGameRequest, opts ...grpc.CallOption) (*QueryGetGameResponse, error) {
-	out := new(QueryGetGameResponse)
-	err := c.cc.Invoke(ctx, "/rook.game.Query/Game", in, out, opts...)
+func (c *queryClient) FindByPlayer(ctx context.Context, in *QueryGameByPlayerRequest, opts ...grpc.CallOption) (*QueryGameByPlayerResponse, error) {
+	out := new(QueryGameByPlayerResponse)
+	err := c.cc.Invoke(ctx, "/rook.game.Query/FindByPlayer", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) Params(ctx context.Context, in *QueryGetParamsRequest, opts ...grpc.CallOption) (*QueryGetParamsResponse, error) {
-	out := new(QueryGetParamsResponse)
+func (c *queryClient) State(ctx context.Context, in *QueryGameStateRequest, opts ...grpc.CallOption) (*QueryGameStateResponse, error) {
+	out := new(QueryGameStateResponse)
+	err := c.cc.Invoke(ctx, "/rook.game.Query/State", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error) {
+	out := new(QueryParamsResponse)
 	err := c.cc.Invoke(ctx, "/rook.game.Query/Params", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -409,23 +521,27 @@ func (c *queryClient) Params(ctx context.Context, in *QueryGetParamsRequest, opt
 
 // QueryServer is the server API for Query service.
 type QueryServer interface {
+	FindByID(context.Context, *QueryGameByIDRequest) (*QueryGameByIDResponse, error)
+	FindByPlayer(context.Context, *QueryGameByPlayerRequest) (*QueryGameByPlayerResponse, error)
 	// Queries a game state by id.
-	GameState(context.Context, *QueryGetGameStateRequest) (*QueryGetGameStateResponse, error)
-	Game(context.Context, *QueryGetGameRequest) (*QueryGetGameResponse, error)
-	Params(context.Context, *QueryGetParamsRequest) (*QueryGetParamsResponse, error)
+	State(context.Context, *QueryGameStateRequest) (*QueryGameStateResponse, error)
+	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
 type UnimplementedQueryServer struct {
 }
 
-func (*UnimplementedQueryServer) GameState(ctx context.Context, req *QueryGetGameStateRequest) (*QueryGetGameStateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GameState not implemented")
+func (*UnimplementedQueryServer) FindByID(ctx context.Context, req *QueryGameByIDRequest) (*QueryGameByIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindByID not implemented")
 }
-func (*UnimplementedQueryServer) Game(ctx context.Context, req *QueryGetGameRequest) (*QueryGetGameResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Game not implemented")
+func (*UnimplementedQueryServer) FindByPlayer(ctx context.Context, req *QueryGameByPlayerRequest) (*QueryGameByPlayerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindByPlayer not implemented")
 }
-func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryGetParamsRequest) (*QueryGetParamsResponse, error) {
+func (*UnimplementedQueryServer) State(ctx context.Context, req *QueryGameStateRequest) (*QueryGameStateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method State not implemented")
+}
+func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsRequest) (*QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
 }
 
@@ -433,44 +549,62 @@ func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
 	s.RegisterService(&_Query_serviceDesc, srv)
 }
 
-func _Query_GameState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetGameStateRequest)
+func _Query_FindByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGameByIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).GameState(ctx, in)
+		return srv.(QueryServer).FindByID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/rook.game.Query/GameState",
+		FullMethod: "/rook.game.Query/FindByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).GameState(ctx, req.(*QueryGetGameStateRequest))
+		return srv.(QueryServer).FindByID(ctx, req.(*QueryGameByIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_Game_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetGameRequest)
+func _Query_FindByPlayer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGameByPlayerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).Game(ctx, in)
+		return srv.(QueryServer).FindByPlayer(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/rook.game.Query/Game",
+		FullMethod: "/rook.game.Query/FindByPlayer",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Game(ctx, req.(*QueryGetGameRequest))
+		return srv.(QueryServer).FindByPlayer(ctx, req.(*QueryGameByPlayerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_State_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGameStateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).State(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/rook.game.Query/State",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).State(ctx, req.(*QueryGameStateRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetParamsRequest)
+	in := new(QueryParamsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -482,7 +616,7 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 		FullMethod: "/rook.game.Query/Params",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Params(ctx, req.(*QueryGetParamsRequest))
+		return srv.(QueryServer).Params(ctx, req.(*QueryParamsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -492,12 +626,16 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GameState",
-			Handler:    _Query_GameState_Handler,
+			MethodName: "FindByID",
+			Handler:    _Query_FindByID_Handler,
 		},
 		{
-			MethodName: "Game",
-			Handler:    _Query_Game_Handler,
+			MethodName: "FindByPlayer",
+			Handler:    _Query_FindByPlayer_Handler,
+		},
+		{
+			MethodName: "State",
+			Handler:    _Query_State_Handler,
 		},
 		{
 			MethodName: "Params",
@@ -508,7 +646,7 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 	Metadata: "rook/game/query.proto",
 }
 
-func (m *QueryGetGameStateRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryGameStateRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -518,12 +656,12 @@ func (m *QueryGetGameStateRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetGameStateRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGameStateRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetGameStateRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGameStateRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -536,7 +674,7 @@ func (m *QueryGetGameStateRequest) MarshalToSizedBuffer(dAtA []byte) (int, error
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetGameStateResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryGameStateResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -546,12 +684,12 @@ func (m *QueryGetGameStateResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetGameStateResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGameStateResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetGameStateResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGameStateResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -569,7 +707,7 @@ func (m *QueryGetGameStateResponse) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetGameRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryGameByIDRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -579,12 +717,12 @@ func (m *QueryGetGameRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetGameRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGameByIDRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetGameRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGameByIDRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -597,7 +735,7 @@ func (m *QueryGetGameRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetGameResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryGameByIDResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -607,12 +745,12 @@ func (m *QueryGetGameResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetGameResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGameByIDResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetGameResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGameByIDResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -635,7 +773,7 @@ func (m *QueryGetGameResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetParamsRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryGameByPlayerRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -645,12 +783,80 @@ func (m *QueryGetParamsRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetParamsRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGameByPlayerRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetParamsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGameByPlayerRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Player) > 0 {
+		i -= len(m.Player)
+		copy(dAtA[i:], m.Player)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Player)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryGameByPlayerResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryGameByPlayerResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryGameByPlayerResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Id != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size, err := m.Overview.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintQuery(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryParamsRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryParamsRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryParamsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -663,7 +869,7 @@ func (m *QueryGetParamsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetParamsResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryParamsResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -673,12 +879,12 @@ func (m *QueryGetParamsResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetParamsResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryParamsResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -712,7 +918,7 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *QueryGetGameStateRequest) Size() (n int) {
+func (m *QueryGameStateRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -724,7 +930,7 @@ func (m *QueryGetGameStateRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetGameStateResponse) Size() (n int) {
+func (m *QueryGameStateResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -735,7 +941,7 @@ func (m *QueryGetGameStateResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetGameRequest) Size() (n int) {
+func (m *QueryGameByIDRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -747,7 +953,7 @@ func (m *QueryGetGameRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetGameResponse) Size() (n int) {
+func (m *QueryGameByIDResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -761,7 +967,34 @@ func (m *QueryGetGameResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetParamsRequest) Size() (n int) {
+func (m *QueryGameByPlayerRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Player)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryGameByPlayerResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.Overview.Size()
+	n += 1 + l + sovQuery(uint64(l))
+	if m.Id != 0 {
+		n += 1 + sovQuery(uint64(m.Id))
+	}
+	return n
+}
+
+func (m *QueryParamsRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -773,7 +1006,7 @@ func (m *QueryGetParamsRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetParamsResponse) Size() (n int) {
+func (m *QueryParamsResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -793,7 +1026,7 @@ func sovQuery(x uint64) (n int) {
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *QueryGetGameStateRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryGameStateRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -816,10 +1049,10 @@ func (m *QueryGetGameStateRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetGameStateRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGameStateRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetGameStateRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGameStateRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -862,7 +1095,7 @@ func (m *QueryGetGameStateRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetGameStateResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryGameStateResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -885,10 +1118,10 @@ func (m *QueryGetGameStateResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetGameStateResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGameStateResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetGameStateResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGameStateResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -945,7 +1178,7 @@ func (m *QueryGetGameStateResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetGameRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryGameByIDRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -968,10 +1201,10 @@ func (m *QueryGetGameRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetGameRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGameByIDRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetGameRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGameByIDRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1014,7 +1247,7 @@ func (m *QueryGetGameRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetGameResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryGameByIDResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1037,10 +1270,10 @@ func (m *QueryGetGameResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetGameResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGameByIDResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetGameResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGameByIDResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1116,7 +1349,7 @@ func (m *QueryGetGameResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetParamsRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryGameByPlayerRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1139,10 +1372,194 @@ func (m *QueryGetParamsRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetParamsRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGameByPlayerRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetParamsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGameByPlayerRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Player", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Player = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryGameByPlayerResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryGameByPlayerResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryGameByPlayerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Overview", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Overview.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryParamsRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryParamsRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryParamsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1185,7 +1602,7 @@ func (m *QueryGetParamsRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetParamsResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryParamsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1208,10 +1625,10 @@ func (m *QueryGetParamsResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetParamsResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryParamsResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

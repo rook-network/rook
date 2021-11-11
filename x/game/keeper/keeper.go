@@ -209,7 +209,7 @@ func (k Keeper) DeleteParams(ctx sdk.Context, version uint32) {
 }
 
 // GetGameID gets the ID to be used for the next game
-func (k Keeper) GetGameID(ctx sdk.Context) (uint64, error) {
+func (k Keeper) GetNextGameID(ctx sdk.Context) (uint64, error) {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get(types.GameIDKey)
 	if bz == nil {
@@ -217,6 +217,11 @@ func (k Keeper) GetGameID(ctx sdk.Context) (uint64, error) {
 	}
 	gameID := binary.BigEndian.Uint64(bz)
 	return gameID, nil
+}
+
+// TODO: implement
+func (k Keeper) GetGameIDByPlayer(ctx sdk.Context, player string) (uint64, error) {
+	return 0, types.ErrPlayerNotInGame
 }
 
 func (k Keeper) GetAllParams(ctx sdk.Context) map[uint32]*types.Params {

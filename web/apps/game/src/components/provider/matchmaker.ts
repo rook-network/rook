@@ -71,7 +71,7 @@ export class MatchmakerProvider {
         this.socket.connect()
     }
 
-    subscribeToRoom(id: Long, onUpdate: (room: Room) => void): void {
+    async subscribeToRoom(id: Long, onUpdate: (room: Room) => void): Promise<void> {
         const subscribeMsg = {
             jsonrpc: "2.0",
             method: "subscribe",
@@ -81,16 +81,17 @@ export class MatchmakerProvider {
             }
         } 
         this.onUpdate = onUpdate
-        this.query.Room({id: id}).then((resp: QueryGetRoomResponse) => {
-            if (this.onUpdate && resp.room) {
-                console.log("updating room")
-                this.onUpdate(resp.room)
-                this.room = resp.room
-                this.socket.send(JSON.stringify(subscribeMsg))
-            } else {
-                throw new Error("failed to subscribe to room events")
-            }
-        })
+        const resp = await this.query.Room({id: id})
+        if (resp.room) {
+            console.log("updating room")
+            console.log(resp.room)
+            this.onUpdate(resp.room)
+            this.room = resp.room
+            await this.socket.send(JSON.stringify(subscribeMsg))
+            console.log("subscribed to room")
+        } else {
+            throw new Error("failed to subscribe to room events")
+        }
     }
 
     unsubscribeToRoom(id: Long): void {
@@ -256,7 +257,7 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
         // TODO: we should emit an event and parse it correct to have a return value.
         // We will return a hard-coded value for now 
         return { 
-            id: 0,
+            modeId: 0,
         }
     }
 

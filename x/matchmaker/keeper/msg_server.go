@@ -105,8 +105,7 @@ func (m msgServer) Join(goCtx context.Context, msg *types.MsgJoin) (*types.MsgJo
 func (m msgServer) Find(goCtx context.Context, msg *types.MsgFind) (*types.MsgFindResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	mode, exists := m.Keeper.GetMode(ctx, msg.Mode)
-	if !exists {
+	if !m.Keeper.HasMode(ctx, msg.Mode) {
 		return nil, sdkerrors.Wrapf(types.ErrModeNotFound, "modeID: %d", msg.Mode)
 	}
 
@@ -114,16 +113,13 @@ func (m msgServer) Find(goCtx context.Context, msg *types.MsgFind) (*types.MsgFi
 
 	// if no room exists using that mode then we need to create a new one
 	if !exists {
-		msgHost := types.NewMsgHost(msg.Player, []string{}, &mode, true)
+		msgHost := types.NewMsgHostByModeID(msg.Player, []string{}, msg.Mode, true)
 		// Host a new game. This will persist the new room, remove the player from an old room,
 		// and emit the relevant events
 		res, err := m.Host(goCtx, msgHost)
 		if err != nil {
 			return nil, err
 		}
-
-		// set the new room as the common room for that mode
-		m.Keeper.SetCommonRoom(ctx, msg.Mode, res.RoomId)
 
 		return &types.MsgFindResponse{RoomId: res.RoomId}, nil
 	}

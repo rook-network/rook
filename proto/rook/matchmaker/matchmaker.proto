@@ -31,7 +31,7 @@ message Room {
   uint32 quorum = 6;
 
   // the max amount of players that can join the room
-  uint32 capacity =7;
+  uint32 capacity = 7;
 
   oneof time {
     // when the room was created. Rooms get garbage collected after a while

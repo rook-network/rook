@@ -32,8 +32,8 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 
 func CmdQueryGame() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "game [id]",
-		Short: "returns the current game state",
+		Use:   "find [id]",
+		Short: "finds a game by id",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
@@ -45,11 +45,11 @@ func CmdQueryGame() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryGetGameRequest{
+			params := &types.QueryGameByIDRequest{
 				Id: id,
 			}
 
-			res, err := queryClient.Game(context.Background(), params)
+			res, err := queryClient.FindByID(context.Background(), params)
 			if err != nil {
 				return err
 			}

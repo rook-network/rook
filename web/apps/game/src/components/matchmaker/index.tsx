@@ -1,6 +1,6 @@
 import styles from './matchmaker.module.less';
 import React from 'react'
-import Card from '../card'
+import Card, { LoadingCard } from '../card'
 import { Mode, IndexedMode, Room } from '../../codec/rook/matchmaker/matchmaker'
 import { MsgFind } from '../../codec/rook/matchmaker/tx'
 import { MatchmakerProvider } from "../provider"
@@ -45,23 +45,28 @@ class Matchmaker extends React.Component<MMProps, MMState> {
   async findGame() {
     // if there is only one mode then we use that one
     if (this.props.modes.length === 1) {
-      const resp = await this.props.provider.tx.Find({
-        creator: this.props.address,
-        mode: this.props.modes[0].id
-      } as MsgFind)
-      console.log(resp)
-      this.props.provider.subscribeToRoom(resp.roomId, (room: Room): void => {
+      try {
+        const resp = await this.props.provider.tx.Find({
+          player: this.props.address,
+          mode: this.props.modes[0].modeId
+        } as MsgFind)
         this.setState({
-          room: room,
+          mode: this.props.modes[0].mode,
+          roomID: resp.roomId,
+          status: "room"
         })
-      })
-      // console.log(roomResp.room)
-      this.setState({
-        mode: this.props.modes[0].mode,
-        roomID: resp.roomId,
-        status: "room"
-      })
+        console.log(resp)
+        await this.props.provider.subscribeToRoom(resp.roomId, (room: Room): void => {
+          this.setState({
+            room: room,
+          })
+        })
+      } catch (err) {
+        console.error(err)
+      }
     } else {
+      // TODO: the user must select which mode they are interested in playing. At the moment,
+      // we have just one mode so this should never happen
       this.setState({
         status: 'mode',
       })
@@ -71,9 +76,9 @@ class Matchmaker extends React.Component<MMProps, MMState> {
   render() {
     if (this.props.modes.length === 0) {
       return (
-          <Card>
-            Loading possible game modes...
-          </Card>
+          <LoadingCard
+            message="Loading modes..."
+          />
       )
     }
     switch (this.state.status) {
@@ -131,9 +136,17 @@ interface RoomProps {
 
 export const RoomComponent = (props: RoomProps) => {
   if (!props.room) {
+    if (props.id.gt(0)) {
+      return (
+        <Card>
+          Joining Room {props.id.toString()}...
+        </Card>
+      )
+    }
+
     return (
       <Card>
-        Loading Room...
+        Finding Room...
       </Card>
     )
   }
@@ -149,6 +162,16 @@ export const RoomComponent = (props: RoomProps) => {
             <li className={styles.player}>{player}</li>
           )}
         </ul>
+        { props.room.pending.length > 0 &&
+          <div>
+            <p style={{ textAlign: "left" }}>Invited:</p>
+            <ul>
+              { props.room.pending.map((player, index) => 
+                <li className={styles.player}>{player}</li>
+              )}
+            </ul>
+          </div>
+        }
         { minSpots === 1 &&
         <p className={styles.footer}>Waiting for 1 more player...</p>
         }

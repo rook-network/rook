@@ -8,8 +8,10 @@ import { Timestamp } from "../../google/protobuf/timestamp";
 export const protobufPackage = "rook.matchmaker";
 
 export interface Room {
-  /** the config to be used for the game */
-  config?: Config;
+  /** Add a custom config */
+  config?: Config | undefined;
+  /** Or you can use a predefined mode */
+  modeId: number | undefined;
   /** the current players in the room */
   players: string[];
   /** pending invitations for players that can join (like a whitelist) */
@@ -20,11 +22,6 @@ export interface Room {
   quorum: number;
   /** the max amount of players that can join the room */
   capacity: number;
-  /**
-   * if this is part of the standard mode pools it will have a corresponding
-   * mode id
-   */
-  modeId: number;
   /** when the room was created. Rooms get garbage collected after a while */
   created?: Date | undefined;
   /**
@@ -43,13 +40,8 @@ export interface Room {
 
 /** IndexedRoom pins an id to the room */
 export interface IndexedRoom {
-  id: Long;
+  roomId: Long;
   room?: Room;
-}
-
-/** Rooms represents a set of rooms by id */
-export interface Rooms {
-  ids: Long[];
 }
 
 /**
@@ -67,8 +59,9 @@ export interface Mode {
 
 /** IndexedMode pins an id to the mode */
 export interface IndexedMode {
-  id: number;
+  modeId: number;
   mode?: Mode;
+  gameId: Long;
 }
 
 export interface Params {
@@ -90,7 +83,6 @@ const baseRoom: object = {
   public: false,
   quorum: 0,
   capacity: 0,
-  modeId: 0,
 };
 
 export const Room = {
@@ -98,23 +90,23 @@ export const Room = {
     if (message.config !== undefined) {
       Config.encode(message.config, writer.uint32(10).fork()).ldelim();
     }
-    for (const v of message.players) {
-      writer.uint32(18).string(v!);
+    if (message.modeId !== undefined) {
+      writer.uint32(16).uint32(message.modeId);
     }
-    for (const v of message.pending) {
+    for (const v of message.players) {
       writer.uint32(26).string(v!);
     }
+    for (const v of message.pending) {
+      writer.uint32(34).string(v!);
+    }
     if (message.public === true) {
-      writer.uint32(32).bool(message.public);
+      writer.uint32(40).bool(message.public);
     }
     if (message.quorum !== 0) {
-      writer.uint32(40).uint32(message.quorum);
+      writer.uint32(48).uint32(message.quorum);
     }
     if (message.capacity !== 0) {
-      writer.uint32(48).uint32(message.capacity);
-    }
-    if (message.modeId !== 0) {
-      writer.uint32(56).uint32(message.modeId);
+      writer.uint32(56).uint32(message.capacity);
     }
     if (message.created !== undefined) {
       Timestamp.encode(
@@ -150,22 +142,22 @@ export const Room = {
           message.config = Config.decode(reader, reader.uint32());
           break;
         case 2:
-          message.players.push(reader.string());
+          message.modeId = reader.uint32();
           break;
         case 3:
-          message.pending.push(reader.string());
+          message.players.push(reader.string());
           break;
         case 4:
-          message.public = reader.bool();
+          message.pending.push(reader.string());
           break;
         case 5:
-          message.quorum = reader.uint32();
+          message.public = reader.bool();
           break;
         case 6:
-          message.capacity = reader.uint32();
+          message.quorum = reader.uint32();
           break;
         case 7:
-          message.modeId = reader.uint32();
+          message.capacity = reader.uint32();
           break;
         case 8:
           message.created = fromTimestamp(
@@ -199,6 +191,11 @@ export const Room = {
     } else {
       message.config = undefined;
     }
+    if (object.modeId !== undefined && object.modeId !== null) {
+      message.modeId = Number(object.modeId);
+    } else {
+      message.modeId = undefined;
+    }
     if (object.players !== undefined && object.players !== null) {
       for (const e of object.players) {
         message.players.push(String(e));
@@ -224,11 +221,6 @@ export const Room = {
     } else {
       message.capacity = 0;
     }
-    if (object.modeId !== undefined && object.modeId !== null) {
-      message.modeId = Number(object.modeId);
-    } else {
-      message.modeId = 0;
-    }
     if (object.created !== undefined && object.created !== null) {
       message.created = fromJsonTimestamp(object.created);
     } else {
@@ -251,6 +243,7 @@ export const Room = {
     const obj: any = {};
     message.config !== undefined &&
       (obj.config = message.config ? Config.toJSON(message.config) : undefined);
+    message.modeId !== undefined && (obj.modeId = message.modeId);
     if (message.players) {
       obj.players = message.players.map((e) => e);
     } else {
@@ -264,7 +257,6 @@ export const Room = {
     message.public !== undefined && (obj.public = message.public);
     message.quorum !== undefined && (obj.quorum = message.quorum);
     message.capacity !== undefined && (obj.capacity = message.capacity);
-    message.modeId !== undefined && (obj.modeId = message.modeId);
     message.created !== undefined &&
       (obj.created = message.created.toISOString());
     message.ready !== undefined && (obj.ready = message.ready.toISOString());
@@ -281,6 +273,11 @@ export const Room = {
       message.config = Config.fromPartial(object.config);
     } else {
       message.config = undefined;
+    }
+    if (object.modeId !== undefined && object.modeId !== null) {
+      message.modeId = object.modeId;
+    } else {
+      message.modeId = undefined;
     }
     if (object.players !== undefined && object.players !== null) {
       for (const e of object.players) {
@@ -307,11 +304,6 @@ export const Room = {
     } else {
       message.capacity = 0;
     }
-    if (object.modeId !== undefined && object.modeId !== null) {
-      message.modeId = object.modeId;
-    } else {
-      message.modeId = 0;
-    }
     if (object.created !== undefined && object.created !== null) {
       message.created = object.created;
     } else {
@@ -331,15 +323,15 @@ export const Room = {
   },
 };
 
-const baseIndexedRoom: object = { id: Long.UZERO };
+const baseIndexedRoom: object = { roomId: Long.UZERO };
 
 export const IndexedRoom = {
   encode(
     message: IndexedRoom,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (!message.id.isZero()) {
-      writer.uint32(8).uint64(message.id);
+    if (!message.roomId.isZero()) {
+      writer.uint32(8).uint64(message.roomId);
     }
     if (message.room !== undefined) {
       Room.encode(message.room, writer.uint32(18).fork()).ldelim();
@@ -355,7 +347,7 @@ export const IndexedRoom = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.uint64() as Long;
+          message.roomId = reader.uint64() as Long;
           break;
         case 2:
           message.room = Room.decode(reader, reader.uint32());
@@ -370,10 +362,10 @@ export const IndexedRoom = {
 
   fromJSON(object: any): IndexedRoom {
     const message = { ...baseIndexedRoom } as IndexedRoom;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
+    if (object.roomId !== undefined && object.roomId !== null) {
+      message.roomId = Long.fromString(object.roomId);
     } else {
-      message.id = Long.UZERO;
+      message.roomId = Long.UZERO;
     }
     if (object.room !== undefined && object.room !== null) {
       message.room = Room.fromJSON(object.room);
@@ -385,8 +377,8 @@ export const IndexedRoom = {
 
   toJSON(message: IndexedRoom): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
+    message.roomId !== undefined &&
+      (obj.roomId = (message.roomId || Long.UZERO).toString());
     message.room !== undefined &&
       (obj.room = message.room ? Room.toJSON(message.room) : undefined);
     return obj;
@@ -394,86 +386,15 @@ export const IndexedRoom = {
 
   fromPartial(object: DeepPartial<IndexedRoom>): IndexedRoom {
     const message = { ...baseIndexedRoom } as IndexedRoom;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id as Long;
+    if (object.roomId !== undefined && object.roomId !== null) {
+      message.roomId = object.roomId as Long;
     } else {
-      message.id = Long.UZERO;
+      message.roomId = Long.UZERO;
     }
     if (object.room !== undefined && object.room !== null) {
       message.room = Room.fromPartial(object.room);
     } else {
       message.room = undefined;
-    }
-    return message;
-  },
-};
-
-const baseRooms: object = { ids: Long.UZERO };
-
-export const Rooms = {
-  encode(message: Rooms, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    writer.uint32(10).fork();
-    for (const v of message.ids) {
-      writer.uint64(v);
-    }
-    writer.ldelim();
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Rooms {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseRooms } as Rooms;
-    message.ids = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if ((tag & 7) === 2) {
-            const end2 = reader.uint32() + reader.pos;
-            while (reader.pos < end2) {
-              message.ids.push(reader.uint64() as Long);
-            }
-          } else {
-            message.ids.push(reader.uint64() as Long);
-          }
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Rooms {
-    const message = { ...baseRooms } as Rooms;
-    message.ids = [];
-    if (object.ids !== undefined && object.ids !== null) {
-      for (const e of object.ids) {
-        message.ids.push(Long.fromString(e));
-      }
-    }
-    return message;
-  },
-
-  toJSON(message: Rooms): unknown {
-    const obj: any = {};
-    if (message.ids) {
-      obj.ids = message.ids.map((e) => (e || Long.UZERO).toString());
-    } else {
-      obj.ids = [];
-    }
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<Rooms>): Rooms {
-    const message = { ...baseRooms } as Rooms;
-    message.ids = [];
-    if (object.ids !== undefined && object.ids !== null) {
-      for (const e of object.ids) {
-        message.ids.push(e);
-      }
     }
     return message;
   },
@@ -569,18 +490,21 @@ export const Mode = {
   },
 };
 
-const baseIndexedMode: object = { id: 0 };
+const baseIndexedMode: object = { modeId: 0, gameId: Long.UZERO };
 
 export const IndexedMode = {
   encode(
     message: IndexedMode,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.id !== 0) {
-      writer.uint32(8).uint32(message.id);
+    if (message.modeId !== 0) {
+      writer.uint32(8).uint32(message.modeId);
     }
     if (message.mode !== undefined) {
       Mode.encode(message.mode, writer.uint32(18).fork()).ldelim();
+    }
+    if (!message.gameId.isZero()) {
+      writer.uint32(24).uint64(message.gameId);
     }
     return writer;
   },
@@ -593,10 +517,13 @@ export const IndexedMode = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.uint32();
+          message.modeId = reader.uint32();
           break;
         case 2:
           message.mode = Mode.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.gameId = reader.uint64() as Long;
           break;
         default:
           reader.skipType(tag & 7);
@@ -608,38 +535,50 @@ export const IndexedMode = {
 
   fromJSON(object: any): IndexedMode {
     const message = { ...baseIndexedMode } as IndexedMode;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
+    if (object.modeId !== undefined && object.modeId !== null) {
+      message.modeId = Number(object.modeId);
     } else {
-      message.id = 0;
+      message.modeId = 0;
     }
     if (object.mode !== undefined && object.mode !== null) {
       message.mode = Mode.fromJSON(object.mode);
     } else {
       message.mode = undefined;
     }
+    if (object.gameId !== undefined && object.gameId !== null) {
+      message.gameId = Long.fromString(object.gameId);
+    } else {
+      message.gameId = Long.UZERO;
+    }
     return message;
   },
 
   toJSON(message: IndexedMode): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
+    message.modeId !== undefined && (obj.modeId = message.modeId);
     message.mode !== undefined &&
       (obj.mode = message.mode ? Mode.toJSON(message.mode) : undefined);
+    message.gameId !== undefined &&
+      (obj.gameId = (message.gameId || Long.UZERO).toString());
     return obj;
   },
 
   fromPartial(object: DeepPartial<IndexedMode>): IndexedMode {
     const message = { ...baseIndexedMode } as IndexedMode;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
+    if (object.modeId !== undefined && object.modeId !== null) {
+      message.modeId = object.modeId;
     } else {
-      message.id = 0;
+      message.modeId = 0;
     }
     if (object.mode !== undefined && object.mode !== null) {
       message.mode = Mode.fromPartial(object.mode);
     } else {
       message.mode = undefined;
+    }
+    if (object.gameId !== undefined && object.gameId !== null) {
+      message.gameId = object.gameId as Long;
+    } else {
+      message.gameId = Long.UZERO;
     }
     return message;
   },

@@ -8,7 +8,7 @@ export const protobufPackage = "rook.matchmaker";
 
 export interface MsgHost {
   /** The host of the room */
-  creator: string;
+  host: string;
   /** Mode defines the game config, the quorum and capacity of players */
   mode?: Mode | undefined;
   /** Or you can use a predefined mode */
@@ -29,14 +29,14 @@ export interface MsgHostResponse {
 }
 
 export interface MsgJoin {
-  creator: string;
+  player: string;
   roomId: Long;
 }
 
 export interface MsgJoinResponse {}
 
 export interface MsgFind {
-  creator: string;
+  player: string;
   mode: number;
 }
 
@@ -45,7 +45,7 @@ export interface MsgFindResponse {
 }
 
 export interface MsgLeave {
-  creator: string;
+  player: string;
   roomId: Long;
 }
 
@@ -57,7 +57,7 @@ export interface MsgAddMode {
 }
 
 export interface MsgAddModeResponse {
-  id: number;
+  modeId: number;
 }
 
 export interface MsgRemoveMode {
@@ -67,15 +67,15 @@ export interface MsgRemoveMode {
 
 export interface MsgRemoveModeResponse {}
 
-const baseMsgHost: object = { creator: "", invitees: "", public: false };
+const baseMsgHost: object = { host: "", invitees: "", public: false };
 
 export const MsgHost = {
   encode(
     message: MsgHost,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.creator !== "") {
-      writer.uint32(10).string(message.creator);
+    if (message.host !== "") {
+      writer.uint32(10).string(message.host);
     }
     if (message.mode !== undefined) {
       Mode.encode(message.mode, writer.uint32(18).fork()).ldelim();
@@ -107,7 +107,7 @@ export const MsgHost = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.creator = reader.string();
+          message.host = reader.string();
           break;
         case 2:
           message.mode = Mode.decode(reader, reader.uint32());
@@ -137,10 +137,10 @@ export const MsgHost = {
   fromJSON(object: any): MsgHost {
     const message = { ...baseMsgHost } as MsgHost;
     message.invitees = [];
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = String(object.creator);
+    if (object.host !== undefined && object.host !== null) {
+      message.host = String(object.host);
     } else {
-      message.creator = "";
+      message.host = "";
     }
     if (object.mode !== undefined && object.mode !== null) {
       message.mode = Mode.fromJSON(object.mode);
@@ -172,7 +172,7 @@ export const MsgHost = {
 
   toJSON(message: MsgHost): unknown {
     const obj: any = {};
-    message.creator !== undefined && (obj.creator = message.creator);
+    message.host !== undefined && (obj.host = message.host);
     message.mode !== undefined &&
       (obj.mode = message.mode ? Mode.toJSON(message.mode) : undefined);
     message.modeId !== undefined && (obj.modeId = message.modeId);
@@ -190,10 +190,10 @@ export const MsgHost = {
   fromPartial(object: DeepPartial<MsgHost>): MsgHost {
     const message = { ...baseMsgHost } as MsgHost;
     message.invitees = [];
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = object.creator;
+    if (object.host !== undefined && object.host !== null) {
+      message.host = object.host;
     } else {
-      message.creator = "";
+      message.host = "";
     }
     if (object.mode !== undefined && object.mode !== null) {
       message.mode = Mode.fromPartial(object.mode);
@@ -283,15 +283,15 @@ export const MsgHostResponse = {
   },
 };
 
-const baseMsgJoin: object = { creator: "", roomId: Long.UZERO };
+const baseMsgJoin: object = { player: "", roomId: Long.UZERO };
 
 export const MsgJoin = {
   encode(
     message: MsgJoin,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.creator !== "") {
-      writer.uint32(10).string(message.creator);
+    if (message.player !== "") {
+      writer.uint32(10).string(message.player);
     }
     if (!message.roomId.isZero()) {
       writer.uint32(16).uint64(message.roomId);
@@ -307,7 +307,7 @@ export const MsgJoin = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.creator = reader.string();
+          message.player = reader.string();
           break;
         case 2:
           message.roomId = reader.uint64() as Long;
@@ -322,10 +322,10 @@ export const MsgJoin = {
 
   fromJSON(object: any): MsgJoin {
     const message = { ...baseMsgJoin } as MsgJoin;
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = String(object.creator);
+    if (object.player !== undefined && object.player !== null) {
+      message.player = String(object.player);
     } else {
-      message.creator = "";
+      message.player = "";
     }
     if (object.roomId !== undefined && object.roomId !== null) {
       message.roomId = Long.fromString(object.roomId);
@@ -337,7 +337,7 @@ export const MsgJoin = {
 
   toJSON(message: MsgJoin): unknown {
     const obj: any = {};
-    message.creator !== undefined && (obj.creator = message.creator);
+    message.player !== undefined && (obj.player = message.player);
     message.roomId !== undefined &&
       (obj.roomId = (message.roomId || Long.UZERO).toString());
     return obj;
@@ -345,10 +345,10 @@ export const MsgJoin = {
 
   fromPartial(object: DeepPartial<MsgJoin>): MsgJoin {
     const message = { ...baseMsgJoin } as MsgJoin;
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = object.creator;
+    if (object.player !== undefined && object.player !== null) {
+      message.player = object.player;
     } else {
-      message.creator = "";
+      message.player = "";
     }
     if (object.roomId !== undefined && object.roomId !== null) {
       message.roomId = object.roomId as Long;
@@ -400,15 +400,15 @@ export const MsgJoinResponse = {
   },
 };
 
-const baseMsgFind: object = { creator: "", mode: 0 };
+const baseMsgFind: object = { player: "", mode: 0 };
 
 export const MsgFind = {
   encode(
     message: MsgFind,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.creator !== "") {
-      writer.uint32(10).string(message.creator);
+    if (message.player !== "") {
+      writer.uint32(10).string(message.player);
     }
     if (message.mode !== 0) {
       writer.uint32(16).uint32(message.mode);
@@ -424,7 +424,7 @@ export const MsgFind = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.creator = reader.string();
+          message.player = reader.string();
           break;
         case 2:
           message.mode = reader.uint32();
@@ -439,10 +439,10 @@ export const MsgFind = {
 
   fromJSON(object: any): MsgFind {
     const message = { ...baseMsgFind } as MsgFind;
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = String(object.creator);
+    if (object.player !== undefined && object.player !== null) {
+      message.player = String(object.player);
     } else {
-      message.creator = "";
+      message.player = "";
     }
     if (object.mode !== undefined && object.mode !== null) {
       message.mode = Number(object.mode);
@@ -454,17 +454,17 @@ export const MsgFind = {
 
   toJSON(message: MsgFind): unknown {
     const obj: any = {};
-    message.creator !== undefined && (obj.creator = message.creator);
+    message.player !== undefined && (obj.player = message.player);
     message.mode !== undefined && (obj.mode = message.mode);
     return obj;
   },
 
   fromPartial(object: DeepPartial<MsgFind>): MsgFind {
     const message = { ...baseMsgFind } as MsgFind;
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = object.creator;
+    if (object.player !== undefined && object.player !== null) {
+      message.player = object.player;
     } else {
-      message.creator = "";
+      message.player = "";
     }
     if (object.mode !== undefined && object.mode !== null) {
       message.mode = object.mode;
@@ -534,15 +534,15 @@ export const MsgFindResponse = {
   },
 };
 
-const baseMsgLeave: object = { creator: "", roomId: Long.UZERO };
+const baseMsgLeave: object = { player: "", roomId: Long.UZERO };
 
 export const MsgLeave = {
   encode(
     message: MsgLeave,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.creator !== "") {
-      writer.uint32(10).string(message.creator);
+    if (message.player !== "") {
+      writer.uint32(10).string(message.player);
     }
     if (!message.roomId.isZero()) {
       writer.uint32(16).uint64(message.roomId);
@@ -558,7 +558,7 @@ export const MsgLeave = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.creator = reader.string();
+          message.player = reader.string();
           break;
         case 2:
           message.roomId = reader.uint64() as Long;
@@ -573,10 +573,10 @@ export const MsgLeave = {
 
   fromJSON(object: any): MsgLeave {
     const message = { ...baseMsgLeave } as MsgLeave;
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = String(object.creator);
+    if (object.player !== undefined && object.player !== null) {
+      message.player = String(object.player);
     } else {
-      message.creator = "";
+      message.player = "";
     }
     if (object.roomId !== undefined && object.roomId !== null) {
       message.roomId = Long.fromString(object.roomId);
@@ -588,7 +588,7 @@ export const MsgLeave = {
 
   toJSON(message: MsgLeave): unknown {
     const obj: any = {};
-    message.creator !== undefined && (obj.creator = message.creator);
+    message.player !== undefined && (obj.player = message.player);
     message.roomId !== undefined &&
       (obj.roomId = (message.roomId || Long.UZERO).toString());
     return obj;
@@ -596,10 +596,10 @@ export const MsgLeave = {
 
   fromPartial(object: DeepPartial<MsgLeave>): MsgLeave {
     const message = { ...baseMsgLeave } as MsgLeave;
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = object.creator;
+    if (object.player !== undefined && object.player !== null) {
+      message.player = object.player;
     } else {
-      message.creator = "";
+      message.player = "";
     }
     if (object.roomId !== undefined && object.roomId !== null) {
       message.roomId = object.roomId as Long;
@@ -727,15 +727,15 @@ export const MsgAddMode = {
   },
 };
 
-const baseMsgAddModeResponse: object = { id: 0 };
+const baseMsgAddModeResponse: object = { modeId: 0 };
 
 export const MsgAddModeResponse = {
   encode(
     message: MsgAddModeResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.id !== 0) {
-      writer.uint32(8).uint32(message.id);
+    if (message.modeId !== 0) {
+      writer.uint32(8).uint32(message.modeId);
     }
     return writer;
   },
@@ -748,7 +748,7 @@ export const MsgAddModeResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.id = reader.uint32();
+          message.modeId = reader.uint32();
           break;
         default:
           reader.skipType(tag & 7);
@@ -760,26 +760,26 @@ export const MsgAddModeResponse = {
 
   fromJSON(object: any): MsgAddModeResponse {
     const message = { ...baseMsgAddModeResponse } as MsgAddModeResponse;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
+    if (object.modeId !== undefined && object.modeId !== null) {
+      message.modeId = Number(object.modeId);
     } else {
-      message.id = 0;
+      message.modeId = 0;
     }
     return message;
   },
 
   toJSON(message: MsgAddModeResponse): unknown {
     const obj: any = {};
-    message.id !== undefined && (obj.id = message.id);
+    message.modeId !== undefined && (obj.modeId = message.modeId);
     return obj;
   },
 
   fromPartial(object: DeepPartial<MsgAddModeResponse>): MsgAddModeResponse {
     const message = { ...baseMsgAddModeResponse } as MsgAddModeResponse;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
+    if (object.modeId !== undefined && object.modeId !== null) {
+      message.modeId = object.modeId;
     } else {
-      message.id = 0;
+      message.modeId = 0;
     }
     return message;
   },
@@ -906,11 +906,17 @@ export const MsgRemoveModeResponse = {
 
 /** Msg defines the Msg service. */
 export interface Msg {
+  /** Host creates a room for a custom game */
   Host(request: MsgHost): Promise<MsgHostResponse>;
+  /** Join adds a player to a room */
   Join(request: MsgJoin): Promise<MsgJoinResponse>;
+  /** Find adds a player to a room based of a mode */
   Find(request: MsgFind): Promise<MsgFindResponse>;
+  /** Leave removes a player from the room they are in. */
   Leave(request: MsgLeave): Promise<MsgLeaveResponse>;
+  /** AddMode adds a new mode */
   AddMode(request: MsgAddMode): Promise<MsgAddModeResponse>;
+  /** RemoveMode removes an existing mode */
   RemoveMode(request: MsgRemoveMode): Promise<MsgRemoveModeResponse>;
 }
 

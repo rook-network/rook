@@ -10,6 +10,12 @@ import {
 
 export const protobufPackage = "rook.matchmaker";
 
+export interface QueryGetRoomsRequest {}
+
+export interface QueryGetRoomsResponse {
+  rooms: IndexedRoom[];
+}
+
 export interface QueryGetRoomRequest {
   id: Long;
 }
@@ -37,6 +43,122 @@ export interface QueryGetParamsRequest {}
 export interface QueryGetParamsResponse {
   params?: Params;
 }
+
+const baseQueryGetRoomsRequest: object = {};
+
+export const QueryGetRoomsRequest = {
+  encode(
+    _: QueryGetRoomsRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryGetRoomsRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetRoomsRequest } as QueryGetRoomsRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryGetRoomsRequest {
+    const message = { ...baseQueryGetRoomsRequest } as QueryGetRoomsRequest;
+    return message;
+  },
+
+  toJSON(_: QueryGetRoomsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<QueryGetRoomsRequest>): QueryGetRoomsRequest {
+    const message = { ...baseQueryGetRoomsRequest } as QueryGetRoomsRequest;
+    return message;
+  },
+};
+
+const baseQueryGetRoomsResponse: object = {};
+
+export const QueryGetRoomsResponse = {
+  encode(
+    message: QueryGetRoomsResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    for (const v of message.rooms) {
+      IndexedRoom.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryGetRoomsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGetRoomsResponse } as QueryGetRoomsResponse;
+    message.rooms = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.rooms.push(IndexedRoom.decode(reader, reader.uint32()));
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetRoomsResponse {
+    const message = { ...baseQueryGetRoomsResponse } as QueryGetRoomsResponse;
+    message.rooms = [];
+    if (object.rooms !== undefined && object.rooms !== null) {
+      for (const e of object.rooms) {
+        message.rooms.push(IndexedRoom.fromJSON(e));
+      }
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGetRoomsResponse): unknown {
+    const obj: any = {};
+    if (message.rooms) {
+      obj.rooms = message.rooms.map((e) =>
+        e ? IndexedRoom.toJSON(e) : undefined
+      );
+    } else {
+      obj.rooms = [];
+    }
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryGetRoomsResponse>
+  ): QueryGetRoomsResponse {
+    const message = { ...baseQueryGetRoomsResponse } as QueryGetRoomsResponse;
+    message.rooms = [];
+    if (object.rooms !== undefined && object.rooms !== null) {
+      for (const e of object.rooms) {
+        message.rooms.push(IndexedRoom.fromPartial(e));
+      }
+    }
+    return message;
+  },
+};
 
 const baseQueryGetRoomRequest: object = { id: Long.UZERO };
 
@@ -532,13 +654,15 @@ export const QueryGetParamsResponse = {
 
 /** Query defines the gRPC querier service. */
 export interface Query {
+  /** Rooms returns all the public rooms that a player can join */
+  Rooms(request: QueryGetRoomsRequest): Promise<QueryGetRoomsResponse>;
   /** Room returns the current state of a specific room */
   Room(request: QueryGetRoomRequest): Promise<QueryGetRoomResponse>;
   /** Invitations lists all the rooms that a player is invited to */
   Invitations(
     request: QueryGetInvitationsRequest
   ): Promise<QueryGetInvitationsResponse>;
-  /** Modes lists all the publicly available modes */
+  /** Modes lists all the publicly available modes and their respective room ids */
   Modes(request: QueryGetModesRequest): Promise<QueryGetModesResponse>;
   /** Params lists the current matchmaker params */
   Params(request: QueryGetParamsRequest): Promise<QueryGetParamsResponse>;
@@ -548,11 +672,20 @@ export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   constructor(rpc: Rpc) {
     this.rpc = rpc;
+    this.Rooms = this.Rooms.bind(this);
     this.Room = this.Room.bind(this);
     this.Invitations = this.Invitations.bind(this);
     this.Modes = this.Modes.bind(this);
     this.Params = this.Params.bind(this);
   }
+  Rooms(request: QueryGetRoomsRequest): Promise<QueryGetRoomsResponse> {
+    const data = QueryGetRoomsRequest.encode(request).finish();
+    const promise = this.rpc.request("rook.matchmaker.Query", "Rooms", data);
+    return promise.then((data) =>
+      QueryGetRoomsResponse.decode(new _m0.Reader(data))
+    );
+  }
+
   Room(request: QueryGetRoomRequest): Promise<QueryGetRoomResponse> {
     const data = QueryGetRoomRequest.encode(request).finish();
     const promise = this.rpc.request("rook.matchmaker.Query", "Room", data);

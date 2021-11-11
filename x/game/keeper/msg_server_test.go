@@ -28,7 +28,7 @@ func TestGame(t *testing.T) {
 	server := keeper.NewMsgServerImpl(app.GameKeeper)
 	querier := app.GameKeeper
 
-	latestParamsRequest := &types.QueryGetParamsRequest{Version: 0}
+	latestParamsRequest := &types.QueryParamsRequest{Version: 0}
 	paramsResp, err := querier.Params(goCtx, latestParamsRequest)
 	require.NoError(t, err)
 	require.Equal(t, uint32(1), paramsResp.Version)
@@ -38,16 +38,16 @@ func TestGame(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, id, createResp.GameId)
 
-	gameRequest := &types.QueryGetGameRequest{Id: id}
-	getGameResp, err := querier.Game(goCtx, gameRequest)
+	gameRequest := &types.QueryGameByIDRequest{Id: id}
+	getGameResp, err := querier.FindByID(goCtx, gameRequest)
 	require.NoError(t, err)
 	require.Equal(t, id, getGameResp.Id)
 	require.Equal(t, uint32(1), getGameResp.Overview.ParamVersion)
 	gameMap := types.GenerateMap(config.Map)
 	require.Equal(t, gameMap, getGameResp.Overview.Map)
 
-	stateRequest := &types.QueryGetGameStateRequest{Id: id}
-	getStateResponse, err := querier.GameState(goCtx, stateRequest)
+	stateRequest := &types.QueryGameStateRequest{Id: id}
+	getStateResponse, err := querier.State(goCtx, stateRequest)
 	require.Equal(t, uint64(0), getStateResponse.State.Step)
 	require.Len(t, getStateResponse.State.Players, len(addrs))
 	require.Empty(t, getStateResponse.State.Gaia)
@@ -61,7 +61,7 @@ func TestGame(t *testing.T) {
 
 	querier.UpdateGames(ctx)
 
-	getStateResponse, err = querier.GameState(goCtx, stateRequest)
+	getStateResponse, err = querier.State(goCtx, stateRequest)
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), getStateResponse.State.Step)
 	require.Len(t, getStateResponse.State.Players[0].Population, 2)
@@ -84,7 +84,7 @@ func TestGame(t *testing.T) {
 
 	querier.UpdateGames(ctx)
 
-	getStateResponse, err = querier.GameState(goCtx, stateRequest)
+	getStateResponse, err = querier.State(goCtx, stateRequest)
 	require.NoError(t, err)
 	require.Equal(t, uint64(2), getStateResponse.State.Step)
 
