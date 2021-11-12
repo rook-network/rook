@@ -3,11 +3,11 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
-	"github.com/tendermint/tendermint/crypto/tmhash"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	"github.com/tendermint/tendermint/crypto/tmhash"
+	"github.com/tendermint/tendermint/libs/log"
 
 	game "github.com/arcane-systems/rook/x/game/types"
 	"github.com/arcane-systems/rook/x/matchmaker/types"
@@ -45,22 +45,13 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 func (k Keeper) CreateGameWithEvents(ctx sdk.Context, roomID uint64, room types.Room) {
 	gameID, err := k.CreateGame(ctx, roomID, room)
 	if err != nil {
-		ctx.EventManager().EmitTypedEvent(&types.EventRoomError{
-			RoomId: roomID,
-			Error:  err.Error(),
-		})
+		ctx.Logger().Error("failed to create game", "err", err)
 	}
 
-	ctx.EventManager().EmitTypedEvent(&types.EventGameStarted{
-		RoomId: roomID,
-		GameId: gameID,
-	})
+	ctx.EventManager().EmitEvent(types.NewGameStartedEvent(roomID, gameID))
 }
 
 func (k Keeper) CreateGame(ctx sdk.Context, roomID uint64, room types.Room) (uint64, error) {
-	// NOTE: we use the block time as a deterministic source of randomness for generating
-	// game maps. We may in the future want a better source of randomness but this suffices
-	// for now.
 	var config game.Config
 	switch g := room.Game.(type) {
 	case *types.Room_Config:
@@ -73,6 +64,13 @@ func (k Keeper) CreateGame(ctx sdk.Context, roomID uint64, room types.Room) (uin
 		config = mode.Config
 	default:
 		return 0, fmt.Errorf("unknown room game type %T", g)
+	}
+
+	if !config.HasSeed() {
+		// TODO: for common games we need to set a seed. For now, we use the unix block time as the
+		// seed although this is a poor random generator and will mean that all games started in a
+		// height will have the same map
+		config.Map.Seed = ctx.BlockTime().Unix()
 	}
 
 	msg := game.NewMsgCreate(room.Players, config)
@@ -117,6 +115,7 @@ func (k Keeper) UpdateRooms(ctx sdk.Context) {
 
 			case room.HasQuorum():
 				room.ReadyUp(now)
+				k.SetRoom(ctx, roomID, room)
 
 			case room.HasExpired(now, params.RoomLifespan):
 				k.DeleteRoomWithEvents(ctx, roomID, room)
@@ -189,10 +188,7 @@ func (k Keeper) RemovePlayerFromCurrentRoom(ctx sdk.Context, player string) {
 			k.SetRoom(ctx, ir.RoomId, ir.Room)
 		}
 
-		ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
-			RoomId:         ir.RoomId,
-			RemovedPlayers: []string{player},
-		})
+		ctx.EventManager().EmitEvent(types.NewPlayerLeftEvent(ir.RoomId, player))
 	}
 }
 
@@ -219,10 +215,9 @@ func (k Keeper) SetRoom(ctx sdk.Context, roomID uint64, room types.Room) {
 
 func (k Keeper) DeleteRoomWithEvents(ctx sdk.Context, roomID uint64, room types.Room) {
 	k.DeleteRoom(ctx, roomID)
-	ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
-		RoomId:         roomID,
-		RemovedPlayers: room.Players,
-	})
+	for _, player := range room.Players {
+		ctx.EventManager().EmitEvent(types.NewPlayerLeftEvent(roomID, player))
+	}
 }
 
 func (k Keeper) DeleteRoom(ctx sdk.Context, roomID uint64) {
@@ -309,7 +304,7 @@ func (k Keeper) CheckForMode(ctx sdk.Context, mode types.Mode) (uint32, int) {
 		modeHash := tmhash.Sum(modeIter.Value())
 		if _, exists := modeHashMap[string(modeHash)]; exists {
 			return types.ParseModeKey(modeIter.Key()), 0
-		}		
+		}
 		modeHashMap[string(modeHash)] = struct{}{}
 	}
 	return 0, counter

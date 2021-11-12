@@ -324,6 +324,10 @@ func (g *Game) Update() {
 	g.Step++
 }
 
+func (g Game) Players() []string {
+	return g.players
+}
+
 func (g Game) playerIndex(player string) int {
 	for idx, p := range g.players {
 		if player == p {

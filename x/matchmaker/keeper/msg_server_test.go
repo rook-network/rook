@@ -17,7 +17,7 @@ import (
 func TestMatchmakerHostAndJoinPublicRoom(t *testing.T) {
 	dir := t.TempDir()
 	app := simapp.New(dir)
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+	ctx := app.BaseApp.NewContext(false, tmproto.Header{Time: time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)})
 	goCtx := sdk.WrapSDKContext(ctx)
 	addrs := simapp.AddTestAddrsIncremental(app, ctx, 5, sdk.NewInt(30000000))
 	alice, bob, charles, david, emma := addrs[0].String(), addrs[1].String(), addrs[2].String(), addrs[3].String(), addrs[4].String()
@@ -114,6 +114,10 @@ func TestMatchmakerHostAndJoinPublicRoom(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), types.ErrRoomNotFound.Error())
 
+	game, err := app.GameKeeper.GetGame(ctx, uint64(1))
+	require.NoError(t, err)
+	require.Equal(t, game.Players(), queryRoomResp2.Room.Players)
+
 	// change the params
 	newParams := types.DefaultParams()
 	newParams.PrestartWaitPeriod = time.Duration(5 * time.Second)
@@ -128,7 +132,8 @@ func TestMatchmakerHostAndJoinPublicRoom(t *testing.T) {
 func TestMatchmakerInvitationsToPrivateGame(t *testing.T) {
 	dir := t.TempDir()
 	app := simapp.New(dir)
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+	blockTime := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+	ctx := app.BaseApp.NewContext(false, tmproto.Header{Time: blockTime})
 	goCtx := sdk.WrapSDKContext(ctx)
 	addrs := simapp.AddTestAddrsIncremental(app, ctx, 4, sdk.NewInt(30000000))
 	alice, bob, charles, david := addrs[0].String(), addrs[1].String(), addrs[2].String(), addrs[3].String()
@@ -167,6 +172,11 @@ func TestMatchmakerInvitationsToPrivateGame(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, uint64(2), findResp.RoomId)
 
+	// If bob tries to find the same room again, nothing should happen
+	findResp, err = server.Find(goCtx, types.NewMsgFind(bob, 1))
+	require.NoError(t, err)
+	require.Equal(t, uint64(2), findResp.RoomId)
+
 	// alice should be the only player in room 1
 	roomResp, err = querier.Room(goCtx, &types.QueryGetRoomRequest{Id: hostResp.RoomId})
 	require.NoError(t, err)
@@ -176,6 +186,25 @@ func TestMatchmakerInvitationsToPrivateGame(t *testing.T) {
 	roomResp, err = querier.Room(goCtx, &types.QueryGetRoomRequest{Id: findResp.RoomId})
 	require.NoError(t, err)
 	require.Equal(t, []string{bob}, roomResp.Room.Players)
+
+	// Charles joins room 1 and now we should have a quorum
+	_, err = server.Join(goCtx, types.NewMsgJoin(charles, hostResp.RoomId))
+	require.NoError(t, err)
+
+	// we wait the necessary time to start the game with the quorum
+	querier.UpdateRooms(ctx)
+	quorumDelay := types.DefaultParams().PrestartWaitPeriod + 1*time.Second
+	newCtx := app.BaseApp.NewContext(false, tmproto.Header{Time: blockTime.Add(quorumDelay)})
+	querier.UpdateRooms(newCtx)
+
+	// Room 1 should have been removed and a new game started
+	_, err = querier.Room(goCtx, &types.QueryGetRoomRequest{Id: hostResp.RoomId})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), types.ErrRoomNotFound.Error())
+
+	game, err := app.GameKeeper.GetGame(ctx, uint64(1))
+	require.NoError(t, err)
+	require.Equal(t, []string{alice, charles}, game.Players())
 }
 
 func TestMatchmakerAddAndRemoveModes(t *testing.T) {

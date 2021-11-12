@@ -3,8 +3,8 @@ import Long from "long";
 import _m0 from "protobufjs/minimal";
 import {
   Room,
-  Params,
   IndexedRoom,
+  Params,
   IndexedMode,
 } from "../../rook/matchmaker/matchmaker";
 
@@ -22,6 +22,14 @@ export interface QueryGetRoomRequest {
 
 export interface QueryGetRoomResponse {
   room?: Room;
+}
+
+export interface QueryRoomByPlayerRequest {
+  player: string;
+}
+
+export interface QueryRoomByPlayerResponse {
+  room?: IndexedRoom;
 }
 
 export interface QueryGetInvitationsRequest {
@@ -274,6 +282,145 @@ export const QueryGetRoomResponse = {
     const message = { ...baseQueryGetRoomResponse } as QueryGetRoomResponse;
     if (object.room !== undefined && object.room !== null) {
       message.room = Room.fromPartial(object.room);
+    } else {
+      message.room = undefined;
+    }
+    return message;
+  },
+};
+
+const baseQueryRoomByPlayerRequest: object = { player: "" };
+
+export const QueryRoomByPlayerRequest = {
+  encode(
+    message: QueryRoomByPlayerRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.player !== "") {
+      writer.uint32(10).string(message.player);
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryRoomByPlayerRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryRoomByPlayerRequest,
+    } as QueryRoomByPlayerRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.player = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryRoomByPlayerRequest {
+    const message = {
+      ...baseQueryRoomByPlayerRequest,
+    } as QueryRoomByPlayerRequest;
+    if (object.player !== undefined && object.player !== null) {
+      message.player = String(object.player);
+    } else {
+      message.player = "";
+    }
+    return message;
+  },
+
+  toJSON(message: QueryRoomByPlayerRequest): unknown {
+    const obj: any = {};
+    message.player !== undefined && (obj.player = message.player);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryRoomByPlayerRequest>
+  ): QueryRoomByPlayerRequest {
+    const message = {
+      ...baseQueryRoomByPlayerRequest,
+    } as QueryRoomByPlayerRequest;
+    if (object.player !== undefined && object.player !== null) {
+      message.player = object.player;
+    } else {
+      message.player = "";
+    }
+    return message;
+  },
+};
+
+const baseQueryRoomByPlayerResponse: object = {};
+
+export const QueryRoomByPlayerResponse = {
+  encode(
+    message: QueryRoomByPlayerResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.room !== undefined) {
+      IndexedRoom.encode(message.room, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(
+    input: _m0.Reader | Uint8Array,
+    length?: number
+  ): QueryRoomByPlayerResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = {
+      ...baseQueryRoomByPlayerResponse,
+    } as QueryRoomByPlayerResponse;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.room = IndexedRoom.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryRoomByPlayerResponse {
+    const message = {
+      ...baseQueryRoomByPlayerResponse,
+    } as QueryRoomByPlayerResponse;
+    if (object.room !== undefined && object.room !== null) {
+      message.room = IndexedRoom.fromJSON(object.room);
+    } else {
+      message.room = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: QueryRoomByPlayerResponse): unknown {
+    const obj: any = {};
+    message.room !== undefined &&
+      (obj.room = message.room ? IndexedRoom.toJSON(message.room) : undefined);
+    return obj;
+  },
+
+  fromPartial(
+    object: DeepPartial<QueryRoomByPlayerResponse>
+  ): QueryRoomByPlayerResponse {
+    const message = {
+      ...baseQueryRoomByPlayerResponse,
+    } as QueryRoomByPlayerResponse;
+    if (object.room !== undefined && object.room !== null) {
+      message.room = IndexedRoom.fromPartial(object.room);
     } else {
       message.room = undefined;
     }
@@ -658,6 +805,8 @@ export interface Query {
   Rooms(request: QueryGetRoomsRequest): Promise<QueryGetRoomsResponse>;
   /** Room returns the current state of a specific room */
   Room(request: QueryGetRoomRequest): Promise<QueryGetRoomResponse>;
+  /** Player returns the room that the player is in if any */
+  Player(request: QueryRoomByPlayerRequest): Promise<QueryRoomByPlayerResponse>;
   /** Invitations lists all the rooms that a player is invited to */
   Invitations(
     request: QueryGetInvitationsRequest
@@ -674,6 +823,7 @@ export class QueryClientImpl implements Query {
     this.rpc = rpc;
     this.Rooms = this.Rooms.bind(this);
     this.Room = this.Room.bind(this);
+    this.Player = this.Player.bind(this);
     this.Invitations = this.Invitations.bind(this);
     this.Modes = this.Modes.bind(this);
     this.Params = this.Params.bind(this);
@@ -691,6 +841,16 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("rook.matchmaker.Query", "Room", data);
     return promise.then((data) =>
       QueryGetRoomResponse.decode(new _m0.Reader(data))
+    );
+  }
+
+  Player(
+    request: QueryRoomByPlayerRequest
+  ): Promise<QueryRoomByPlayerResponse> {
+    const data = QueryRoomByPlayerRequest.encode(request).finish();
+    const promise = this.rpc.request("rook.matchmaker.Query", "Player", data);
+    return promise.then((data) =>
+      QueryRoomByPlayerResponse.decode(new _m0.Reader(data))
     );
   }
 

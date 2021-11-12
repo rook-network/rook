@@ -21,6 +21,11 @@ service Query {
     option (google.api.http).get = "/matchmaker/room/{id}";
   }
 
+  // Player returns the room that the player is in if any
+  rpc Player(QueryRoomByPlayerRequest) returns (QueryRoomByPlayerResponse) {
+    option (google.api.http).get = "/matchmaker/player/{player}";
+  }
+
   // Invitations lists all the rooms that a player is invited to
   rpc Invitations(QueryGetInvitationsRequest)
       returns (QueryGetInvitationsResponse) {
@@ -47,6 +52,10 @@ message QueryGetRoomsResponse {
 message QueryGetRoomRequest { uint64 id = 1; }
 
 message QueryGetRoomResponse { Room room = 1; }
+
+message QueryRoomByPlayerRequest { string player = 1; }
+
+message QueryRoomByPlayerResponse { IndexedRoom room = 1; }
 
 message QueryGetInvitationsRequest { string player = 1; }
 

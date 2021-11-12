@@ -5,6 +5,9 @@ import "rook/game/game.proto";
 
 option go_package = "github.com/arcane-systems/rook/x/game/types";
 
+// FIXME: These events are currently not used because they add "" to each
+// field and make it difficult to parse and query. Vanilla events are used instead.
+
 message EventNewGame {
   uint64 game_id = 1;
   repeated string players = 2;

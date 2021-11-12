@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/arcane-systems/rook/x/matchmaker/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -64,10 +63,8 @@ func (m msgServer) Host(goCtx context.Context, msg *types.MsgHost) (*types.MsgHo
 
 	m.Keeper.IncrementNextRoomID(ctx)
 
-	ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
-		RoomId:       roomID,
-		AddedPlayers: []string{msg.Host},
-	})
+	// FIXME: emitting types events uses double strings which makes it difficult to parse
+	ctx.EventManager().EmitEvent(types.NewPlayerJoinedEvent(roomID, msg.Host))
 
 	return &types.MsgHostResponse{RoomId: roomID}, nil
 }
@@ -82,20 +79,26 @@ func (m msgServer) Join(goCtx context.Context, msg *types.MsgJoin) (*types.MsgJo
 	}
 
 	err := room.TryAddPlayer(msg.Player)
-	if err != nil {
-		return nil, err
+	switch err {
+	case nil:
+		// Check if the player is already in a room. If so, remove them from the existing room
+		m.Keeper.RemovePlayerFromCurrentRoom(ctx, msg.Player)
+
+		if room.IsFull() && room.Public && room.IsCommon() {
+			m.Keeper.DetachCommonRoom(ctx, room.ModeID())
+		}
+
+		// persist changes to that room
+		m.Keeper.SetRoom(ctx, msg.RoomId, room)
+
+		ctx.EventManager().EmitEvent(types.NewPlayerJoinedEvent(msg.RoomId, msg.Player))
+
+	// do nothing if the player is already in the same room
+	case types.ErrPlayerAlreadyInRoom:
+
+	default:
+		return nil, err	
 	}
-
-	// Check if the player is already in a room. If so, remove them from the existing room
-	m.Keeper.RemovePlayerFromCurrentRoom(ctx, msg.Player)
-
-	// persist changes to that room
-	m.Keeper.SetRoom(ctx, msg.RoomId, room)
-
-	ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
-		RoomId:       msg.RoomId,
-		AddedPlayers: []string{msg.Player},
-	})
 
 	return &types.MsgJoinResponse{}, nil
 }
@@ -125,24 +128,26 @@ func (m msgServer) Find(goCtx context.Context, msg *types.MsgFind) (*types.MsgFi
 	}
 
 	err := room.TryAddPlayer(msg.Player)
-	if err != nil {
-		return nil, fmt.Errorf("error adding player to room: %w", err)
+	switch err {
+	case nil:
+		// Check if the player is already in a room. If so, remove them from the existing room
+		m.Keeper.RemovePlayerFromCurrentRoom(ctx, msg.Player)
+
+		if room.IsFull() {
+			m.Keeper.DetachCommonRoom(ctx, msg.Mode)
+		}
+
+		// persist changes to that room
+		m.Keeper.SetRoom(ctx, roomID, room)
+
+		ctx.EventManager().EmitEvent(types.NewPlayerJoinedEvent(roomID, msg.Player))
+
+	// do nothing if the player is already in the same room
+	case types.ErrPlayerAlreadyInRoom:
+
+	default:
+		return nil, err	
 	}
-
-	// Check if the player is already in a room. If so, remove them from the existing room
-	m.Keeper.RemovePlayerFromCurrentRoom(ctx, msg.Player)
-
-	if room.IsFull() {
-		m.Keeper.DetachCommonRoom(ctx, msg.Mode)
-	}
-
-	// persist changes to that room
-	m.Keeper.SetRoom(ctx, roomID, room)
-
-	ctx.EventManager().EmitTypedEvent(&types.EventRoomUpdated{
-		RoomId:       roomID,
-		AddedPlayers: []string{msg.Player},
-	})
 
 	return &types.MsgFindResponse{RoomId: roomID}, nil
 }

@@ -23,6 +23,8 @@ export interface MMState {
 type Status = 'home' | 'find' | 'host' | 'join' | 'room' | 'mode'
 
 class Matchmaker extends React.Component<MMProps, MMState> {
+  checkRoom = false
+
   constructor(props: MMProps) {
     super(props)
     this.state = {
@@ -33,6 +35,23 @@ class Matchmaker extends React.Component<MMProps, MMState> {
     this.hostGame = this.hostGame.bind(this)
     this.joinGame = this.joinGame.bind(this)
     this.findGame = this.findGame.bind(this)
+  }
+
+  async componentDidMount() {
+    if (!this.checkRoom) {
+      const resp = await this.props.provider.query.Player({player: this.props.address})
+      if (resp.room) {
+        console.log("player is currently in a room")
+        this.setState({
+          status: 'room',
+          room: resp.room.room,
+          roomID: resp.room.roomId,
+        })
+      } else {
+        console.log("player is not currently in a room")
+      }
+      this.checkRoom = true
+    }
   }
 
   hostGame() {
@@ -143,17 +162,18 @@ interface RoomProps {
 export const RoomComponent = (props: RoomProps) => {
   if (!props.room) {
     if (props.id.gt(0)) {
+      const msg = "Joining Room " + props.id.toString() + "..."
       return (
-        <Card>
-          Joining Room {props.id.toString()}...
-        </Card>
+        <LoadingCard
+          message={msg}
+        />
       )
     }
 
     return (
-      <Card>
-        Finding Room...
-      </Card>
+      <LoadingCard
+          message="Finding Room..."
+      />
     )
   }
 
@@ -165,7 +185,7 @@ export const RoomComponent = (props: RoomProps) => {
         <p style={{ textAlign: "left" }}>Players:</p>
         <ul>
           { props.room.players.map((player, index) => 
-            <li className={styles.player}>{player}</li>
+            <li key={index} className={styles.player}>{player}</li>
           )}
         </ul>
         { props.room.pending.length > 0 &&
@@ -173,7 +193,7 @@ export const RoomComponent = (props: RoomProps) => {
             <p style={{ textAlign: "left" }}>Invited:</p>
             <ul>
               { props.room.pending.map((player, index) => 
-                <li className={styles.player}>{player}</li>
+                <li key={index} className={styles.player}>{player}</li>
               )}
             </ul>
           </div>

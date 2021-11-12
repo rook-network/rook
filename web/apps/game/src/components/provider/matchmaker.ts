@@ -20,10 +20,12 @@ export const typeMsgLeave = "/rook.matchmaker.MsgLeave"
 export const typeMsgAddMode = "/rook.matchmaker.MsgAddMode"
 export const typeMsgRemoveMode = "/rook.matchmaker.MsgRemoveMode" 
 
-export const eventRoomUpdated = "rook.matchmaker.EventRoomUpdated"
-export const eventGameStarted = "rook.matchmaker.EventGameStarted"
+export const eventRoom = "matchmaker.room"
 
 export const attributeRoomID = "room_id"
+export const attributeGameID = "game_id"
+export const attributePlayerJoined = "player_joined"
+export const attributePlayerLeft = "player_left"
 
 export function registerMatchmakerMsgs(registry: Registry) {
     registry.register(typeMsgFind, MsgFind)
@@ -48,6 +50,7 @@ export class MatchmakerProvider {
     private onUpdate?: (room: Room) => void
     private onGameStart?: (id: Long) => void
     private room?: Room
+    private roomID?: Long
 
     constructor(querier: QueryClient, client: SigningStargateClient, address: string) {
         const protoRpcClient = createProtobufRpcClient(querier)
@@ -63,10 +66,8 @@ export class MatchmakerProvider {
                 if (parsedEvent.query === undefined) {
                     return
                 }
-                if (parsedEvent.query.contains(eventRoomUpdated)) {
-                    this.parseJoinedRoomEvent(parsedEvent)
-                } else if (parsedEvent.query.contains(eventGameStarted)) {
-                    this.parseGameStartedEvent(parsedEvent)
+                if (parsedEvent.query.contains(eventRoom)) {
+                    this.parseRoomEvent(parsedEvent)
                 }
             },
             (event: SocketWrapperErrorEvent) => { console.error(event)}
@@ -97,6 +98,7 @@ export class MatchmakerProvider {
         this.onUpdate(resp.room)
         this.onGameStart = onGameStart
         this.room = resp.room
+        this.roomID = id
 
         // await for the socket to be connected
         await this.socket.connected
@@ -106,16 +108,7 @@ export class MatchmakerProvider {
             method: "subscribe",
             id: "0",
             params: {
-                query: `${eventRoomUpdated}.room_id='${id.toString()}'`
-            }
-        }))
-        // open a subscription for when the game starts
-        await this.socket.send(JSON.stringify({
-            jsonrpc: "2.0",
-            method: "subscribe",
-            id: "0",
-            params: {
-                query: `${eventGameStarted}.room_id='${id}'`
+                query: `${eventRoom}.${attributeRoomID}='${id.toString()}'`
             }
         }))
         console.log("subscribed to room " + id)
@@ -137,45 +130,48 @@ export class MatchmakerProvider {
         this.socket.disconnect()
     }
 
-    private parseJoinedRoomEvent(event: any): void {
-        if (!this.room || !this.onUpdate) {
-            console.error("received room event but subscription not set")
+    private parseRoomEvent(event: any): void {
+        if (!this.room || !this.onUpdate || !this.roomID  || !this.onGameStart ) {
+            console.error("received room event but no subscription set")
             return
         } 
         if (!event.result.events) {
-            console.log("no events")
-            return
-        }
-        if (!event.result.events["joined_room.player"]) {
-            console.log("no joined room")
+            console.error("no events")
             return
         }
 
-        if (event.result.events["joined_room.player"]) {
-            this.room.players.push(event.result.events["joined_room.player"][0])
+        if (!event.result.events["matchmaker.room.room_id"]) {
+            console.error("no event containing a room ID")
+            return
+        }
+
+        if (event.result.events["matchmaker.room.room_id"][0] !== this.roomID.toString()) {
+            console.error("received event update for a room we are not listening to")
+            return
+        }
+
+
+        if (event.result.events["matchmaker.room.player_joined"]) {
+            this.room.players.push(event.result.event["matchmaker.room.player_joined"][0])
             this.onUpdate(this.room)
         }
+
+        if (event.result.events["matchmaker.room.player_left"]) {
+            const removedPlayer = event.result.event["matchmaker.room.player_left"][0] as string
+            for (let i = 0; i < this.room.players.length; i++) {
+                if (this.room.players[i] === removedPlayer) {
+                    this.room.players.splice(i, 1)
+                    break
+                }
+            }
+            this.onUpdate(this.room)
+        }
+
+        if (event.result.events["matchmaker.room.game_id"]) {
+            const gameID = Long.fromString(event.result.event["matchmaker.room.game_id"][0])
+            this.onGameStart(gameID)
+        }
     }
-
-    private parseGameStartedEvent(event: any): void {
-        if (!this.onGameStart) {
-            console.error("received game started event but subscription not sent")
-        }
-        if (!event.result.events) {
-            console.log("no events")
-            return
-        }
-        if (!event.result.events["joined_room.player"]) {
-            console.log("no joined room")
-            return
-        }
-
-        // if (event.result.events["joined_room.player"]) {
-        //     this.room.players.push(event.result.events["joined_room.player"][0])
-        //     this.onUpdate(this.room)
-        // }
-    }
-
 
 }
 
@@ -220,7 +216,7 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
         if (resp.rawLog !== undefined) {
             const events = JSON.parse(resp.rawLog)[0].events as Event[]
             for (const event of events) {
-                if (event.type === eventRoomUpdated) {
+                if (event.type === eventRoom) {
                     
                     return {
                         roomId: Long.fromString(event.attributes[0].value.toString())
@@ -249,9 +245,10 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
         if (resp.rawLog !== undefined) {
             const events = JSON.parse(resp.rawLog)[0].events as Event[]
             console.log(events)
-            const event = findFirstEventType(events, eventRoomUpdated)
+            const event = findFirstEventType(events, eventRoom)
             if (event) {
                 const roomIDStr = findValueFromEventKey(event, attributeRoomID)
+                console.log("room id: " + roomIDStr)
                 if (roomIDStr) {
                     return {
                         roomId: Long.fromString(roomIDStr),
@@ -259,7 +256,7 @@ export class MatchmakerMsgClient implements IMatchmakerMsgClient {
                 }
                 throw new Error("could not find " + attributeRoomID + " attribute key.")
             }
-            throw new Error("could not find " + eventRoomUpdated + " event.")
+            throw new Error("could not find " + eventRoom + " event.")
         }
         throw new Error("Unable to parse transaction response: " + JSON.stringify(resp))
     }
@@ -296,7 +293,8 @@ function findFirstEventType(events: Event[], type: string): Event | null {
 function findValueFromEventKey(event: Event, key: string): string | null {
     for (const attribute of event.attributes) {
         if (attribute.key.toString() === key) {
-            return parseAttributeString(attribute.value)
+            return attribute.value.toString()
+            // return parseAttributeString(attribute.value)
         }
     }
     return null

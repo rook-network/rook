@@ -27,6 +27,7 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 
 	// this line is used by starport scaffolding # 1
 	cmd.AddCommand(CmdQueryGame())
+	cmd.AddCommand(CmdQueryParams())
 
 	return cmd
 }
@@ -58,7 +59,6 @@ func CmdQueryGame() *cobra.Command {
 				return err
 			}
 
-
 			req := &types.QueryGameByIDRequest{
 				Id: id,
 			}
@@ -76,10 +76,6 @@ func CmdQueryGame() *cobra.Command {
 
 	return cmd
 }
-
-// func CmdQueryAllGames() *cobra.Command {
-
-// }
 
 func CmdQueryParams() *cobra.Command {
 	cmd := &cobra.Command{

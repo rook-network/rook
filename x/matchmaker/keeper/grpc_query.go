@@ -25,6 +25,15 @@ func (q Keeper) Room(goCtx context.Context, req *types.QueryGetRoomRequest) (*ty
 	return &types.QueryGetRoomResponse{Room: &room}, nil
 }
 
+func (q Keeper) Player(goCtx context.Context, req *types.QueryRoomByPlayerRequest) (*types.QueryRoomByPlayerResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	exists, room := q.FindPlayer(ctx, req.Player)
+	if !exists {
+		return &types.QueryRoomByPlayerResponse{}, nil
+	}
+	return &types.QueryRoomByPlayerResponse{Room: &room}, nil
+}
+
 func (q Keeper) Invitations(goCtx context.Context, req *types.QueryGetInvitationsRequest) (*types.QueryGetInvitationsResponse, error) {
 	return &types.QueryGetInvitationsResponse{}, nil
 }
