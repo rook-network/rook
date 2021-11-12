@@ -4,7 +4,7 @@ import {
 } from '../../codec/rook/matchmaker/tx'
 import { SocketWrapper, SocketWrapperMessageEvent, SocketWrapperErrorEvent } from '@cosmjs/socket'
 import { Event } from '@cosmjs/tendermint-rpc'
-import { QueryClientImpl as MatchmakerQueryClient, QueryGetRoomResponse} from '../../codec/rook/matchmaker/query'
+import { QueryClientImpl as MatchmakerQueryClient} from '../../codec/rook/matchmaker/query'
 import { SigningStargateClient, QueryClient, createProtobufRpcClient, isBroadcastTxSuccess, BroadcastTxSuccess } from "@cosmjs/stargate"
 import { Registry } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing'
 import Long from 'long'
@@ -63,12 +63,10 @@ export class MatchmakerProvider {
             (event: SocketWrapperMessageEvent) => { 
                 const parsedEvent = JSON.parse(event.data)
                 console.log(parsedEvent)
-                if (parsedEvent.query === undefined) {
+                if (!parsedEvent.result) {
                     return
                 }
-                if (parsedEvent.query.contains(eventRoom)) {
-                    this.parseRoomEvent(parsedEvent)
-                }
+                this.parseRoomEvent(parsedEvent.result.events)
             },
             (event: SocketWrapperErrorEvent) => { console.error(event)}
         )
@@ -78,8 +76,6 @@ export class MatchmakerProvider {
     }
 
     async subscribeToRoom(id: Long, onUpdate: (room: Room) => void, onGameStart: (id: Long) => void): Promise<void> {
-        this.socket.connect()
-
         if (this.room !== undefined) {
             throw new Error("already subscribed to room events")
         }
@@ -101,6 +97,7 @@ export class MatchmakerProvider {
         this.roomID = id
 
         // await for the socket to be connected
+        // this.socket.connect()
         await this.socket.connected
         // open subscription for room updates
         await this.socket.send(JSON.stringify({
@@ -130,34 +127,45 @@ export class MatchmakerProvider {
         this.socket.disconnect()
     }
 
-    private parseRoomEvent(event: any): void {
+    private parseRoomEvent(events: any): void {
         if (!this.room || !this.onUpdate || !this.roomID  || !this.onGameStart ) {
             console.error("received room event but no subscription set")
             return
         } 
-        if (!event.result.events) {
+        if (!events) {
             console.error("no events")
             return
         }
 
-        if (!event.result.events["matchmaker.room.room_id"]) {
+        if (!events["matchmaker.room.room_id"]) {
             console.error("no event containing a room ID")
             return
         }
 
-        if (event.result.events["matchmaker.room.room_id"][0] !== this.roomID.toString()) {
+        if (events["matchmaker.room.room_id"][0] !== this.roomID.toString()) {
             console.error("received event update for a room we are not listening to")
             return
         }
 
-
-        if (event.result.events["matchmaker.room.player_joined"]) {
-            this.room.players.push(event.result.event["matchmaker.room.player_joined"][0])
-            this.onUpdate(this.room)
+        if (events["matchmaker.room.player_joined"]) {
+            // NOTE: because the sdk event system sends multiple occurences of the same
+            // event we need to check whether the player has already been added to avoid
+            // adding the same player twice
+            const newPlayer = events["matchmaker.room.player_joined"][0]
+            let exists = false
+            for (const player of this.room.players) {
+                if (player === newPlayer) {
+                    exists = true
+                }
+            }
+            if (!exists) {
+                this.room.players.push(newPlayer)
+                this.onUpdate(this.room)
+            }
         }
 
-        if (event.result.events["matchmaker.room.player_left"]) {
-            const removedPlayer = event.result.event["matchmaker.room.player_left"][0] as string
+        if (events["matchmaker.room.player_left"]) {
+            const removedPlayer = events["matchmaker.room.player_left"][0] as string
             for (let i = 0; i < this.room.players.length; i++) {
                 if (this.room.players[i] === removedPlayer) {
                     this.room.players.splice(i, 1)
@@ -167,8 +175,8 @@ export class MatchmakerProvider {
             this.onUpdate(this.room)
         }
 
-        if (event.result.events["matchmaker.room.game_id"]) {
-            const gameID = Long.fromString(event.result.event["matchmaker.room.game_id"][0])
+        if (events["matchmaker.room.game_id"]) {
+            const gameID = Long.fromString(events["matchmaker.room.game_id"][0])
             this.onGameStart(gameID)
         }
     }

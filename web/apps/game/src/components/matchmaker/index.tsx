@@ -10,6 +10,7 @@ export interface MMProps {
   provider: MatchmakerProvider
   modes: IndexedMode[]
   address: string
+  gameFn: (gameID: Long) => void
 }
 
 export interface MMState {
@@ -46,6 +47,14 @@ class Matchmaker extends React.Component<MMProps, MMState> {
           status: 'room',
           room: resp.room.room,
           roomID: resp.room.roomId,
+        })
+        await this.props.provider.subscribeToRoom(resp.room.roomId, (room: Room): void => {
+          this.setState({
+            room: room,
+          })
+        }, (id: Long) => {
+          console.log("starting game: " + id)
+          this.props.gameFn(id)
         })
       } else {
         console.log("player is not currently in a room")
@@ -84,6 +93,7 @@ class Matchmaker extends React.Component<MMProps, MMState> {
           })
         }, (id: Long) => {
           console.log("starting game: " + id)
+          this.props.gameFn(id)
         })
       } catch (err) {
         console.error(err)

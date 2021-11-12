@@ -100,7 +100,6 @@ func (k Keeper) UpdateRooms(ctx sdk.Context) {
 	for ; roomIter.Valid(); roomIter.Next() {
 		var room types.Room
 		k.cdc.MustUnmarshal(roomIter.Value(), &room)
-
 		roomID := types.ParseRoomKey(roomIter.Key())
 
 		switch t := room.Time.(type) {
@@ -112,20 +111,29 @@ func (k Keeper) UpdateRooms(ctx sdk.Context) {
 				if room.IsCommon() {
 					k.DetachCommonRoom(ctx, room.ModeID())
 				}
-
-			case room.HasQuorum():
-				room.ReadyUp(now)
-				k.SetRoom(ctx, roomID, room)
+				ctx.Logger().Info("Started new game and closed room", "roomID", roomID)
 
 			case room.HasExpired(now, params.RoomLifespan):
 				k.DeleteRoomWithEvents(ctx, roomID, room)
 				if room.IsCommon() {
 					k.DetachCommonRoom(ctx, room.ModeID())
 				}
+				ctx.Logger().Info("Room has expired. Closing room...", "roomID", roomID)
+
+			case room.HasQuorum():
+				room.ReadyUp(now)
+				k.SetRoom(ctx, roomID, room)
+				ctx.Logger().Info("Room reached quorum", "roomID", roomID)
 			}
+
 		case *types.Room_Ready:
+			// FIXME: there is a case where a room that had quorum, loses quorum.
+			// In this case the room is closed after the allotted prewait time.
 			if now.After(t.Ready.Add(params.PrestartWaitPeriod)) {
-				k.CreateGameWithEvents(ctx, roomID, room)
+				if room.HasQuorum() {
+					k.CreateGameWithEvents(ctx, roomID, room)
+					ctx.Logger().Info("Started new game after reaching quorum. Closing room...", "roomID", roomID)
+				}
 				k.DeleteRoomWithEvents(ctx, roomID, room)
 				if room.IsCommon() {
 					k.DetachCommonRoom(ctx, room.ModeID())
@@ -135,6 +143,9 @@ func (k Keeper) UpdateRooms(ctx sdk.Context) {
 			if now.After(*t.Scheduled) {
 				if room.HasQuorum() {
 					k.CreateGameWithEvents(ctx, roomID, room)
+					ctx.Logger().Info("Starting scheduled game. Closing room...", "roomID", roomID)
+				} else {
+					ctx.Logger().Info("Scheduled room never reached quorum. Closing room...", "roomID", roomID)
 				}
 				k.DeleteRoomWithEvents(ctx, roomID, room)
 				if room.IsCommon() {

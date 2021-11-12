@@ -120,19 +120,11 @@ func (r *Room) ReadyUp(time time.Time) {
 
 func (r Room) HasExpired(now time.Time, lifespan time.Duration) bool {
 	time, ok := r.Time.(*Room_Created)
-	return ok && time.Created.Add(lifespan).After(now)
+	if !ok {
+		return false
+	}
+	return !time.Created.Add(lifespan).After(now)
 }
-
-// func (r Room) MsgCreate(randSource int64, mode *Mode) *game.MsgCreate {
-// 	// If no seed has been set then set it using a deterministic random source
-// 	if r.Config.Map.Seed == 0 {
-// 		r.Config.Map.Seed = rand.NewSource(randSource).Int63()
-// 	}
-// 	return &game.MsgCreate{
-// 		Players: r.Players,
-// 		Config:  r.Config,
-// 	}
-// }
 
 func NewMode(config game.Config, quorum, capacity uint32) Mode {
 	return Mode{

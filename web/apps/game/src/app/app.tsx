@@ -5,8 +5,8 @@ import { Provider } from '../components/provider';
 import { IndexedMode, Room } from '../codec/rook/matchmaker/matchmaker'
 import { Account } from '../components/account'
 import { NotConnectedCard, ErrorCard } from '../components/card'
-import { ErrKeplrNotEnabled } from '../components/provider/errors';
-
+import Game from '../components/game'
+import Long from 'long'
 
 declare global {
     interface Window { getOfflineSigner: any; keplr: any; }
@@ -16,8 +16,8 @@ export interface AppState {
   modes: IndexedMode[]
   address: string
   balance: number
+  gameID: Long
   error?: Error
-  viewMode: boolean
 }
 
 class App extends React.Component<any, AppState> {
@@ -29,9 +29,11 @@ class App extends React.Component<any, AppState> {
       modes: [],
       address: "",
       balance: 0,
-      viewMode: false
+      gameID: new Long(0),
     }
     this.connectWallet = this.connectWallet.bind(this)
+    this.setGame = this.setGame.bind(this)
+    this.findGame = this.findGame.bind(this)
   }
 
   async componentDidMount() {
@@ -55,6 +57,17 @@ class App extends React.Component<any, AppState> {
       this.setState({ error: err as Error })
       return
     }
+    setTimeout(async () => {
+      if (this.state.modes.length === 0 && this.provider) {
+        console.log("retrying....")
+        const resp = await this.provider.matchmaker.query.Modes({})
+        const balance = await this.provider.getBalance()
+        this.setState({ 
+          modes: resp.modes,
+          balance: balance
+        })
+      }
+    }, 3000) // 3 seconds
     const resp = await this.provider.matchmaker.query.Modes({})
     const address = this.provider.getAddress()
     const balance = await this.provider.getBalance()
@@ -63,12 +76,39 @@ class App extends React.Component<any, AppState> {
       address: address,
       balance: balance,
     })
+    await this.findGame()
+  }
+
+  async findGame() {
+    if (!this.provider)
+      return
+
+    try {
+      const resp = await this.provider.game.query.FindByPlayer({player: this.provider.getAddress()})
+      this.setState({
+        gameID: resp.id
+      })
+    } catch (err) {
+      console.log("no current game")
+    }
+  }
+
+  setGame(gameID: Long): void {
+    this.setState({ 
+      gameID: gameID
+    })
   }
 
   render() {
     if (this.state.error) {
       return (
         <ErrorCard error={this.state.error.message} />
+      )
+    }
+    
+    if (!this.provider) {
+      return (
+        <NotConnectedCard connectFn={this.connectWallet} /> 
       )
     }
 
@@ -80,16 +120,19 @@ class App extends React.Component<any, AppState> {
           balance={this.state.balance} 
           isConnected={isConnected} 
         />
-        { isConnected ?
+        { this.state.gameID.eq(0) ?
           <Matchmaker 
             modes={this.state.modes} 
-            provider={this.provider!.matchmaker} 
-            address={this.provider!.getAddress()}
+            provider={this.provider.matchmaker} 
+            address={this.state.address}
+            gameFn={this.setGame}
           /> :
-          <NotConnectedCard connectFn={this.connectWallet} />
+          <Game 
+            gameID={this.state.gameID}
+            provider={this.provider.game}
+          />
         }
       </div>
-      // <Game />
     );
   }
 }
