@@ -100,6 +100,20 @@ func (k Keeper) UpdateGames(ctx sdk.Context) {
 	}
 }
 
+func (k Keeper) LeaveGame(ctx sdk.Context, player string) {
+	gameID, err := k.GetGameIDByPlayer(ctx, player)
+	if err != nil {
+		return
+	}
+	game, err := k.GetGame(ctx, gameID)
+	if err != nil {
+		ctx.Logger().Error("Error getting game", "err", err)
+		return
+	}
+	game.RemovePlayer(player)
+	k.SetGame(ctx, gameID, &game)
+}
+
 // LoadInMemory loads all the games persisted to disk in to memory. This should
 // only be done once on startup
 func (k *Keeper) LoadInMemory(ctx sdk.Context) {

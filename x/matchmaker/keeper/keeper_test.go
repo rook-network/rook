@@ -43,8 +43,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 
 	registry := codectypes.NewInterfaceRegistry()
 	gk := gameKeeper.NewKeeper(codec.NewProtoCodec(registry), storeKey, memKey[types.MemStoreKey])
-	gameServer := gameKeeper.NewMsgServerImpl(gk)
-	keeper := NewKeeper(codec.NewProtoCodec(registry), storeKey, params, gameServer)
+	keeper := NewKeeper(codec.NewProtoCodec(registry), storeKey, params, gk)
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 	keeper.InitGenesis(ctx, *types.DefaultGenesis())

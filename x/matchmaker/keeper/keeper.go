@@ -13,27 +13,27 @@ import (
 )
 
 type Keeper struct {
-	cdc        codec.Codec
-	params     paramtypes.Subspace
-	storeKey   sdk.StoreKey
-	gameServer game.MsgServer
+	cdc      codec.Codec
+	params   paramtypes.Subspace
+	storeKey sdk.StoreKey
+	game     GameKeeper
 }
 
 func NewKeeper(
 	cdc codec.Codec,
 	storeKey sdk.StoreKey,
 	paramSpace paramtypes.Subspace,
-	gameServer game.MsgServer,
+	game GameKeeper,
 ) Keeper {
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
 	}
 
 	return Keeper{
-		cdc:        cdc,
-		storeKey:   storeKey,
-		params:     paramSpace,
-		gameServer: gameServer,
+		cdc:      cdc,
+		storeKey: storeKey,
+		params:   paramSpace,
+		game:     game,
 	}
 }
 
@@ -72,14 +72,12 @@ func (k Keeper) CreateGame(ctx sdk.Context, roomID uint64, room types.Room) (uin
 		config.Map.Seed = ctx.BlockTime().Unix()
 	}
 
-	msg := game.NewMsgCreate(room.Players, config)
-
-	resp, err := k.gameServer.Create(sdk.WrapSDKContext(ctx), msg)
+	gameID, err := k.game.CreateGame(ctx, room.Players, config)
 	if err != nil {
 		return 0, fmt.Errorf("failed to start game: %w", err)
 	}
 
-	return resp.GameId, nil
+	return gameID, nil
 }
 
 // UpdateRooms loops through all rooms and performs the following:
@@ -152,7 +150,6 @@ func (k Keeper) UpdateRooms(ctx sdk.Context) {
 				}
 			}
 		}
-
 	}
 }
 

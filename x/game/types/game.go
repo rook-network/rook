@@ -282,6 +282,23 @@ func (g Game) FindFaction(player string) (*Faction, int, bool) {
 	return nil, -1, false
 }
 
+func (g *Game) RemovePlayer(player string) {
+	for idx, p := range g.Players {
+		if p == player {
+			g.Players = append(g.Players[:idx], g.Players[idx+1:]...)
+			break
+		}
+	}
+	for _, faction := range g.State.Factions {
+		for idx, p := range faction.Players {
+			if p == player {
+				faction.Players = append(faction.Players[:idx], faction.Players[idx+1:]...)
+				break
+			}
+		}
+	}
+}
+
 // Update loops through all factions and calculates how many resources were reaped
 // in that step, updates the population and performs any other passive actions
 func (g *Game) Update(params Params) {

@@ -368,7 +368,7 @@ func New(
 		appCodec,
 		keys[matchmakertypes.StoreKey],
 		app.GetSubspace(matchmakertypes.ModuleName),
-		gamekeeper.NewMsgServerImpl(app.GameKeeper),
+		app.GameKeeper,
 	)
 	matchmakerModule := matchmaker.NewAppModule(appCodec, app.MatchmakerKeeper)
 
