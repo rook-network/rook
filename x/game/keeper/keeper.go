@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"encoding/binary"
 	"fmt"
 
 	"github.com/tendermint/tendermint/libs/log"
@@ -34,6 +33,43 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
+func (k Keeper) CreateGame(ctx sdk.Context, players []string, config types.Config) (uint64, error) {
+	if config.Map.Seed == 0 {
+		return 0, types.ErrSeedNotSet
+	}
+
+	params := k.GetLatestParamsVersion(ctx)
+
+	game, err := types.SetupGame(players, &config, params)
+	if err != nil {
+		return 0, err
+	}
+
+	gameID, err := k.GetNextGameID(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	// add the game in memory
+	k.SetGame(ctx, gameID, game)
+
+	// add the players to the secondary index
+	k.SetPlayersInGame(ctx, players, gameID)
+
+	// save the next game ID
+	k.SetNextGameID(ctx, gameID+1)
+
+	// emit the events for the new game
+	ctx.EventManager().EmitTypedEvent(&types.EventNewGame{
+		GameId:        gameID,
+		Players:       players,
+		Config:        &config,
+		ParamsVersion: params,
+	})
+
+	return gameID, nil
+}
+
 func (k Keeper) UpdateGames(ctx sdk.Context) {
 	memStore := ctx.KVStore(k.memKey)
 
@@ -48,7 +84,7 @@ func (k Keeper) UpdateGames(ctx sdk.Context) {
 	for ; iter.Valid(); iter.Next() {
 		var game types.Game
 		k.cdc.MustUnmarshal(iter.Value(), &game)
-		id := types.ParseGameID(iter.Key())
+		id := types.ParseGameKey(iter.Key())
 		p, ok := params[game.ParamVersion]
 		if !ok {
 			panic("param version for game is missing")
@@ -114,7 +150,7 @@ func (k Keeper) GetNextGameID(ctx sdk.Context) (uint64, error) {
 	if bz == nil {
 		return 0, sdkerrors.Wrap(types.ErrGameCountNotSet, "initial proposal ID hasn't been set")
 	}
-	gameID := binary.BigEndian.Uint64(bz)
+	gameID := types.ParseGameID(bz)
 	return gameID, nil
 }
 
@@ -168,7 +204,30 @@ func (k Keeper) GetGameState(ctx sdk.Context, gameID uint64) (types.State, error
 	return state, nil
 }
 
-// TODO: implement
 func (k Keeper) GetGameIDByPlayer(ctx sdk.Context, player string) (uint64, error) {
-	return 0, types.ErrPlayerNotInGame
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(types.GamePlayerKey(player))
+	if len(bz) == 0 {
+		return 0, types.ErrPlayerNotInGame
+	}
+	return types.ParseGameID(bz), nil
+}
+
+func (k Keeper) IsPlaying(ctx sdk.Context, player string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.GamePlayerKey(player))
+}
+
+func (k Keeper) SetPlayersInGame(ctx sdk.Context, players []string, gameID uint64) {
+	store := ctx.KVStore(k.storeKey)
+	for _, p := range players {
+		store.Set(types.GamePlayerKey(p), types.GameIDBytes(gameID))
+	}
+}
+
+func (k Keeper) RemovePlayersFromGame(ctx sdk.Context, players []string) {
+	store := ctx.KVStore(k.storeKey)
+	for _, p := range players {
+		store.Delete(types.GamePlayerKey(p))
+	}
 }

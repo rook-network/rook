@@ -46,7 +46,7 @@ class GameComponent extends React.Component<GameProps, GameState> {
   }
 
   render() {
-    if (!this.state.game || !this.state.game.map) {
+    if (this.state.game === undefined || this.state.game.map === undefined) {
       return (
         <LoadingCard 
           message="Loading Game..."

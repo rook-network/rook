@@ -25,5 +25,6 @@ var (
 	ErrParamsNotFound        = sdkerrors.Register(ModuleName, 15, "params not found for this game")
 	ErrInvalidConfig         = sdkerrors.Register(ModuleName, 16, "incomplete config")
 	ErrInvalidTeams          = sdkerrors.Register(ModuleName, 17, "amount of initial teams can not be one")
+	ErrPlayerAlreadyInGame   = sdkerrors.Register(ModuleName, 18, "player already playing in another game")
 	// this line is used by starport scaffolding # ibc/errors
 )

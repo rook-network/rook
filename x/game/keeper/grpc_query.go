@@ -19,7 +19,7 @@ func (q Keeper) Games(goCtx context.Context, req *types.QueryGamesRequest) (*typ
 		types.GameKey(1<<63-1),
 	)
 	for ; gameIter.Valid(); gameIter.Next() {
-		ids = append(ids, types.ParseGameID(gameIter.Key()))
+		ids = append(ids, types.ParseGameKey(gameIter.Key()))
 	}
 
 	return &types.QueryGamesResponse{Ids: ids}, nil

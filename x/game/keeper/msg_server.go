@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"errors"
 
 	"github.com/arcane-systems/rook/x/game/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -23,36 +22,10 @@ var _ types.MsgServer = msgServer{}
 func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.MsgCreateResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if msg.Config.Map.Seed == 0 {
-		return nil, errors.New("no map seed specified")
-	}
-
-	params := m.Keeper.GetLatestParamsVersion(ctx)
-
-	game, err := types.SetupGame(msg.Players, &msg.Config, params)
+	gameID, err := m.Keeper.CreateGame(ctx, msg.Players, msg.Config)
 	if err != nil {
 		return nil, err
 	}
-
-	gameID, err := m.Keeper.GetNextGameID(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	// add the game in memory
-	m.Keeper.SetGame(ctx, gameID, game)
-
-	// save the next game ID
-	m.Keeper.SetNextGameID(ctx, gameID+1)
-
-	// emit the events for the new game
-	ctx.EventManager().EmitTypedEvent(&types.EventNewGame{
-		GameId:        gameID,
-		Players:       msg.Players,
-		Config:        &msg.Config,
-		ParamsVersion: params,
-	})
-
 	return &types.MsgCreateResponse{GameId: gameID}, nil
 }
 

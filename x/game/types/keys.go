@@ -50,12 +50,16 @@ func GamePlayerKey(player string) []byte {
 	return append(GamePlayerPrefix, []byte(player)...)
 }
 
-func ParseGameID(key []byte) uint64 {
+func ParseGameKey(key []byte) uint64 {
 	if len(key) != 9 {
 		panic(fmt.Sprintf("unexpected key length; got: %d, expected: %d", len(key), 9))
 	}
 
-	return binary.BigEndian.Uint64(key[1:])
+	return ParseGameID(key[1:])
+}
+
+func ParseGameID(id []byte) uint64 {
+	return binary.BigEndian.Uint64(id)
 }
 
 func GameIDBytes(gameID uint64) []byte {
