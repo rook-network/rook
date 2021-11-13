@@ -1,12 +1,17 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { State, Game } from "../../rook/game/game";
+import { State, GameSnapshot } from "../../rook/game/game";
 import { Params } from "../../rook/game/config";
 
 export const protobufPackage = "rook.game";
 
-/** this line is used by starport scaffolding # 3 */
+export interface QueryGamesRequest {}
+
+export interface QueryGamesResponse {
+  ids: Long[];
+}
+
 export interface QueryGameStateRequest {
   id: Long;
 }
@@ -20,7 +25,7 @@ export interface QueryGameByIDRequest {
 }
 
 export interface QueryGameByIDResponse {
-  game?: Game;
+  game?: GameSnapshot;
 }
 
 export interface QueryGameByPlayerRequest {
@@ -28,7 +33,8 @@ export interface QueryGameByPlayerRequest {
 }
 
 export interface QueryGameByPlayerResponse {
-  game?: Game;
+  game?: GameSnapshot;
+  id: Long;
 }
 
 export interface QueryParamsRequest {
@@ -39,6 +45,121 @@ export interface QueryParamsResponse {
   params?: Params;
   version: number;
 }
+
+const baseQueryGamesRequest: object = {};
+
+export const QueryGamesRequest = {
+  encode(
+    _: QueryGamesRequest,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGamesRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGamesRequest } as QueryGamesRequest;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryGamesRequest {
+    const message = { ...baseQueryGamesRequest } as QueryGamesRequest;
+    return message;
+  },
+
+  toJSON(_: QueryGamesRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial(_: DeepPartial<QueryGamesRequest>): QueryGamesRequest {
+    const message = { ...baseQueryGamesRequest } as QueryGamesRequest;
+    return message;
+  },
+};
+
+const baseQueryGamesResponse: object = { ids: Long.UZERO };
+
+export const QueryGamesResponse = {
+  encode(
+    message: QueryGamesResponse,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    writer.uint32(10).fork();
+    for (const v of message.ids) {
+      writer.uint64(v);
+    }
+    writer.ldelim();
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGamesResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseQueryGamesResponse } as QueryGamesResponse;
+    message.ids = [];
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if ((tag & 7) === 2) {
+            const end2 = reader.uint32() + reader.pos;
+            while (reader.pos < end2) {
+              message.ids.push(reader.uint64() as Long);
+            }
+          } else {
+            message.ids.push(reader.uint64() as Long);
+          }
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGamesResponse {
+    const message = { ...baseQueryGamesResponse } as QueryGamesResponse;
+    message.ids = [];
+    if (object.ids !== undefined && object.ids !== null) {
+      for (const e of object.ids) {
+        message.ids.push(Long.fromString(e));
+      }
+    }
+    return message;
+  },
+
+  toJSON(message: QueryGamesResponse): unknown {
+    const obj: any = {};
+    if (message.ids) {
+      obj.ids = message.ids.map((e) => (e || Long.UZERO).toString());
+    } else {
+      obj.ids = [];
+    }
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<QueryGamesResponse>): QueryGamesResponse {
+    const message = { ...baseQueryGamesResponse } as QueryGamesResponse;
+    message.ids = [];
+    if (object.ids !== undefined && object.ids !== null) {
+      for (const e of object.ids) {
+        message.ids.push(e);
+      }
+    }
+    return message;
+  },
+};
 
 const baseQueryGameStateRequest: object = { id: Long.UZERO };
 
@@ -238,7 +359,7 @@ export const QueryGameByIDResponse = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.game !== undefined) {
-      Game.encode(message.game, writer.uint32(10).fork()).ldelim();
+      GameSnapshot.encode(message.game, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -254,7 +375,7 @@ export const QueryGameByIDResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.game = Game.decode(reader, reader.uint32());
+          message.game = GameSnapshot.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -267,7 +388,7 @@ export const QueryGameByIDResponse = {
   fromJSON(object: any): QueryGameByIDResponse {
     const message = { ...baseQueryGameByIDResponse } as QueryGameByIDResponse;
     if (object.game !== undefined && object.game !== null) {
-      message.game = Game.fromJSON(object.game);
+      message.game = GameSnapshot.fromJSON(object.game);
     } else {
       message.game = undefined;
     }
@@ -277,7 +398,7 @@ export const QueryGameByIDResponse = {
   toJSON(message: QueryGameByIDResponse): unknown {
     const obj: any = {};
     message.game !== undefined &&
-      (obj.game = message.game ? Game.toJSON(message.game) : undefined);
+      (obj.game = message.game ? GameSnapshot.toJSON(message.game) : undefined);
     return obj;
   },
 
@@ -286,7 +407,7 @@ export const QueryGameByIDResponse = {
   ): QueryGameByIDResponse {
     const message = { ...baseQueryGameByIDResponse } as QueryGameByIDResponse;
     if (object.game !== undefined && object.game !== null) {
-      message.game = Game.fromPartial(object.game);
+      message.game = GameSnapshot.fromPartial(object.game);
     } else {
       message.game = undefined;
     }
@@ -363,7 +484,7 @@ export const QueryGameByPlayerRequest = {
   },
 };
 
-const baseQueryGameByPlayerResponse: object = {};
+const baseQueryGameByPlayerResponse: object = { id: Long.UZERO };
 
 export const QueryGameByPlayerResponse = {
   encode(
@@ -371,7 +492,10 @@ export const QueryGameByPlayerResponse = {
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
     if (message.game !== undefined) {
-      Game.encode(message.game, writer.uint32(10).fork()).ldelim();
+      GameSnapshot.encode(message.game, writer.uint32(10).fork()).ldelim();
+    }
+    if (!message.id.isZero()) {
+      writer.uint32(16).uint64(message.id);
     }
     return writer;
   },
@@ -389,7 +513,10 @@ export const QueryGameByPlayerResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.game = Game.decode(reader, reader.uint32());
+          message.game = GameSnapshot.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.id = reader.uint64() as Long;
           break;
         default:
           reader.skipType(tag & 7);
@@ -404,9 +531,14 @@ export const QueryGameByPlayerResponse = {
       ...baseQueryGameByPlayerResponse,
     } as QueryGameByPlayerResponse;
     if (object.game !== undefined && object.game !== null) {
-      message.game = Game.fromJSON(object.game);
+      message.game = GameSnapshot.fromJSON(object.game);
     } else {
       message.game = undefined;
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = Long.fromString(object.id);
+    } else {
+      message.id = Long.UZERO;
     }
     return message;
   },
@@ -414,7 +546,9 @@ export const QueryGameByPlayerResponse = {
   toJSON(message: QueryGameByPlayerResponse): unknown {
     const obj: any = {};
     message.game !== undefined &&
-      (obj.game = message.game ? Game.toJSON(message.game) : undefined);
+      (obj.game = message.game ? GameSnapshot.toJSON(message.game) : undefined);
+    message.id !== undefined &&
+      (obj.id = (message.id || Long.UZERO).toString());
     return obj;
   },
 
@@ -425,9 +559,14 @@ export const QueryGameByPlayerResponse = {
       ...baseQueryGameByPlayerResponse,
     } as QueryGameByPlayerResponse;
     if (object.game !== undefined && object.game !== null) {
-      message.game = Game.fromPartial(object.game);
+      message.game = GameSnapshot.fromPartial(object.game);
     } else {
       message.game = undefined;
+    }
+    if (object.id !== undefined && object.id !== null) {
+      message.id = object.id as Long;
+    } else {
+      message.id = Long.UZERO;
     }
     return message;
   },
@@ -569,6 +708,8 @@ export const QueryParamsResponse = {
 
 /** Query defines the gRPC querier service. */
 export interface Query {
+  /** Games returns all active games */
+  Games(request: QueryGamesRequest): Promise<QueryGamesResponse>;
   Game(request: QueryGameByIDRequest): Promise<QueryGameByIDResponse>;
   GameByPlayer(
     request: QueryGameByPlayerRequest
@@ -582,11 +723,20 @@ export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   constructor(rpc: Rpc) {
     this.rpc = rpc;
+    this.Games = this.Games.bind(this);
     this.Game = this.Game.bind(this);
     this.GameByPlayer = this.GameByPlayer.bind(this);
     this.State = this.State.bind(this);
     this.Params = this.Params.bind(this);
   }
+  Games(request: QueryGamesRequest): Promise<QueryGamesResponse> {
+    const data = QueryGamesRequest.encode(request).finish();
+    const promise = this.rpc.request("rook.game.Query", "Games", data);
+    return promise.then((data) =>
+      QueryGamesResponse.decode(new _m0.Reader(data))
+    );
+  }
+
   Game(request: QueryGameByIDRequest): Promise<QueryGameByIDResponse> {
     const data = QueryGameByIDRequest.encode(request).finish();
     const promise = this.rpc.request("rook.game.Query", "Game", data);

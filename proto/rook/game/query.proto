@@ -10,7 +10,11 @@ option go_package = "github.com/arcane-systems/rook/x/game/types";
 
 // Query defines the gRPC querier service.
 service Query {
-  // this line is used by starport scaffolding # 2
+
+  // Games returns all active games
+  rpc Games(QueryGamesRequest) returns (QueryGamesResponse) {
+    option (google.api.http).get = "/game/games";
+  }
 
   rpc Game(QueryGameByIDRequest) returns (QueryGameByIDResponse) {
     option (google.api.http).get = "/game/game/{id}";
@@ -18,7 +22,7 @@ service Query {
 
   rpc GameByPlayer(QueryGameByPlayerRequest)
       returns (QueryGameByPlayerResponse) {
-    option (google.api.http).get = "/game/game/{player}";
+    option (google.api.http).get = "/game/player/{player}";
   }
 
   // Queries a game state by id.
@@ -31,7 +35,10 @@ service Query {
   }
 }
 
-// this line is used by starport scaffolding # 3
+message QueryGamesRequest {}
+
+message QueryGamesResponse { repeated uint64 ids = 1; }
+
 message QueryGameStateRequest { uint64 id = 1; }
 
 message QueryGameStateResponse {
@@ -41,13 +48,14 @@ message QueryGameStateResponse {
 message QueryGameByIDRequest { uint64 id = 1; }
 
 message QueryGameByIDResponse {
-  Game game = 1 [ (gogoproto.nullable) = false ];
+  GameSnapshot game = 1 [ (gogoproto.nullable) = false ];
 }
 
 message QueryGameByPlayerRequest { string player = 1; }
 
 message QueryGameByPlayerResponse {
-  Game game = 1 [ (gogoproto.nullable) = false ];
+  GameSnapshot game = 1 [ (gogoproto.nullable) = false ];
+  uint64 id = 2; 
 }
 
 message QueryParamsRequest { uint32 version = 1; }

@@ -84,7 +84,7 @@ class App extends React.Component<any, AppState> {
       return
 
     try {
-      const resp = await this.provider.game.query.FindByPlayer({player: this.provider.getAddress()})
+      const resp = await this.provider.game.query.GameByPlayer({player: this.provider.getAddress()})
       this.setState({
         gameID: resp.id
       })

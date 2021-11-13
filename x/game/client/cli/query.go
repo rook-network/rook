@@ -26,8 +26,31 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	}
 
 	// this line is used by starport scaffolding # 1
+	cmd.AddCommand(CmdQueryGames())
 	cmd.AddCommand(CmdQueryGame())
 	cmd.AddCommand(CmdQueryParams())
+
+	return cmd
+}
+
+func CmdQueryGames() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "list",
+		Short: "Lists all the active games",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.Games(context.Background(), &types.QueryGamesRequest{})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
 }

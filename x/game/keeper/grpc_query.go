@@ -9,6 +9,22 @@ import (
 
 var _ types.QueryServer = Keeper{}
 
+func (q Keeper) Games(goCtx context.Context, req *types.QueryGamesRequest) (*types.QueryGamesResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	ids := make([]uint64, 0)
+
+	memStore := ctx.KVStore(q.memKey)
+	gameIter := memStore.Iterator(
+		types.GameKey(0),
+		types.GameKey(1<<63-1),
+	)
+	for ; gameIter.Valid(); gameIter.Next() {
+		ids = append(ids, types.ParseGameID(gameIter.Key()))
+	}
+
+	return &types.QueryGamesResponse{Ids: ids}, nil
+}
+
 func (q Keeper) Game(goCtx context.Context, req *types.QueryGameByIDRequest) (*types.QueryGameByIDResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	game, err := q.GetGame(ctx, req.Id)
@@ -16,7 +32,7 @@ func (q Keeper) Game(goCtx context.Context, req *types.QueryGameByIDRequest) (*t
 		return nil, err
 	}
 
-	return &types.QueryGameByIDResponse{Game: game}, nil
+	return &types.QueryGameByIDResponse{Game: game.Snapshot()}, nil
 }
 
 func (q Keeper) GameByPlayer(goCtx context.Context, req *types.QueryGameByPlayerRequest) (*types.QueryGameByPlayerResponse, error) {
@@ -31,7 +47,7 @@ func (q Keeper) GameByPlayer(goCtx context.Context, req *types.QueryGameByPlayer
 		return nil, err
 	}
 
-	return &types.QueryGameByPlayerResponse{Game: game}, nil
+	return &types.QueryGameByPlayerResponse{Game: game.Snapshot(), Id: gameID}, nil
 }
 
 func (q Keeper) State(goCtx context.Context, req *types.QueryGameStateRequest) (*types.QueryGameStateResponse, error) {
