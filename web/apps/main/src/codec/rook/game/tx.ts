@@ -4,13 +4,12 @@ import _m0 from "protobufjs/minimal";
 import {
   Direction,
   Settlement,
-  Config,
-  Params,
   directionFromJSON,
   directionToJSON,
   settlementFromJSON,
   settlementToJSON,
 } from "../../rook/game/game";
+import { Config, Params } from "../../rook/game/config";
 
 export const protobufPackage = "rook.game";
 

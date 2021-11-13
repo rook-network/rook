@@ -1,7 +1,8 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
-import { State, Overview, Params } from "../../rook/game/game";
+import { State, Game } from "../../rook/game/game";
+import { Params } from "../../rook/game/config";
 
 export const protobufPackage = "rook.game";
 
@@ -19,8 +20,7 @@ export interface QueryGameByIDRequest {
 }
 
 export interface QueryGameByIDResponse {
-  overview?: Overview;
-  id: Long;
+  game?: Game;
 }
 
 export interface QueryGameByPlayerRequest {
@@ -28,8 +28,7 @@ export interface QueryGameByPlayerRequest {
 }
 
 export interface QueryGameByPlayerResponse {
-  overview?: Overview;
-  id: Long;
+  game?: Game;
 }
 
 export interface QueryParamsRequest {
@@ -231,18 +230,15 @@ export const QueryGameByIDRequest = {
   },
 };
 
-const baseQueryGameByIDResponse: object = { id: Long.UZERO };
+const baseQueryGameByIDResponse: object = {};
 
 export const QueryGameByIDResponse = {
   encode(
     message: QueryGameByIDResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.overview !== undefined) {
-      Overview.encode(message.overview, writer.uint32(10).fork()).ldelim();
-    }
-    if (!message.id.isZero()) {
-      writer.uint32(16).uint64(message.id);
+    if (message.game !== undefined) {
+      Game.encode(message.game, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -258,10 +254,7 @@ export const QueryGameByIDResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.overview = Overview.decode(reader, reader.uint32());
-          break;
-        case 2:
-          message.id = reader.uint64() as Long;
+          message.game = Game.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -273,27 +266,18 @@ export const QueryGameByIDResponse = {
 
   fromJSON(object: any): QueryGameByIDResponse {
     const message = { ...baseQueryGameByIDResponse } as QueryGameByIDResponse;
-    if (object.overview !== undefined && object.overview !== null) {
-      message.overview = Overview.fromJSON(object.overview);
+    if (object.game !== undefined && object.game !== null) {
+      message.game = Game.fromJSON(object.game);
     } else {
-      message.overview = undefined;
-    }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
-    } else {
-      message.id = Long.UZERO;
+      message.game = undefined;
     }
     return message;
   },
 
   toJSON(message: QueryGameByIDResponse): unknown {
     const obj: any = {};
-    message.overview !== undefined &&
-      (obj.overview = message.overview
-        ? Overview.toJSON(message.overview)
-        : undefined);
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
+    message.game !== undefined &&
+      (obj.game = message.game ? Game.toJSON(message.game) : undefined);
     return obj;
   },
 
@@ -301,15 +285,10 @@ export const QueryGameByIDResponse = {
     object: DeepPartial<QueryGameByIDResponse>
   ): QueryGameByIDResponse {
     const message = { ...baseQueryGameByIDResponse } as QueryGameByIDResponse;
-    if (object.overview !== undefined && object.overview !== null) {
-      message.overview = Overview.fromPartial(object.overview);
+    if (object.game !== undefined && object.game !== null) {
+      message.game = Game.fromPartial(object.game);
     } else {
-      message.overview = undefined;
-    }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id as Long;
-    } else {
-      message.id = Long.UZERO;
+      message.game = undefined;
     }
     return message;
   },
@@ -384,18 +363,15 @@ export const QueryGameByPlayerRequest = {
   },
 };
 
-const baseQueryGameByPlayerResponse: object = { id: Long.UZERO };
+const baseQueryGameByPlayerResponse: object = {};
 
 export const QueryGameByPlayerResponse = {
   encode(
     message: QueryGameByPlayerResponse,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.overview !== undefined) {
-      Overview.encode(message.overview, writer.uint32(10).fork()).ldelim();
-    }
-    if (!message.id.isZero()) {
-      writer.uint32(16).uint64(message.id);
+    if (message.game !== undefined) {
+      Game.encode(message.game, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -413,10 +389,7 @@ export const QueryGameByPlayerResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.overview = Overview.decode(reader, reader.uint32());
-          break;
-        case 2:
-          message.id = reader.uint64() as Long;
+          message.game = Game.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -430,27 +403,18 @@ export const QueryGameByPlayerResponse = {
     const message = {
       ...baseQueryGameByPlayerResponse,
     } as QueryGameByPlayerResponse;
-    if (object.overview !== undefined && object.overview !== null) {
-      message.overview = Overview.fromJSON(object.overview);
+    if (object.game !== undefined && object.game !== null) {
+      message.game = Game.fromJSON(object.game);
     } else {
-      message.overview = undefined;
-    }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
-    } else {
-      message.id = Long.UZERO;
+      message.game = undefined;
     }
     return message;
   },
 
   toJSON(message: QueryGameByPlayerResponse): unknown {
     const obj: any = {};
-    message.overview !== undefined &&
-      (obj.overview = message.overview
-        ? Overview.toJSON(message.overview)
-        : undefined);
-    message.id !== undefined &&
-      (obj.id = (message.id || Long.UZERO).toString());
+    message.game !== undefined &&
+      (obj.game = message.game ? Game.toJSON(message.game) : undefined);
     return obj;
   },
 
@@ -460,15 +424,10 @@ export const QueryGameByPlayerResponse = {
     const message = {
       ...baseQueryGameByPlayerResponse,
     } as QueryGameByPlayerResponse;
-    if (object.overview !== undefined && object.overview !== null) {
-      message.overview = Overview.fromPartial(object.overview);
+    if (object.game !== undefined && object.game !== null) {
+      message.game = Game.fromPartial(object.game);
     } else {
-      message.overview = undefined;
-    }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id as Long;
-    } else {
-      message.id = Long.UZERO;
+      message.game = undefined;
     }
     return message;
   },
@@ -610,8 +569,8 @@ export const QueryParamsResponse = {
 
 /** Query defines the gRPC querier service. */
 export interface Query {
-  FindByID(request: QueryGameByIDRequest): Promise<QueryGameByIDResponse>;
-  FindByPlayer(
+  Game(request: QueryGameByIDRequest): Promise<QueryGameByIDResponse>;
+  GameByPlayer(
     request: QueryGameByPlayerRequest
   ): Promise<QueryGameByPlayerResponse>;
   /** Queries a game state by id. */
@@ -623,24 +582,24 @@ export class QueryClientImpl implements Query {
   private readonly rpc: Rpc;
   constructor(rpc: Rpc) {
     this.rpc = rpc;
-    this.FindByID = this.FindByID.bind(this);
-    this.FindByPlayer = this.FindByPlayer.bind(this);
+    this.Game = this.Game.bind(this);
+    this.GameByPlayer = this.GameByPlayer.bind(this);
     this.State = this.State.bind(this);
     this.Params = this.Params.bind(this);
   }
-  FindByID(request: QueryGameByIDRequest): Promise<QueryGameByIDResponse> {
+  Game(request: QueryGameByIDRequest): Promise<QueryGameByIDResponse> {
     const data = QueryGameByIDRequest.encode(request).finish();
-    const promise = this.rpc.request("rook.game.Query", "FindByID", data);
+    const promise = this.rpc.request("rook.game.Query", "Game", data);
     return promise.then((data) =>
       QueryGameByIDResponse.decode(new _m0.Reader(data))
     );
   }
 
-  FindByPlayer(
+  GameByPlayer(
     request: QueryGameByPlayerRequest
   ): Promise<QueryGameByPlayerResponse> {
     const data = QueryGameByPlayerRequest.encode(request).finish();
-    const promise = this.rpc.request("rook.game.Query", "FindByPlayer", data);
+    const promise = this.rpc.request("rook.game.Query", "GameByPlayer", data);
     return promise.then((data) =>
       QueryGameByPlayerResponse.decode(new _m0.Reader(data))
     );

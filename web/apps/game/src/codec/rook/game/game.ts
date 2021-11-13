@@ -166,57 +166,76 @@ export function settlementToJSON(object: Settlement): string {
   }
 }
 
+/**
+ * Game is what is the in memory state and includes a map of territories
+ * used for faster look up. Full game is not persisted to disk (Overview and
+ * State are)
+ */
+export interface Game {
+  players: string[];
+  map?: Map;
+  state?: State;
+  paramVersion: number;
+  territory: { [key: number]: Territory };
+}
+
+export interface Game_TerritoryEntry {
+  key: number;
+  value?: Territory;
+}
+
+/**
+ * GameSnapshot contains a complete snapshot representation of the state of any
+ * game. The object is used to trans
+ */
+export interface GameSnapshot {
+  map?: Map;
+  state?: State;
+  paramVersion: number;
+}
+
+/** Overview is the fixed aspect of the game */
 export interface Overview {
+  players: string[];
   map?: Map;
   paramVersion: number;
 }
 
+/**
+ * State is the variable aspect of the game that
+ * changes per step
+ */
 export interface State {
-  players: Faction[];
+  factions: Faction[];
   gaia: Populace[];
   step: Long;
 }
 
+/** Map represents the 2D grid of various landscapes */
 export interface Map {
   tiles: Landscape[];
   width: number;
 }
 
+/**
+ * Factions are a combination of resources and populace
+ * that are controlled by one or more players
+ */
 export interface Faction {
-  player: string;
+  players: string[];
   resources?: ResourceSet;
   population: Populace[];
 }
 
+/**
+ * A populace is a group of people. They may be
+ * wandering or part of a settlement
+ */
 export interface Populace {
   amount: number;
   position?: Position;
   settlement: Settlement;
-}
-
-export interface Config {
-  initial?: InitializationConfig;
-  map?: MapConfig;
-}
-
-export interface MapConfig {
-  width: number;
-  height: number;
-  seed: Long;
-  mountainsDensity: number;
-  forestDensity: number;
-  lakeDensity: number;
-  plainsDensity: number;
-}
-
-export interface InitializationConfig {
-  teams: number;
-  resources?: ResourceSet;
-}
-
-export interface Params {
-  productionRate: ResourceSet[];
-  constructionCost: ResourceSet[];
+  used: boolean;
 }
 
 export interface Position {
@@ -229,20 +248,349 @@ export interface ResourceSet {
   stone: number;
   wood: number;
   population: number;
+  tech: number;
 }
 
-const baseOverview: object = { paramVersion: 0 };
+export interface Territory {
+  faction: number;
+  populace: number;
+}
+
+const baseGame: object = { players: "", paramVersion: 0 };
+
+export const Game = {
+  encode(message: Game, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.players) {
+      writer.uint32(10).string(v!);
+    }
+    if (message.map !== undefined) {
+      Map.encode(message.map, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.state !== undefined) {
+      State.encode(message.state, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.paramVersion !== 0) {
+      writer.uint32(32).uint32(message.paramVersion);
+    }
+    Object.entries(message.territory).forEach(([key, value]) => {
+      Game_TerritoryEntry.encode(
+        { key: key as any, value },
+        writer.uint32(42).fork()
+      ).ldelim();
+    });
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Game {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseGame } as Game;
+    message.players = [];
+    message.territory = {};
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.players.push(reader.string());
+          break;
+        case 2:
+          message.map = Map.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.state = State.decode(reader, reader.uint32());
+          break;
+        case 4:
+          message.paramVersion = reader.uint32();
+          break;
+        case 5:
+          const entry5 = Game_TerritoryEntry.decode(reader, reader.uint32());
+          if (entry5.value !== undefined) {
+            message.territory[entry5.key] = entry5.value;
+          }
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Game {
+    const message = { ...baseGame } as Game;
+    message.players = [];
+    message.territory = {};
+    if (object.players !== undefined && object.players !== null) {
+      for (const e of object.players) {
+        message.players.push(String(e));
+      }
+    }
+    if (object.map !== undefined && object.map !== null) {
+      message.map = Map.fromJSON(object.map);
+    } else {
+      message.map = undefined;
+    }
+    if (object.state !== undefined && object.state !== null) {
+      message.state = State.fromJSON(object.state);
+    } else {
+      message.state = undefined;
+    }
+    if (object.paramVersion !== undefined && object.paramVersion !== null) {
+      message.paramVersion = Number(object.paramVersion);
+    } else {
+      message.paramVersion = 0;
+    }
+    if (object.territory !== undefined && object.territory !== null) {
+      Object.entries(object.territory).forEach(([key, value]) => {
+        message.territory[Number(key)] = Territory.fromJSON(value);
+      });
+    }
+    return message;
+  },
+
+  toJSON(message: Game): unknown {
+    const obj: any = {};
+    if (message.players) {
+      obj.players = message.players.map((e) => e);
+    } else {
+      obj.players = [];
+    }
+    message.map !== undefined &&
+      (obj.map = message.map ? Map.toJSON(message.map) : undefined);
+    message.state !== undefined &&
+      (obj.state = message.state ? State.toJSON(message.state) : undefined);
+    message.paramVersion !== undefined &&
+      (obj.paramVersion = message.paramVersion);
+    obj.territory = {};
+    if (message.territory) {
+      Object.entries(message.territory).forEach(([k, v]) => {
+        obj.territory[k] = Territory.toJSON(v);
+      });
+    }
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Game>): Game {
+    const message = { ...baseGame } as Game;
+    message.players = [];
+    message.territory = {};
+    if (object.players !== undefined && object.players !== null) {
+      for (const e of object.players) {
+        message.players.push(e);
+      }
+    }
+    if (object.map !== undefined && object.map !== null) {
+      message.map = Map.fromPartial(object.map);
+    } else {
+      message.map = undefined;
+    }
+    if (object.state !== undefined && object.state !== null) {
+      message.state = State.fromPartial(object.state);
+    } else {
+      message.state = undefined;
+    }
+    if (object.paramVersion !== undefined && object.paramVersion !== null) {
+      message.paramVersion = object.paramVersion;
+    } else {
+      message.paramVersion = 0;
+    }
+    if (object.territory !== undefined && object.territory !== null) {
+      Object.entries(object.territory).forEach(([key, value]) => {
+        if (value !== undefined) {
+          message.territory[Number(key)] = Territory.fromPartial(value);
+        }
+      });
+    }
+    return message;
+  },
+};
+
+const baseGame_TerritoryEntry: object = { key: 0 };
+
+export const Game_TerritoryEntry = {
+  encode(
+    message: Game_TerritoryEntry,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.key !== 0) {
+      writer.uint32(8).uint32(message.key);
+    }
+    if (message.value !== undefined) {
+      Territory.encode(message.value, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Game_TerritoryEntry {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseGame_TerritoryEntry } as Game_TerritoryEntry;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.key = reader.uint32();
+          break;
+        case 2:
+          message.value = Territory.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Game_TerritoryEntry {
+    const message = { ...baseGame_TerritoryEntry } as Game_TerritoryEntry;
+    if (object.key !== undefined && object.key !== null) {
+      message.key = Number(object.key);
+    } else {
+      message.key = 0;
+    }
+    if (object.value !== undefined && object.value !== null) {
+      message.value = Territory.fromJSON(object.value);
+    } else {
+      message.value = undefined;
+    }
+    return message;
+  },
+
+  toJSON(message: Game_TerritoryEntry): unknown {
+    const obj: any = {};
+    message.key !== undefined && (obj.key = message.key);
+    message.value !== undefined &&
+      (obj.value = message.value ? Territory.toJSON(message.value) : undefined);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Game_TerritoryEntry>): Game_TerritoryEntry {
+    const message = { ...baseGame_TerritoryEntry } as Game_TerritoryEntry;
+    if (object.key !== undefined && object.key !== null) {
+      message.key = object.key;
+    } else {
+      message.key = 0;
+    }
+    if (object.value !== undefined && object.value !== null) {
+      message.value = Territory.fromPartial(object.value);
+    } else {
+      message.value = undefined;
+    }
+    return message;
+  },
+};
+
+const baseGameSnapshot: object = { paramVersion: 0 };
+
+export const GameSnapshot = {
+  encode(
+    message: GameSnapshot,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.map !== undefined) {
+      Map.encode(message.map, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.state !== undefined) {
+      State.encode(message.state, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.paramVersion !== 0) {
+      writer.uint32(24).uint32(message.paramVersion);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): GameSnapshot {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseGameSnapshot } as GameSnapshot;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.map = Map.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.state = State.decode(reader, reader.uint32());
+          break;
+        case 3:
+          message.paramVersion = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GameSnapshot {
+    const message = { ...baseGameSnapshot } as GameSnapshot;
+    if (object.map !== undefined && object.map !== null) {
+      message.map = Map.fromJSON(object.map);
+    } else {
+      message.map = undefined;
+    }
+    if (object.state !== undefined && object.state !== null) {
+      message.state = State.fromJSON(object.state);
+    } else {
+      message.state = undefined;
+    }
+    if (object.paramVersion !== undefined && object.paramVersion !== null) {
+      message.paramVersion = Number(object.paramVersion);
+    } else {
+      message.paramVersion = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: GameSnapshot): unknown {
+    const obj: any = {};
+    message.map !== undefined &&
+      (obj.map = message.map ? Map.toJSON(message.map) : undefined);
+    message.state !== undefined &&
+      (obj.state = message.state ? State.toJSON(message.state) : undefined);
+    message.paramVersion !== undefined &&
+      (obj.paramVersion = message.paramVersion);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<GameSnapshot>): GameSnapshot {
+    const message = { ...baseGameSnapshot } as GameSnapshot;
+    if (object.map !== undefined && object.map !== null) {
+      message.map = Map.fromPartial(object.map);
+    } else {
+      message.map = undefined;
+    }
+    if (object.state !== undefined && object.state !== null) {
+      message.state = State.fromPartial(object.state);
+    } else {
+      message.state = undefined;
+    }
+    if (object.paramVersion !== undefined && object.paramVersion !== null) {
+      message.paramVersion = object.paramVersion;
+    } else {
+      message.paramVersion = 0;
+    }
+    return message;
+  },
+};
+
+const baseOverview: object = { players: "", paramVersion: 0 };
 
 export const Overview = {
   encode(
     message: Overview,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
+    for (const v of message.players) {
+      writer.uint32(10).string(v!);
+    }
     if (message.map !== undefined) {
-      Map.encode(message.map, writer.uint32(10).fork()).ldelim();
+      Map.encode(message.map, writer.uint32(18).fork()).ldelim();
     }
     if (message.paramVersion !== 0) {
-      writer.uint32(16).uint32(message.paramVersion);
+      writer.uint32(24).uint32(message.paramVersion);
     }
     return writer;
   },
@@ -251,13 +599,17 @@ export const Overview = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseOverview } as Overview;
+    message.players = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.map = Map.decode(reader, reader.uint32());
+          message.players.push(reader.string());
           break;
         case 2:
+          message.map = Map.decode(reader, reader.uint32());
+          break;
+        case 3:
           message.paramVersion = reader.uint32();
           break;
         default:
@@ -270,6 +622,12 @@ export const Overview = {
 
   fromJSON(object: any): Overview {
     const message = { ...baseOverview } as Overview;
+    message.players = [];
+    if (object.players !== undefined && object.players !== null) {
+      for (const e of object.players) {
+        message.players.push(String(e));
+      }
+    }
     if (object.map !== undefined && object.map !== null) {
       message.map = Map.fromJSON(object.map);
     } else {
@@ -285,6 +643,11 @@ export const Overview = {
 
   toJSON(message: Overview): unknown {
     const obj: any = {};
+    if (message.players) {
+      obj.players = message.players.map((e) => e);
+    } else {
+      obj.players = [];
+    }
     message.map !== undefined &&
       (obj.map = message.map ? Map.toJSON(message.map) : undefined);
     message.paramVersion !== undefined &&
@@ -294,6 +657,12 @@ export const Overview = {
 
   fromPartial(object: DeepPartial<Overview>): Overview {
     const message = { ...baseOverview } as Overview;
+    message.players = [];
+    if (object.players !== undefined && object.players !== null) {
+      for (const e of object.players) {
+        message.players.push(e);
+      }
+    }
     if (object.map !== undefined && object.map !== null) {
       message.map = Map.fromPartial(object.map);
     } else {
@@ -312,7 +681,7 @@ const baseState: object = { step: Long.UZERO };
 
 export const State = {
   encode(message: State, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.players) {
+    for (const v of message.factions) {
       Faction.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     for (const v of message.gaia) {
@@ -328,13 +697,13 @@ export const State = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseState } as State;
-    message.players = [];
+    message.factions = [];
     message.gaia = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.players.push(Faction.decode(reader, reader.uint32()));
+          message.factions.push(Faction.decode(reader, reader.uint32()));
           break;
         case 2:
           message.gaia.push(Populace.decode(reader, reader.uint32()));
@@ -352,11 +721,11 @@ export const State = {
 
   fromJSON(object: any): State {
     const message = { ...baseState } as State;
-    message.players = [];
+    message.factions = [];
     message.gaia = [];
-    if (object.players !== undefined && object.players !== null) {
-      for (const e of object.players) {
-        message.players.push(Faction.fromJSON(e));
+    if (object.factions !== undefined && object.factions !== null) {
+      for (const e of object.factions) {
+        message.factions.push(Faction.fromJSON(e));
       }
     }
     if (object.gaia !== undefined && object.gaia !== null) {
@@ -374,12 +743,12 @@ export const State = {
 
   toJSON(message: State): unknown {
     const obj: any = {};
-    if (message.players) {
-      obj.players = message.players.map((e) =>
+    if (message.factions) {
+      obj.factions = message.factions.map((e) =>
         e ? Faction.toJSON(e) : undefined
       );
     } else {
-      obj.players = [];
+      obj.factions = [];
     }
     if (message.gaia) {
       obj.gaia = message.gaia.map((e) => (e ? Populace.toJSON(e) : undefined));
@@ -393,11 +762,11 @@ export const State = {
 
   fromPartial(object: DeepPartial<State>): State {
     const message = { ...baseState } as State;
-    message.players = [];
+    message.factions = [];
     message.gaia = [];
-    if (object.players !== undefined && object.players !== null) {
-      for (const e of object.players) {
-        message.players.push(Faction.fromPartial(e));
+    if (object.factions !== undefined && object.factions !== null) {
+      for (const e of object.factions) {
+        message.factions.push(Faction.fromPartial(e));
       }
     }
     if (object.gaia !== undefined && object.gaia !== null) {
@@ -502,15 +871,15 @@ export const Map = {
   },
 };
 
-const baseFaction: object = { player: "" };
+const baseFaction: object = { players: "" };
 
 export const Faction = {
   encode(
     message: Faction,
     writer: _m0.Writer = _m0.Writer.create()
   ): _m0.Writer {
-    if (message.player !== "") {
-      writer.uint32(10).string(message.player);
+    for (const v of message.players) {
+      writer.uint32(10).string(v!);
     }
     if (message.resources !== undefined) {
       ResourceSet.encode(message.resources, writer.uint32(18).fork()).ldelim();
@@ -525,12 +894,13 @@ export const Faction = {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = { ...baseFaction } as Faction;
+    message.players = [];
     message.population = [];
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.player = reader.string();
+          message.players.push(reader.string());
           break;
         case 2:
           message.resources = ResourceSet.decode(reader, reader.uint32());
@@ -548,11 +918,12 @@ export const Faction = {
 
   fromJSON(object: any): Faction {
     const message = { ...baseFaction } as Faction;
+    message.players = [];
     message.population = [];
-    if (object.player !== undefined && object.player !== null) {
-      message.player = String(object.player);
-    } else {
-      message.player = "";
+    if (object.players !== undefined && object.players !== null) {
+      for (const e of object.players) {
+        message.players.push(String(e));
+      }
     }
     if (object.resources !== undefined && object.resources !== null) {
       message.resources = ResourceSet.fromJSON(object.resources);
@@ -569,7 +940,11 @@ export const Faction = {
 
   toJSON(message: Faction): unknown {
     const obj: any = {};
-    message.player !== undefined && (obj.player = message.player);
+    if (message.players) {
+      obj.players = message.players.map((e) => e);
+    } else {
+      obj.players = [];
+    }
     message.resources !== undefined &&
       (obj.resources = message.resources
         ? ResourceSet.toJSON(message.resources)
@@ -586,11 +961,12 @@ export const Faction = {
 
   fromPartial(object: DeepPartial<Faction>): Faction {
     const message = { ...baseFaction } as Faction;
+    message.players = [];
     message.population = [];
-    if (object.player !== undefined && object.player !== null) {
-      message.player = object.player;
-    } else {
-      message.player = "";
+    if (object.players !== undefined && object.players !== null) {
+      for (const e of object.players) {
+        message.players.push(e);
+      }
     }
     if (object.resources !== undefined && object.resources !== null) {
       message.resources = ResourceSet.fromPartial(object.resources);
@@ -606,7 +982,7 @@ export const Faction = {
   },
 };
 
-const basePopulace: object = { amount: 0, settlement: 0 };
+const basePopulace: object = { amount: 0, settlement: 0, used: false };
 
 export const Populace = {
   encode(
@@ -621,6 +997,9 @@ export const Populace = {
     }
     if (message.settlement !== 0) {
       writer.uint32(24).int32(message.settlement);
+    }
+    if (message.used === true) {
+      writer.uint32(32).bool(message.used);
     }
     return writer;
   },
@@ -640,6 +1019,9 @@ export const Populace = {
           break;
         case 3:
           message.settlement = reader.int32() as any;
+          break;
+        case 4:
+          message.used = reader.bool();
           break;
         default:
           reader.skipType(tag & 7);
@@ -666,6 +1048,11 @@ export const Populace = {
     } else {
       message.settlement = 0;
     }
+    if (object.used !== undefined && object.used !== null) {
+      message.used = Boolean(object.used);
+    } else {
+      message.used = false;
+    }
     return message;
   },
 
@@ -678,6 +1065,7 @@ export const Populace = {
         : undefined);
     message.settlement !== undefined &&
       (obj.settlement = settlementToJSON(message.settlement));
+    message.used !== undefined && (obj.used = message.used);
     return obj;
   },
 
@@ -698,453 +1086,10 @@ export const Populace = {
     } else {
       message.settlement = 0;
     }
-    return message;
-  },
-};
-
-const baseConfig: object = {};
-
-export const Config = {
-  encode(
-    message: Config,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.initial !== undefined) {
-      InitializationConfig.encode(
-        message.initial,
-        writer.uint32(10).fork()
-      ).ldelim();
-    }
-    if (message.map !== undefined) {
-      MapConfig.encode(message.map, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Config {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseConfig } as Config;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.initial = InitializationConfig.decode(
-            reader,
-            reader.uint32()
-          );
-          break;
-        case 2:
-          message.map = MapConfig.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Config {
-    const message = { ...baseConfig } as Config;
-    if (object.initial !== undefined && object.initial !== null) {
-      message.initial = InitializationConfig.fromJSON(object.initial);
+    if (object.used !== undefined && object.used !== null) {
+      message.used = object.used;
     } else {
-      message.initial = undefined;
-    }
-    if (object.map !== undefined && object.map !== null) {
-      message.map = MapConfig.fromJSON(object.map);
-    } else {
-      message.map = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: Config): unknown {
-    const obj: any = {};
-    message.initial !== undefined &&
-      (obj.initial = message.initial
-        ? InitializationConfig.toJSON(message.initial)
-        : undefined);
-    message.map !== undefined &&
-      (obj.map = message.map ? MapConfig.toJSON(message.map) : undefined);
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<Config>): Config {
-    const message = { ...baseConfig } as Config;
-    if (object.initial !== undefined && object.initial !== null) {
-      message.initial = InitializationConfig.fromPartial(object.initial);
-    } else {
-      message.initial = undefined;
-    }
-    if (object.map !== undefined && object.map !== null) {
-      message.map = MapConfig.fromPartial(object.map);
-    } else {
-      message.map = undefined;
-    }
-    return message;
-  },
-};
-
-const baseMapConfig: object = {
-  width: 0,
-  height: 0,
-  seed: Long.ZERO,
-  mountainsDensity: 0,
-  forestDensity: 0,
-  lakeDensity: 0,
-  plainsDensity: 0,
-};
-
-export const MapConfig = {
-  encode(
-    message: MapConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.width !== 0) {
-      writer.uint32(8).uint32(message.width);
-    }
-    if (message.height !== 0) {
-      writer.uint32(16).uint32(message.height);
-    }
-    if (!message.seed.isZero()) {
-      writer.uint32(24).int64(message.seed);
-    }
-    if (message.mountainsDensity !== 0) {
-      writer.uint32(32).uint32(message.mountainsDensity);
-    }
-    if (message.forestDensity !== 0) {
-      writer.uint32(40).uint32(message.forestDensity);
-    }
-    if (message.lakeDensity !== 0) {
-      writer.uint32(48).uint32(message.lakeDensity);
-    }
-    if (message.plainsDensity !== 0) {
-      writer.uint32(56).uint32(message.plainsDensity);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MapConfig {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseMapConfig } as MapConfig;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.width = reader.uint32();
-          break;
-        case 2:
-          message.height = reader.uint32();
-          break;
-        case 3:
-          message.seed = reader.int64() as Long;
-          break;
-        case 4:
-          message.mountainsDensity = reader.uint32();
-          break;
-        case 5:
-          message.forestDensity = reader.uint32();
-          break;
-        case 6:
-          message.lakeDensity = reader.uint32();
-          break;
-        case 7:
-          message.plainsDensity = reader.uint32();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MapConfig {
-    const message = { ...baseMapConfig } as MapConfig;
-    if (object.width !== undefined && object.width !== null) {
-      message.width = Number(object.width);
-    } else {
-      message.width = 0;
-    }
-    if (object.height !== undefined && object.height !== null) {
-      message.height = Number(object.height);
-    } else {
-      message.height = 0;
-    }
-    if (object.seed !== undefined && object.seed !== null) {
-      message.seed = Long.fromString(object.seed);
-    } else {
-      message.seed = Long.ZERO;
-    }
-    if (
-      object.mountainsDensity !== undefined &&
-      object.mountainsDensity !== null
-    ) {
-      message.mountainsDensity = Number(object.mountainsDensity);
-    } else {
-      message.mountainsDensity = 0;
-    }
-    if (object.forestDensity !== undefined && object.forestDensity !== null) {
-      message.forestDensity = Number(object.forestDensity);
-    } else {
-      message.forestDensity = 0;
-    }
-    if (object.lakeDensity !== undefined && object.lakeDensity !== null) {
-      message.lakeDensity = Number(object.lakeDensity);
-    } else {
-      message.lakeDensity = 0;
-    }
-    if (object.plainsDensity !== undefined && object.plainsDensity !== null) {
-      message.plainsDensity = Number(object.plainsDensity);
-    } else {
-      message.plainsDensity = 0;
-    }
-    return message;
-  },
-
-  toJSON(message: MapConfig): unknown {
-    const obj: any = {};
-    message.width !== undefined && (obj.width = message.width);
-    message.height !== undefined && (obj.height = message.height);
-    message.seed !== undefined &&
-      (obj.seed = (message.seed || Long.ZERO).toString());
-    message.mountainsDensity !== undefined &&
-      (obj.mountainsDensity = message.mountainsDensity);
-    message.forestDensity !== undefined &&
-      (obj.forestDensity = message.forestDensity);
-    message.lakeDensity !== undefined &&
-      (obj.lakeDensity = message.lakeDensity);
-    message.plainsDensity !== undefined &&
-      (obj.plainsDensity = message.plainsDensity);
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<MapConfig>): MapConfig {
-    const message = { ...baseMapConfig } as MapConfig;
-    if (object.width !== undefined && object.width !== null) {
-      message.width = object.width;
-    } else {
-      message.width = 0;
-    }
-    if (object.height !== undefined && object.height !== null) {
-      message.height = object.height;
-    } else {
-      message.height = 0;
-    }
-    if (object.seed !== undefined && object.seed !== null) {
-      message.seed = object.seed as Long;
-    } else {
-      message.seed = Long.ZERO;
-    }
-    if (
-      object.mountainsDensity !== undefined &&
-      object.mountainsDensity !== null
-    ) {
-      message.mountainsDensity = object.mountainsDensity;
-    } else {
-      message.mountainsDensity = 0;
-    }
-    if (object.forestDensity !== undefined && object.forestDensity !== null) {
-      message.forestDensity = object.forestDensity;
-    } else {
-      message.forestDensity = 0;
-    }
-    if (object.lakeDensity !== undefined && object.lakeDensity !== null) {
-      message.lakeDensity = object.lakeDensity;
-    } else {
-      message.lakeDensity = 0;
-    }
-    if (object.plainsDensity !== undefined && object.plainsDensity !== null) {
-      message.plainsDensity = object.plainsDensity;
-    } else {
-      message.plainsDensity = 0;
-    }
-    return message;
-  },
-};
-
-const baseInitializationConfig: object = { teams: 0 };
-
-export const InitializationConfig = {
-  encode(
-    message: InitializationConfig,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.teams !== 0) {
-      writer.uint32(8).uint32(message.teams);
-    }
-    if (message.resources !== undefined) {
-      ResourceSet.encode(message.resources, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): InitializationConfig {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseInitializationConfig } as InitializationConfig;
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.teams = reader.uint32();
-          break;
-        case 2:
-          message.resources = ResourceSet.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): InitializationConfig {
-    const message = { ...baseInitializationConfig } as InitializationConfig;
-    if (object.teams !== undefined && object.teams !== null) {
-      message.teams = Number(object.teams);
-    } else {
-      message.teams = 0;
-    }
-    if (object.resources !== undefined && object.resources !== null) {
-      message.resources = ResourceSet.fromJSON(object.resources);
-    } else {
-      message.resources = undefined;
-    }
-    return message;
-  },
-
-  toJSON(message: InitializationConfig): unknown {
-    const obj: any = {};
-    message.teams !== undefined && (obj.teams = message.teams);
-    message.resources !== undefined &&
-      (obj.resources = message.resources
-        ? ResourceSet.toJSON(message.resources)
-        : undefined);
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<InitializationConfig>): InitializationConfig {
-    const message = { ...baseInitializationConfig } as InitializationConfig;
-    if (object.teams !== undefined && object.teams !== null) {
-      message.teams = object.teams;
-    } else {
-      message.teams = 0;
-    }
-    if (object.resources !== undefined && object.resources !== null) {
-      message.resources = ResourceSet.fromPartial(object.resources);
-    } else {
-      message.resources = undefined;
-    }
-    return message;
-  },
-};
-
-const baseParams: object = {};
-
-export const Params = {
-  encode(
-    message: Params,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    for (const v of message.productionRate) {
-      ResourceSet.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    for (const v of message.constructionCost) {
-      ResourceSet.encode(v!, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Params {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = { ...baseParams } as Params;
-    message.productionRate = [];
-    message.constructionCost = [];
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.productionRate.push(
-            ResourceSet.decode(reader, reader.uint32())
-          );
-          break;
-        case 2:
-          message.constructionCost.push(
-            ResourceSet.decode(reader, reader.uint32())
-          );
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Params {
-    const message = { ...baseParams } as Params;
-    message.productionRate = [];
-    message.constructionCost = [];
-    if (object.productionRate !== undefined && object.productionRate !== null) {
-      for (const e of object.productionRate) {
-        message.productionRate.push(ResourceSet.fromJSON(e));
-      }
-    }
-    if (
-      object.constructionCost !== undefined &&
-      object.constructionCost !== null
-    ) {
-      for (const e of object.constructionCost) {
-        message.constructionCost.push(ResourceSet.fromJSON(e));
-      }
-    }
-    return message;
-  },
-
-  toJSON(message: Params): unknown {
-    const obj: any = {};
-    if (message.productionRate) {
-      obj.productionRate = message.productionRate.map((e) =>
-        e ? ResourceSet.toJSON(e) : undefined
-      );
-    } else {
-      obj.productionRate = [];
-    }
-    if (message.constructionCost) {
-      obj.constructionCost = message.constructionCost.map((e) =>
-        e ? ResourceSet.toJSON(e) : undefined
-      );
-    } else {
-      obj.constructionCost = [];
-    }
-    return obj;
-  },
-
-  fromPartial(object: DeepPartial<Params>): Params {
-    const message = { ...baseParams } as Params;
-    message.productionRate = [];
-    message.constructionCost = [];
-    if (object.productionRate !== undefined && object.productionRate !== null) {
-      for (const e of object.productionRate) {
-        message.productionRate.push(ResourceSet.fromPartial(e));
-      }
-    }
-    if (
-      object.constructionCost !== undefined &&
-      object.constructionCost !== null
-    ) {
-      for (const e of object.constructionCost) {
-        message.constructionCost.push(ResourceSet.fromPartial(e));
-      }
+      message.used = false;
     }
     return message;
   },
@@ -1225,7 +1170,13 @@ export const Position = {
   },
 };
 
-const baseResourceSet: object = { food: 0, stone: 0, wood: 0, population: 0 };
+const baseResourceSet: object = {
+  food: 0,
+  stone: 0,
+  wood: 0,
+  population: 0,
+  tech: 0,
+};
 
 export const ResourceSet = {
   encode(
@@ -1243,6 +1194,9 @@ export const ResourceSet = {
     }
     if (message.population !== 0) {
       writer.uint32(32).uint32(message.population);
+    }
+    if (message.tech !== 0) {
+      writer.uint32(40).uint32(message.tech);
     }
     return writer;
   },
@@ -1265,6 +1219,9 @@ export const ResourceSet = {
           break;
         case 4:
           message.population = reader.uint32();
+          break;
+        case 5:
+          message.tech = reader.uint32();
           break;
         default:
           reader.skipType(tag & 7);
@@ -1296,6 +1253,11 @@ export const ResourceSet = {
     } else {
       message.population = 0;
     }
+    if (object.tech !== undefined && object.tech !== null) {
+      message.tech = Number(object.tech);
+    } else {
+      message.tech = 0;
+    }
     return message;
   },
 
@@ -1305,6 +1267,7 @@ export const ResourceSet = {
     message.stone !== undefined && (obj.stone = message.stone);
     message.wood !== undefined && (obj.wood = message.wood);
     message.population !== undefined && (obj.population = message.population);
+    message.tech !== undefined && (obj.tech = message.tech);
     return obj;
   },
 
@@ -1329,6 +1292,86 @@ export const ResourceSet = {
       message.population = object.population;
     } else {
       message.population = 0;
+    }
+    if (object.tech !== undefined && object.tech !== null) {
+      message.tech = object.tech;
+    } else {
+      message.tech = 0;
+    }
+    return message;
+  },
+};
+
+const baseTerritory: object = { faction: 0, populace: 0 };
+
+export const Territory = {
+  encode(
+    message: Territory,
+    writer: _m0.Writer = _m0.Writer.create()
+  ): _m0.Writer {
+    if (message.faction !== 0) {
+      writer.uint32(8).uint32(message.faction);
+    }
+    if (message.populace !== 0) {
+      writer.uint32(16).uint32(message.populace);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Territory {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = { ...baseTerritory } as Territory;
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.faction = reader.uint32();
+          break;
+        case 2:
+          message.populace = reader.uint32();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Territory {
+    const message = { ...baseTerritory } as Territory;
+    if (object.faction !== undefined && object.faction !== null) {
+      message.faction = Number(object.faction);
+    } else {
+      message.faction = 0;
+    }
+    if (object.populace !== undefined && object.populace !== null) {
+      message.populace = Number(object.populace);
+    } else {
+      message.populace = 0;
+    }
+    return message;
+  },
+
+  toJSON(message: Territory): unknown {
+    const obj: any = {};
+    message.faction !== undefined && (obj.faction = message.faction);
+    message.populace !== undefined && (obj.populace = message.populace);
+    return obj;
+  },
+
+  fromPartial(object: DeepPartial<Territory>): Territory {
+    const message = { ...baseTerritory } as Territory;
+    if (object.faction !== undefined && object.faction !== null) {
+      message.faction = object.faction;
+    } else {
+      message.faction = 0;
+    }
+    if (object.populace !== undefined && object.populace !== null) {
+      message.populace = object.populace;
+    } else {
+      message.populace = 0;
     }
     return message;
   },
