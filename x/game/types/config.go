@@ -18,10 +18,16 @@ func DefaultConfig() Config {
 }
 
 func (cfg *Config) ValidateBasic(players int) error {
-	if cfg.Map != nil {
-		if err := cfg.Map.ValidateBasic(); err != nil {
-			return err
-		}
+	if cfg.Map == nil || cfg.Initial == nil {
+		return ErrInvalidConfig
+	}
+
+	if err := cfg.Initial.ValidateBasic(); err != nil {
+		return err
+	}
+
+	if err := cfg.Map.ValidateBasic(); err != nil {
+		return err
 	}
 
 	if int(cfg.Map.Width*cfg.Map.Height)/players < MinTilesPerPlayer {
@@ -45,6 +51,14 @@ func DefaultInitializationConfig() *InitializationConfig {
 		Teams:     0, // free for all
 		Resources: &ResourceSet{Wood: 5, Food: 5, Stone: 5, Population: 1},
 	}
+}
+
+func (cfg InitializationConfig) ValidateBasic() error {
+	if cfg.Teams == 1 {
+		return ErrInvalidTeams
+	}
+
+	return nil
 }
 
 func DefaultMapConfig() *MapConfig {

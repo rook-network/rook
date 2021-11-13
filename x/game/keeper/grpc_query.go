@@ -36,8 +36,11 @@ func (q Keeper) GameByPlayer(goCtx context.Context, req *types.QueryGameByPlayer
 
 func (q Keeper) State(goCtx context.Context, req *types.QueryGameStateRequest) (*types.QueryGameStateResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	state, err := q.GetGameState(ctx, req.Id)
-	return &types.QueryGameStateResponse{State: state}, err
+	game, err := q.GetGame(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &types.QueryGameStateResponse{State: *game.State}, err
 }
 
 func (q Keeper) Params(goCtx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {

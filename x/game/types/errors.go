@@ -23,5 +23,7 @@ var (
 	ErrPopulaceAlreadActed   = sdkerrors.Register(ModuleName, 13, "players populace has already acted in this step")
 	ErrAbandoningCapital     = sdkerrors.Register(ModuleName, 14, "not allowed to abandon capital")
 	ErrParamsNotFound        = sdkerrors.Register(ModuleName, 15, "params not found for this game")
+	ErrInvalidConfig         = sdkerrors.Register(ModuleName, 16, "incomplete config")
+	ErrInvalidTeams          = sdkerrors.Register(ModuleName, 17, "amount of initial teams can not be one")
 	// this line is used by starport scaffolding # ibc/errors
 )

@@ -46,10 +46,11 @@ func (f *Faction) Capitals() int {
 	return count
 }
 
-func NewPopulace(amount uint32, pos *Position, settlement Settlement) *Populace {
+func NewPopulace(amount uint32, pos *Position, settlement Settlement, used bool) *Populace {
 	return &Populace{
 		Amount:     amount,
 		Position:   pos,
 		Settlement: settlement,
+		Used:       used,
 	}
 }

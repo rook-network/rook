@@ -10,17 +10,20 @@ import (
 // CONSTRUCTORS
 func SetupGame(players []string, config *Config, paramVersion uint32) (*Game, error) {
 	gameMap := GenerateMap(config.Map)
-	factions := make([]*Faction, config.Initial.Teams)
+	teams := len(players)
+	if config.Initial.Teams > 1 {
+		teams = int(config.Initial.Teams)
+	}
+	factions := make([]*Faction, teams)
 
-	startingPositions, err := gameMap.RandomStartingPoints(rand.New(rand.NewSource(config.Map.Seed)), int(config.Initial.Teams))
+	startingPositions, err := gameMap.RandomStartingPoints(rand.New(rand.NewSource(config.Map.Seed)), teams)
 	if err != nil {
 		return nil, err
 	}
-
-	playersPerTeam := len(players) / int(config.Initial.Teams)
+	playersPerTeam := len(players) / teams
 	playerIdx := 0
-	for i := 0; i < int(config.Initial.Teams); i++ {
-		if i == int(config.Initial.Teams)-1 {
+	for i := 0; i < teams; i++ {
+		if i == teams-1 {
 			factions[i] = NewFaction(players[playerIdx:], config.Initial.Resources, startingPositions[i])
 		} else {
 			factions[i] = NewFaction(players[playerIdx:playerIdx+playersPerTeam], config.Initial.Resources, startingPositions[i])
@@ -33,6 +36,7 @@ func SetupGame(players []string, config *Config, paramVersion uint32) (*Game, er
 		Map:          gameMap,
 		State:        NewState(factions, []*Populace{}),
 		ParamVersion: paramVersion,
+		Territory:    make(map[uint32]*Territory),
 	}
 	game.calculateTerritory()
 
@@ -45,6 +49,7 @@ func NewGame(overview Overview, state *State) *Game {
 		Map:          overview.Map,
 		State:        state,
 		ParamVersion: overview.ParamVersion,
+		Territory:    make(map[uint32]*Territory),
 	}
 	game.calculateTerritory()
 	return game
@@ -115,7 +120,7 @@ func (g *Game) Build(params Params, player string, populace uint32, settlement S
 
 	// All validity checks have passed. Now we update state.
 
-	// mark the populace as used it's move
+	// mark the populace as used its move
 	faction.Population[populace].Used = true
 
 	// Pay for the settlement
@@ -283,6 +288,7 @@ func (g *Game) Update(params Params) {
 	for _, faction := range g.State.Factions {
 		faction.Reap(params)
 	}
+	g.resetUsedPopulace()
 	g.State.Step++
 }
 
@@ -301,6 +307,14 @@ func (g Game) playerIndex(player string) int {
 		}
 	}
 	return -1
+}
+
+func (g *Game) resetUsedPopulace() {
+	for _, faction := range g.State.Factions {
+		for _, p := range faction.Population {
+			p.Used = false
+		}
+	}
 }
 
 func (g Game) getFactionlessSettlementAtPos(pos *Position) Settlement {

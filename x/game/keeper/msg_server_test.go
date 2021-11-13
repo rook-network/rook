@@ -48,7 +48,7 @@ func TestGame(t *testing.T) {
 	stateRequest := &types.QueryGameStateRequest{Id: id}
 	getStateResponse, err := querier.State(goCtx, stateRequest)
 	require.Equal(t, uint64(0), getStateResponse.State.Step)
-	require.Len(t, getStateResponse.State.Players, len(addrs))
+	require.Len(t, getStateResponse.State.Factions, len(addrs))
 	require.Empty(t, getStateResponse.State.Gaia)
 	for idx, faction := range getStateResponse.State.Factions {
 		require.Contains(t, faction.Players, addrs[idx].String())
@@ -68,10 +68,10 @@ func TestGame(t *testing.T) {
 	t.Log(getStateResponse.State.Factions[0].Population)
 	t.Log(getStateResponse.State.Factions[0].Resources)
 
-	pop1 := types.NewPopulace(4, types.NewPosition(14, 11), types.Settlement_CAPITAL)
+	pop1 := types.NewPopulace(4, types.NewPosition(14, 11), types.Settlement_CAPITAL, false)
 	require.Equal(t, pop1, getStateResponse.State.Factions[0].Population[0])
 
-	pop2 := types.NewPopulace(3, types.NewPosition(13, 11), types.Settlement_NONE)
+	pop2 := types.NewPopulace(3, types.NewPosition(13, 11), types.Settlement_NONE, false)
 	require.Equal(t, pop2, getStateResponse.State.Factions[0].Population[1])
 
 	resources := types.NewResources(6, 6, 8, 7)

@@ -30,7 +30,7 @@ func TestNewGame(t *testing.T) {
 		require.Equal(t, players[idx], player)
 		faction, _, ok := game.FindFaction(player)
 		require.True(t, ok)
-		require.Contains(t, player, faction.Players)
+		require.Contains(t, faction.Players, player)
 		require.Equal(t, config.Initial.Resources, faction.Resources)
 		require.Len(t, faction.Population, 1)
 		require.Equal(t, config.Initial.Resources.Population, faction.Population[0].Amount)
@@ -38,8 +38,8 @@ func TestNewGame(t *testing.T) {
 		index := game.Map.GetIndex(faction.Population[0].Position)
 		ter, ok := game.Territory[index]
 		require.True(t, ok)
-		require.Equal(t, ter.Faction, idx)
-		require.Equal(t, ter.Populace, 0)
+		require.Equal(t, ter.Faction, uint32(idx))
+		require.Equal(t, ter.Populace, uint32(0))
 	}
 
 	require.Equal(t, uint64(0), game.State.Step)
@@ -279,21 +279,23 @@ func forceSetStartingPopulace(g *Game, pop [][]*Populace) {
 }
 
 func assertTerritory(t *testing.T, g *Game, idx int) {
-	_, ok := g.Territory[uint32(idx)]
-	assert.True(t, ok)
+	territory, ok := g.Territory[uint32(idx)]
+	assert.True(t, ok, territory)
 }
 
 func assertNoTerritory(t *testing.T, g *Game, idx int) {
-	_, ok := g.Territory[uint32(idx)]
-	assert.False(t, ok)
+	territory, ok := g.Territory[uint32(idx)]
+	assert.False(t, ok, territory)
 }
 
 func assertTurnUsed(t *testing.T, g *Game, player string, populace uint32) {
 	faction, _, ok := g.FindFaction(player)
-	assert.True(t, ok && faction.Population[populace].Used)
+	require.True(t, ok)
+	assert.True(t, faction.Population[populace].Used)
 }
 
 func assertTurnNotUsed(t *testing.T, g *Game, player string, populace uint32) {
 	faction, _, ok := g.FindFaction(player)
-	assert.False(t, ok && !faction.Population[populace].Used)
+	require.True(t, ok)
+	assert.False(t, faction.Population[populace].Used)
 }

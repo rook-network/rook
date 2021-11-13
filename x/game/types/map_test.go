@@ -22,22 +22,22 @@ func MockMap(width, height int, landscape Landscape) *Map {
 func TestDirections(t *testing.T) {
 	mock := MockMap(3, 3, Landscape_PLAINS)
 
-	require.Equal(t, 7, mock.Above(1))
-	require.Equal(t, 5, mock.Above(8))
+	require.Equal(t, uint32(7), mock.Above(1))
+	require.Equal(t, uint32(5), mock.Above(8))
 
-	require.Equal(t, 0, mock.Below(6))
-	require.Equal(t, 4, mock.Below(1))
+	require.Equal(t, uint32(0), mock.Below(6))
+	require.Equal(t, uint32(4), mock.Below(1))
 
-	require.Equal(t, 5, mock.Left(3))
-	require.Equal(t, 7, mock.Left(8))
+	require.Equal(t, uint32(5), mock.Left(3))
+	require.Equal(t, uint32(7), mock.Left(8))
 
-	require.Equal(t, 0, mock.Right(2))
-	require.Equal(t, 7, mock.Right(6))
+	require.Equal(t, uint32(0), mock.Right(2))
+	require.Equal(t, uint32(7), mock.Right(6))
 }
 
 func TestGetNeighbor(t *testing.T) {
 	mock := MockMap(3, 3, Landscape_PLAINS)
-	require.Equal(t, 2, mock.GetNeighbor(0, Direction_LEFT))
+	require.Equal(t, uint32(2), mock.GetNeighbor(0, Direction_LEFT))
 }
 
 func TestGetPosition(t *testing.T) {
