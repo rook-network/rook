@@ -7,67 +7,47 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// Game is the in memory representation of an instance of the rook game.
-type Game struct {
-	// state
-	Factions map[string]*Faction
-	Gaia     []*Populace
-	Step     uint64
-	// overview
-	Map     *Map
-	Version uint32
-
-	// cached fields
-	params  *Params
-	players []string // immutable
-	// map position index -> { player index, populace index }
-	territory map[int]territory
-	// check to see if the player/populace has already done their turn
-	used map[string]map[uint32]struct{}
-}
-
 // CONSTRUCTORS
-func SetupGame(players []string, config *Config, paramVersion uint32) (*Overview, *State, error) {
+func SetupGame(players []string, config *Config, paramVersion uint32) (*Game, error) {
 	gameMap := GenerateMap(config.Map)
-	factions := make([]*Faction, len(players))
+	factions := make([]*Faction, config.Initial.Teams)
 
-	startingPositions, err := gameMap.RandomStartingPoints(rand.New(rand.NewSource(config.Map.Seed)), len(players))
+	startingPositions, err := gameMap.RandomStartingPoints(rand.New(rand.NewSource(config.Map.Seed)), int(config.Initial.Teams))
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	for idx, player := range players {
-		factions[idx] = NewFaction(player, config.Initial.Resources, startingPositions[idx])
+	playersPerTeam := len(players) / int(config.Initial.Teams)
+	playerIdx := 0
+	for i := 0; i < int(config.Initial.Teams); i++ {
+		if i == int(config.Initial.Teams)-1 {
+			factions[i] = NewFaction(players[playerIdx:], config.Initial.Resources, startingPositions[i])
+		} else {
+			factions[i] = NewFaction(players[playerIdx:playerIdx+playersPerTeam], config.Initial.Resources, startingPositions[i])
+			playerIdx += playersPerTeam
+		}
 	}
 
-	overview := NewGameOverview(gameMap, paramVersion)
-	state := NewGameState(factions, []*Populace{}, 0)
-	return &overview, &state, nil
+	game := &Game{
+		Players:      players,
+		Map:          gameMap,
+		State:        NewState(factions, []*Populace{}),
+		ParamVersion: paramVersion,
+	}
+	game.calculateTerritory()
+
+	return game, nil
 }
 
-func NewGame(overview *Overview, state *State, params *Params) *Game {
-	factions := make(map[string]*Faction, len(state.Players))
-	players := make([]string, len(state.Players))
-	for idx, faction := range state.Players {
-		factions[faction.Player] = faction
-		players[idx] = faction.Player
+func NewGame(overview Overview, state *State) *Game {
+	game := &Game{
+		Players:      overview.Players,
+		Map:          overview.Map,
+		State:        state,
+		ParamVersion: overview.ParamVersion,
 	}
-
-	g := &Game{
-		Factions:  factions,
-		players:   players,
-		Gaia:      state.Gaia,
-		Map:       overview.Map,
-		Step:      state.Step,
-		params:    params,
-		Version:   overview.ParamVersion,
-		territory: make(map[int]territory),
-		used:      make(map[string]map[uint32]struct{}),
-	}
-	g.initializeUsedMap()
-	g.calculateTerritory()
-
-	return g
+	game.calculateTerritory()
+	return game
 }
 
 // ACTIONS
@@ -76,13 +56,13 @@ func NewGame(overview *Overview, state *State, params *Params) *Game {
 // following two methods entail how each of these actions changes the games
 // state
 
-func (g *Game) Build(player string, populace uint32, settlement Settlement) error {
+func (g *Game) Build(params Params, player string, populace uint32, settlement Settlement) error {
 	if settlement == Settlement_NONE {
 		return sdkerrors.Wrap(ErrInvalidSettlement, Settlement_name[int32(settlement)])
 	}
 
 	// Validate that the player is part of the game
-	faction, ok := g.Factions[player]
+	faction, _, ok := g.FindFaction(player)
 	if !ok {
 		return sdkerrors.Wrap(ErrPlayerNotInGame, player)
 	}
@@ -94,13 +74,13 @@ func (g *Game) Build(player string, populace uint32, settlement Settlement) erro
 	}
 
 	// Validate that the player's populace has not already acted
-	if _, ok := g.used[player][populace]; ok {
+	if faction.Population[populace].Used {
 		return sdkerrors.Wrap(ErrPopulaceAlreadActed,
-			fmt.Sprintf("step=%d, populace=%d", g.Step, populace))
+			fmt.Sprintf("step=%d, populace=%d", g.State.Step, populace))
 	}
 
 	// Check that the faction has sufficient resources
-	if !faction.Resources.CanAfford(g.params.ConstructionCost[int(settlement)]) {
+	if !faction.Resources.CanAfford(params.ConstructionCost[int(settlement)]) {
 		return sdkerrors.Wrap(ErrInsufficientResources, player)
 	}
 
@@ -136,10 +116,10 @@ func (g *Game) Build(player string, populace uint32, settlement Settlement) erro
 	// All validity checks have passed. Now we update state.
 
 	// mark the populace as used it's move
-	g.used[player][populace] = struct{}{}
+	faction.Population[populace].Used = true
 
 	// Pay for the settlement
-	faction.Resources.Pay(g.params.ConstructionCost[int(settlement)])
+	faction.Resources.Pay(params.ConstructionCost[int(settlement)])
 
 	// Update the settlement at the populace. NOTE: This will replace an
 	// existing settlement
@@ -151,7 +131,7 @@ func (g *Game) Build(player string, populace uint32, settlement Settlement) erro
 
 func (g *Game) Move(player string, populace uint32, direction Direction, amount uint32) error {
 	// Validate that the player is part of the game
-	faction, ok := g.Factions[player]
+	faction, factionIdx, ok := g.FindFaction(player)
 	if !ok {
 		return sdkerrors.Wrap(ErrPlayerNotInGame, player)
 	}
@@ -163,9 +143,9 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 	}
 
 	// Validate that the player's populace has not already acted
-	if _, ok := g.used[player][populace]; ok {
+	if faction.Population[populace].Used {
 		return sdkerrors.Wrap(ErrPopulaceAlreadActed,
-			fmt.Sprintf("step=%d, populace=%d", g.Step, populace))
+			fmt.Sprintf("step=%d, populace=%d", g.State.Step, populace))
 	}
 
 	pop := faction.Population[int(populace)]
@@ -195,18 +175,17 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 	// All validity checks have passed. Now we update state.
 
 	// mark the populace as used it's move
-	g.used[player][populace] = struct{}{}
+	faction.Population[populace].Used = true
 
 	newIndex := g.Map.GetNeighbor(index, direction)
-	territory, ok := g.territory[newIndex]
+	territory, ok := g.Territory[newIndex]
 	newPos := g.Map.GetPosition(newIndex)
 
 	// Are we moving into an existing territory?
 	if ok {
-		existingPlayer := g.players[territory.Faction]
-		existingPopulace := g.Factions[existingPlayer].Population[territory.Populace]
-		// Does the territory belong to the player
-		if existingPlayer == player {
+		existingPopulace := g.State.Factions[territory.Faction].Population[territory.Populace]
+		// Does the territory belong to the same faction
+		if territory.Faction == uint32(factionIdx) {
 			// We increase the population of the new populace and decrease the
 			// population of the old populace
 			existingPopulace.Amount += amount
@@ -231,9 +210,9 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 					Settlement: existingPopulace.Settlement,
 				})
 				// update the territory
-				territory.Faction = g.playerIndex(player)
+				territory.Faction = uint32(g.playerIndex(player))
 				// add the index of the new populace to the territory
-				territory.Populace = len(faction.Population) - 1
+				territory.Populace = uint32(len(faction.Population) - 1)
 
 			case existingPopulace.Amount == amount:
 				// There is a draw.
@@ -245,10 +224,10 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 					// Else we reduce populace to zero
 					existingPopulace.Amount = 0
 					// and remove the territory
-					delete(g.territory, newIndex)
+					delete(g.Territory, newIndex)
 
 					if existingPopulace.Settlement != Settlement_NONE {
-						g.Gaia = append(g.Gaia, &Populace{
+						g.State.Gaia = append(g.State.Gaia, &Populace{
 							Amount:     0,
 							Position:   existingPopulace.Position,
 							Settlement: existingPopulace.Settlement,
@@ -264,7 +243,7 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 
 		// Is there any remainding population at the old position
 		if pop.Amount == 0 {
-			delete(g.territory, index)
+			delete(g.Territory, index)
 			// the populace itself will get flushed in end block
 		}
 
@@ -272,8 +251,8 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 		// The player is marching into new unchartered territory
 		if amount == pop.Amount { // with the entire population
 			pop.Position = newPos
-			g.territory[newIndex] = g.territory[index].Copy()
-			delete(g.territory, index)
+			g.Territory[newIndex] = g.Territory[index].Copy()
+			delete(g.Territory, index)
 		} else { // with a portion of the population
 			pop.Amount -= amount
 			faction.Population = append(faction.Population, &Populace{
@@ -281,7 +260,7 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 				Position:   newPos,
 				Settlement: g.getFactionlessSettlementAtPos(newPos),
 			})
-			g.territory[newIndex] = newTerritory(g.playerIndex(player), len(faction.Population)-1)
+			g.Territory[newIndex] = NewTerritory(g.playerIndex(player), len(faction.Population)-1)
 		}
 	}
 
@@ -289,47 +268,34 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 	return nil
 }
 
-// The persistence of a game is divided into two parts. The overview which
-// remains constant throughout the duration of the game, and state which gets
-// updated after each height.
-
-// State extracts out the state component of the game
-func (g Game) State() *State {
-	players := make([]*Faction, len(g.Factions))
-	for idx, player := range g.players {
-		players[idx] = g.Factions[player]
+func (g Game) FindFaction(player string) (*Faction, int, bool) {
+	for idx, faction := range g.State.Factions {
+		if faction.HasPlayer(player) {
+			return faction, idx, true
+		}
 	}
-
-	return &State{
-		Players: players,
-		Gaia:    g.Gaia,
-		Step:    g.Step,
-	}
-}
-
-// Overview extracts out the overview component of the game
-func (g Game) Overview() *Overview {
-	return &Overview{
-		Map:          g.Map,
-		ParamVersion: g.Version,
-	}
+	return nil, -1, false
 }
 
 // Update loops through all factions and calculates how many resources were reaped
 // in that step, updates the population and performs any other passive actions
-func (g *Game) Update() {
-	for _, faction := range g.Factions {
-		faction.Reap(g.params)
+func (g *Game) Update(params Params) {
+	for _, faction := range g.State.Factions {
+		faction.Reap(params)
 	}
-	g.Step++
+	g.State.Step++
 }
 
-func (g Game) Players() []string {
-	return g.players
+func (g Game) Snapshot() GameSnapshot {
+	return GameSnapshot{
+		Map:          g.Map,
+		State:        g.State,
+		ParamVersion: g.ParamVersion,
+	}
 }
 
 func (g Game) playerIndex(player string) int {
-	for idx, p := range g.players {
+	for idx, p := range g.Players {
 		if player == p {
 			return idx
 		}
@@ -338,7 +304,7 @@ func (g Game) playerIndex(player string) int {
 }
 
 func (g Game) getFactionlessSettlementAtPos(pos *Position) Settlement {
-	for _, populace := range g.Gaia {
+	for _, populace := range g.State.Gaia {
 		if populace.Position.Equals(pos) {
 			return populace.Settlement
 		}
@@ -347,48 +313,48 @@ func (g Game) getFactionlessSettlementAtPos(pos *Position) Settlement {
 }
 
 func (g *Game) calculateTerritory() {
-	for playerIdx, player := range g.players {
-		faction := g.Factions[player]
+	for factionIdx, faction := range g.State.Factions {
 		for popIdx, populace := range faction.Population {
 			posIdx := g.Map.GetIndex(populace.Position)
-			g.territory[posIdx] = newTerritory(playerIdx, popIdx)
+			g.Territory[uint32(posIdx)] = NewTerritory(factionIdx, popIdx)
 		}
 	}
 }
 
-func (g *Game) initializeUsedMap() {
-	for _, player := range g.players {
-		g.used[player] = make(map[uint32]struct{})
+func (g Game) Overview() *Overview {
+	return &Overview{
+		Players:      g.Players,
+		Map:          g.Map,
+		ParamVersion: g.ParamVersion,
 	}
 }
 
-type territory struct {
-	Faction  int
-	Populace int
-}
-
-func (t territory) Copy() territory {
-	return newTerritory(t.Faction, t.Populace)
-}
-
-func newTerritory(faction, populace int) territory {
-	return territory{
-		Faction:  faction,
-		Populace: populace,
+func NewTerritory(faction, populace int) *Territory {
+	return &Territory{
+		Faction:  uint32(faction),
+		Populace: uint32(populace),
 	}
 }
 
-func NewGameOverview(gameMap *Map, paramVersion uint32) Overview {
-	return Overview{
-		Map:          gameMap,
-		ParamVersion: paramVersion,
+func (t Territory) Copy() *Territory {
+	return &Territory{
+		Faction:  t.Faction,
+		Populace: t.Populace,
 	}
 }
 
-func NewGameState(players []*Faction, gaia []*Populace, step uint64) State {
-	return State{
-		Players: players,
-		Gaia:    gaia,
-		Step:    step,
+func NewState(factions []*Faction, gaia []*Populace) *State {
+	return &State{
+		Factions: factions,
+		Gaia:     gaia,
+		Step:     0,
 	}
+}
+
+func (s State) Players() []string {
+	players := make([]string, 0)
+	for _, faction := range s.Factions {
+		players = append(players, faction.Players...)
+	}
+	return players
 }

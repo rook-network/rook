@@ -3,6 +3,7 @@ package rook.game;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "rook/game/config.proto";
 import "rook/game/game.proto";
 
 option go_package = "github.com/arcane-systems/rook/x/game/types";
@@ -11,11 +12,11 @@ option go_package = "github.com/arcane-systems/rook/x/game/types";
 service Query {
   // this line is used by starport scaffolding # 2
 
-  rpc FindByID(QueryGameByIDRequest) returns (QueryGameByIDResponse) {
+  rpc Game(QueryGameByIDRequest) returns (QueryGameByIDResponse) {
     option (google.api.http).get = "/game/game/{id}";
   }
 
-  rpc FindByPlayer(QueryGameByPlayerRequest)
+  rpc GameByPlayer(QueryGameByPlayerRequest)
       returns (QueryGameByPlayerResponse) {
     option (google.api.http).get = "/game/game/{player}";
   }
@@ -40,15 +41,13 @@ message QueryGameStateResponse {
 message QueryGameByIDRequest { uint64 id = 1; }
 
 message QueryGameByIDResponse {
-  Overview overview = 1 [ (gogoproto.nullable) = false ];
-  uint64 id = 2;
+  Game game = 1 [ (gogoproto.nullable) = false ];
 }
 
 message QueryGameByPlayerRequest { string player = 1; }
 
 message QueryGameByPlayerResponse {
-  Overview overview = 1 [ (gogoproto.nullable) = false ];
-  uint64 id = 2;
+  Game game = 1 [ (gogoproto.nullable) = false ];
 }
 
 message QueryParamsRequest { uint32 version = 1; }

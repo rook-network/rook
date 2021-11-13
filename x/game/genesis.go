@@ -11,7 +11,7 @@ import (
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
 	k.SetParamsVersion(ctx, genState.ParamsVersion)
 
-	k.SetGameID(ctx, genState.NextGameId)
+	k.SetNextGameID(ctx, genState.NextGameId)
 
 	k.SetParams(ctx, genState.Params)
 }

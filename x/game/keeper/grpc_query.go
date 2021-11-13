@@ -9,29 +9,29 @@ import (
 
 var _ types.QueryServer = Keeper{}
 
-func (q Keeper) FindByID(goCtx context.Context, req *types.QueryGameByIDRequest) (*types.QueryGameByIDResponse, error) {
+func (q Keeper) Game(goCtx context.Context, req *types.QueryGameByIDRequest) (*types.QueryGameByIDResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	overview, err := q.GetGameOverview(ctx, req.Id)
+	game, err := q.GetGame(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.QueryGameByIDResponse{Overview: overview, Id: req.Id}, nil
+	return &types.QueryGameByIDResponse{Game: game}, nil
 }
 
-func (q Keeper) FindByPlayer(goCtx context.Context, req *types.QueryGameByPlayerRequest) (*types.QueryGameByPlayerResponse, error) {
+func (q Keeper) GameByPlayer(goCtx context.Context, req *types.QueryGameByPlayerRequest) (*types.QueryGameByPlayerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	gameID, err := q.GetGameIDByPlayer(ctx, req.Player)
 	if err != nil {
 		return nil, err
 	}
 
-	overview, err := q.GetGameOverview(ctx, gameID)
+	game, err := q.GetGame(ctx, gameID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &types.QueryGameByPlayerResponse{Overview: overview, Id: gameID}, nil
+	return &types.QueryGameByPlayerResponse{Game: game}, nil
 }
 
 func (q Keeper) State(goCtx context.Context, req *types.QueryGameStateRequest) (*types.QueryGameStateResponse, error) {

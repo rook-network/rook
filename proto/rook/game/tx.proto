@@ -1,6 +1,7 @@
 syntax = "proto3";
 package rook.game;
 
+import "rook/game/config.proto";
 import "rook/game/game.proto";
 import "gogoproto/gogo.proto";
 

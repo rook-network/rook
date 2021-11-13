@@ -116,7 +116,7 @@ func TestMatchmakerHostAndJoinPublicRoom(t *testing.T) {
 
 	game, err := app.GameKeeper.GetGame(ctx, uint64(1))
 	require.NoError(t, err)
-	require.Equal(t, game.Players(), queryRoomResp2.Room.Players)
+	require.Equal(t, game.Players, queryRoomResp2.Room.Players)
 
 	// change the params
 	newParams := types.DefaultParams()
@@ -204,7 +204,7 @@ func TestMatchmakerInvitationsToPrivateGame(t *testing.T) {
 
 	game, err := app.GameKeeper.GetGame(ctx, uint64(1))
 	require.NoError(t, err)
-	require.Equal(t, []string{alice, charles}, game.Players())
+	require.Equal(t, []string{alice, charles}, game.Players)
 }
 
 func TestMatchmakerAddAndRemoveModes(t *testing.T) {

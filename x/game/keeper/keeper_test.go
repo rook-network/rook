@@ -46,7 +46,7 @@ func TestParams(t *testing.T) {
 	require.Equal(t, params, gotParams)
 
 	nextParams := types.DefaultParams()
-	nextParams.ConstructionCost[1] = &types.ResourceSet{8, 10, 5, 0}
+	nextParams.ConstructionCost[1] = types.NewResources(8, 10, 5, 0)
 	nextVersion := keeper.SetParams(ctx, nextParams)
 	require.Equal(t, version+1, nextVersion)
 

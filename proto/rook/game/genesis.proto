@@ -2,7 +2,7 @@ syntax = "proto3";
 package rook.game;
 
 // this line is used by starport scaffolding # genesis/proto/import
-import "rook/game/game.proto";
+import "rook/game/config.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/arcane-systems/rook/x/game/types";

@@ -4,7 +4,7 @@ package rook.matchmaker;
 import "gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
-import "rook/game/game.proto";
+import "rook/game/config.proto";
 
 option go_package = "github.com/arcane-systems/rook/x/matchmaker/types";
 

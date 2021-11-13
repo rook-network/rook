@@ -81,10 +81,10 @@ func TestGenerateMap(t *testing.T) {
 	require.Greater(t, tally[Landscape_MOUNTAINS], 50)
 
 	// all plains should be connected with at least another one
-	plains := make([]int, 0)
+	plains := make([]uint32, 0)
 	for idx, tile := range gameMap.Tiles {
 		if tile == Landscape_PLAINS {
-			plains = append(plains, idx)
+			plains = append(plains, uint32(idx))
 		}
 	}
 

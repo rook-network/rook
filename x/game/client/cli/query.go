@@ -46,7 +46,7 @@ func CmdQueryGame() *cobra.Command {
 					Player: args[0],
 				}
 
-				res, err := queryClient.FindByPlayer(context.Background(), req)
+				res, err := queryClient.GameByPlayer(context.Background(), req)
 				if err != nil {
 					return err
 				}
@@ -63,7 +63,7 @@ func CmdQueryGame() *cobra.Command {
 				Id: id,
 			}
 
-			res, err := queryClient.FindByID(context.Background(), req)
+			res, err := queryClient.Game(context.Background(), req)
 			if err != nil {
 				return err
 			}

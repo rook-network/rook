@@ -97,7 +97,7 @@ func (m msgServer) Join(goCtx context.Context, msg *types.MsgJoin) (*types.MsgJo
 	case types.ErrPlayerAlreadyInRoom:
 
 	default:
-		return nil, err	
+		return nil, err
 	}
 
 	return &types.MsgJoinResponse{}, nil
@@ -146,7 +146,7 @@ func (m msgServer) Find(goCtx context.Context, msg *types.MsgFind) (*types.MsgFi
 	case types.ErrPlayerAlreadyInRoom:
 
 	default:
-		return nil, err	
+		return nil, err
 	}
 
 	return &types.MsgFindResponse{RoomId: roomID}, nil

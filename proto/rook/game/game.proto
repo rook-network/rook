@@ -3,57 +3,61 @@ package rook.game;
 
 option go_package = "github.com/arcane-systems/rook/x/game/types";
 
-message Overview {
-  Map map = 1;
-  uint32 param_version = 2;
+// Game is what is the in memory state and includes a map of territories
+// used for faster look up. Full game is not persisted to disk (Overview and
+// State are)
+message Game {
+  repeated string players = 1;
+  Map map = 2;
+  State state = 3;
+  uint32 param_version = 4;
+  map<uint32, Territory> territory = 5;
 }
 
+// GameSnapshot contains a complete snapshot representation of the state of any
+// game. The object is used to trans
+message GameSnapshot {
+  Map map = 1;
+  State state = 2;
+  uint32 param_version = 3;
+}
+
+// Overview is the fixed aspect of the game
+message Overview {
+  repeated string players = 1;
+  Map map = 2;
+  uint32 param_version = 3;
+}
+
+// State is the variable aspect of the game that
+// changes per step
 message State {
-  repeated Faction players = 1;
+  repeated Faction factions = 1;
   repeated Populace gaia = 2;
   uint64 step = 3;
 }
 
+// Map represents the 2D grid of various landscapes
 message Map {
   repeated Landscape tiles = 1;
   uint32 width = 2;
 }
 
+// Factions are a combination of resources and populace
+// that are controlled by one or more players
 message Faction {
-  string player = 1;
+  repeated string players = 1;
   ResourceSet resources = 2;
   repeated Populace population = 3;
 }
 
+// A populace is a group of people. They may be
+// wandering or part of a settlement
 message Populace {
   uint32 amount = 1;
   Position position = 2;
   Settlement settlement = 3;
-}
-
-message Config {
-  InitializationConfig initial = 1;
-  MapConfig map = 2;
-}
-
-message MapConfig {
-  uint32 width = 1;
-  uint32 height = 2;
-  int64 seed = 3;
-  uint32 mountains_density = 4;
-  uint32 forest_density = 5;
-  uint32 lake_density = 6;
-  uint32 plains_density = 7;
-}
-
-message InitializationConfig {
-  uint32 teams = 1;
-  ResourceSet resources = 2;
-}
-
-message Params {
-  repeated ResourceSet production_rate = 1;
-  repeated ResourceSet construction_cost = 2;
+  bool used = 4;
 }
 
 message Position {
@@ -92,4 +96,10 @@ message ResourceSet {
   uint32 stone = 2;
   uint32 wood = 3;
   uint32 population = 4;
+  uint32 tech = 5;
+}
+
+message Territory {
+  uint32 faction = 1;
+  uint32 populace = 2;
 }

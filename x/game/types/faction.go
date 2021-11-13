@@ -1,8 +1,8 @@
 package types
 
-func NewFaction(player string, resources *ResourceSet, startingPosition *Position) *Faction {
+func NewFaction(players []string, resources *ResourceSet, startingPosition *Position) *Faction {
 	return &Faction{
-		Player:    player,
+		Players:   players,
 		Resources: resources,
 		Population: []*Populace{
 			{
@@ -15,7 +15,16 @@ func NewFaction(player string, resources *ResourceSet, startingPosition *Positio
 
 }
 
-func (f *Faction) Reap(params *Params) {
+func (f Faction) HasPlayer(player string) bool {
+	for _, p := range f.Players {
+		if p == player {
+			return true
+		}
+	}
+	return false
+}
+
+func (f *Faction) Reap(params Params) {
 	for _, pop := range f.Population {
 		produce := params.ProductionRate[int(pop.Settlement)]
 		f.Resources.Add(produce)

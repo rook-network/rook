@@ -1,6 +1,6 @@
 import './game.module.less';
 import React from 'react'
-import Map from '../map';
+import MapComponent from '../map';
 import { GameProvider } from "../provider"
 import { Map as MapState, Params, State, Overview } from "../../codec/rook/game/game"
 import Long from 'long';
@@ -18,9 +18,9 @@ export interface GameState {
 }
 
 class Game extends React.Component<GameProps, GameState> {
-  constructor(props: GameProps, state: GameState) {
-    super(props)
-    this.state = state
+
+  async componentDidMount() {
+    await this.load(this.props.gameID)
   }
 
   async load(gameID: Long): Promise<void> {
@@ -48,7 +48,7 @@ class Game extends React.Component<GameProps, GameState> {
 
   render() {
     return (
-      <Map tiles={['red', 'green', 'blue']}/>
+      <MapComponent map={this.state.overview.map!}/>
     );
   }
 }

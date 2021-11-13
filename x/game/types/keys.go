@@ -26,11 +26,17 @@ const (
 // store subkeys
 var (
 	GameIDKey          = []byte{0x00}
-	GameOverviewPrefix = []byte{0x01}
-	GameStatePrefix    = []byte{0x02}
-	ParamsVersionKey   = []byte{0x03}
-	ParamsPrefix       = []byte{0x04}
+	GamePrefix         = []byte{0x01}
+	GameOverviewPrefix = []byte{0x02}
+	GameStatePrefix    = []byte{0x03}
+	GamePlayerPrefix   = []byte{0x04}
+	ParamsVersionKey   = []byte{0x05}
+	ParamsPrefix       = []byte{0x06}
 )
+
+func GameKey(gamID uint64) []byte {
+	return append(GamePrefix, GameIDBytes(gamID)...)
+}
 
 func GameOverviewKey(gameID uint64) []byte {
 	return append(GameOverviewPrefix, GameIDBytes(gameID)...)
@@ -38,6 +44,10 @@ func GameOverviewKey(gameID uint64) []byte {
 
 func GameStateKey(gameID uint64) []byte {
 	return append(GameStatePrefix, GameIDBytes(gameID)...)
+}
+
+func GamePlayerKey(player string) []byte {
+	return append(GamePlayerPrefix, []byte(player)...)
 }
 
 func ParseGameID(key []byte) uint64 {

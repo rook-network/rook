@@ -36,37 +36,37 @@ func (m *Map) GetLandscape(position *Position) Landscape {
 	return m.Tiles[position.Y*m.Width+position.X]
 }
 
-func (m *Map) Above(index int) int {
-	return (index - int(m.Width) + len(m.Tiles)) % len(m.Tiles)
+func (m *Map) Above(index uint32) uint32 {
+	return (index - m.Width + m.Len()) % m.Len()
 }
 
-func (m *Map) Below(index int) int {
-	return (index + int(m.Width)) % len(m.Tiles)
+func (m *Map) Below(index uint32) uint32 {
+	return (index + m.Width) % m.Len()
 }
 
-func (m *Map) Left(index int) int {
-	if index%int(m.Width) == 0 {
-		return index + int(m.Width) - 1
+func (m *Map) Left(index uint32) uint32 {
+	if index%m.Width == 0 {
+		return index + m.Width - 1
 	}
 	return index - 1
 }
 
-func (m *Map) Right(index int) int {
-	if index%int(m.Width) == int(m.Width)-1 {
-		return index - (int(m.Width) - 1)
+func (m *Map) Right(index uint32) uint32 {
+	if index%m.Width == m.Width-1 {
+		return index - (m.Width - 1)
 	}
 	return index + 1
 }
 
-func (m *Map) GetPosition(index int) *Position {
+func (m *Map) GetPosition(index uint32) *Position {
 	return &Position{X: uint32(index) % m.Width, Y: uint32(index) / m.Width}
 }
 
-func (m *Map) GetIndex(pos *Position) int {
-	return int(pos.Y*m.Width + pos.X)
+func (m *Map) GetIndex(pos *Position) uint32 {
+	return pos.Y*m.Width + pos.X
 }
 
-func (m *Map) GetNeighbor(index int, direction Direction) int {
+func (m *Map) GetNeighbor(index uint32, direction Direction) uint32 {
 	switch direction {
 	case Direction_RIGHT:
 		return m.Right(index)
@@ -81,12 +81,12 @@ func (m *Map) GetNeighbor(index int, direction Direction) int {
 	}
 }
 
-func (m *Map) GetNeighborLandscape(index int, direction Direction) Landscape {
+func (m *Map) GetNeighborLandscape(index uint32, direction Direction) Landscape {
 	return m.Tiles[m.GetNeighbor(index, direction)]
 }
 
-func (m *Map) Len() int {
-	return len(m.Tiles)
+func (m *Map) Len() uint32 {
+	return uint32(len(m.Tiles))
 }
 
 func (m *Map) Equal(m2 *Map) bool {
@@ -113,7 +113,7 @@ func (m *Map) RandomStartingPoints(r *rand.Rand, amount int) ([]*Position, error
 	// loop through and find all the possible starting positions
 	for idx, tile := range m.Tiles {
 		if tile == Landscape_PLAINS {
-			pos := m.GetPosition(idx)
+			pos := m.GetPosition(uint32(idx))
 			points = append(points, pos)
 			pointMap[pos] = struct{}{}
 		}
@@ -208,7 +208,7 @@ func fillMapWithPaths(gameMap *Map, r *rand.Rand, config *MapConfig) {
 
 }
 
-func getNextTile(gameMap *Map, r *rand.Rand, current int) (next int) {
+func getNextTile(gameMap *Map, r *rand.Rand, current uint32) (next uint32) {
 	routes := getViableRoutes(gameMap, current)
 	if len(routes) == 0 {
 		newPoint := findNewPoint(gameMap, r)
@@ -240,11 +240,11 @@ func getNextTile(gameMap *Map, r *rand.Rand, current int) (next int) {
 
 // findNewPoint loops through all the tiles in the map, collecting all
 // the ones that are PLAINS, then picks a random plain and returns the index
-func findNewPoint(gameMap *Map, r *rand.Rand) int {
-	points := make([]int, 0)
+func findNewPoint(gameMap *Map, r *rand.Rand) uint32 {
+	points := make([]uint32, 0)
 	for idx, tile := range gameMap.Tiles {
 		if tile == Landscape_PLAINS {
-			points = append(points, idx)
+			points = append(points, uint32(idx))
 		}
 	}
 	return points[r.Intn(len(points))]
@@ -252,11 +252,11 @@ func findNewPoint(gameMap *Map, r *rand.Rand) int {
 
 type route struct {
 	direction Direction
-	index     int
+	index     uint32
 	score     int
 }
 
-func getViableRoutes(gameMap *Map, index int) []*route {
+func getViableRoutes(gameMap *Map, index uint32) []*route {
 	routes := make([]*route, 0)
 	for _, direction := range Directions {
 		neighbor := gameMap.GetNeighbor(index, direction)
@@ -267,11 +267,11 @@ func getViableRoutes(gameMap *Map, index int) []*route {
 	return routes
 }
 
-func randomPoint(gameMap *Map, r *rand.Rand) int {
-	return r.Intn(len(gameMap.Tiles))
+func randomPoint(gameMap *Map, r *rand.Rand) uint32 {
+	return uint32(r.Intn(len(gameMap.Tiles)))
 }
 
-func calculateRouteScore(gameMap *Map, index int) int {
+func calculateRouteScore(gameMap *Map, index uint32) int {
 	score := 0
 	pos := gameMap.GetPosition(index)
 	for x := int(pos.X) - 1; x <= int(pos.X)+1; x++ {

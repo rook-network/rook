@@ -29,7 +29,7 @@ func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 
 	params := m.Keeper.GetLatestParamsVersion(ctx)
 
-	overview, state, err := types.SetupGame(msg.Players, &msg.Config, params)
+	game, err := types.SetupGame(msg.Players, &msg.Config, params)
 	if err != nil {
 		return nil, err
 	}
@@ -38,12 +38,12 @@ func (m msgServer) Create(goCtx context.Context, msg *types.MsgCreate) (*types.M
 	if err != nil {
 		return nil, err
 	}
-	// save the next game ID
-	m.Keeper.SetGameID(ctx, gameID+1)
 
-	// persist the game overview. We will save game state in the end block
-	m.Keeper.SetGameOverview(ctx, gameID, overview)
-	m.Keeper.SetGameState(ctx, gameID, state)
+	// add the game in memory
+	m.Keeper.SetGame(ctx, gameID, game)
+
+	// save the next game ID
+	m.Keeper.SetNextGameID(ctx, gameID+1)
 
 	// emit the events for the new game
 	ctx.EventManager().EmitTypedEvent(&types.EventNewGame{
@@ -65,12 +65,14 @@ func (m msgServer) Build(goCtx context.Context, msg *types.MsgBuild) (*types.Msg
 		return resp, err
 	}
 
-	err = game.Build(msg.Creator, msg.Populace, msg.Settlement)
+	params, err := m.Keeper.GetParams(ctx, game.ParamVersion)
+
+	err = game.Build(params, msg.Creator, msg.Populace, msg.Settlement)
 	if err != nil {
 		return resp, err
 	}
 
-	m.Keeper.SetGameState(ctx, msg.GameId, game.State())
+	m.Keeper.SetGame(ctx, msg.GameId, &game)
 	return resp, nil
 }
 
@@ -88,7 +90,7 @@ func (m msgServer) Move(goCtx context.Context, msg *types.MsgMove) (*types.MsgMo
 		return resp, err
 	}
 
-	m.Keeper.SetGameState(ctx, msg.GameId, game.State())
+	m.Keeper.SetGame(ctx, msg.GameId, &game)
 	return resp, err
 }
 

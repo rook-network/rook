@@ -1,0 +1,31 @@
+syntax = "proto3";
+package rook.game;
+
+import "rook/game/game.proto";
+
+option go_package = "github.com/arcane-systems/rook/x/game/types";
+
+message Config {
+  InitializationConfig initial = 1;
+  MapConfig map = 2;
+}
+
+message MapConfig {
+  uint32 width = 1;
+  uint32 height = 2;
+  int64 seed = 3;
+  uint32 mountains_density = 4;
+  uint32 forest_density = 5;
+  uint32 lake_density = 6;
+  uint32 plains_density = 7;
+}
+
+message InitializationConfig {
+  uint32 teams = 1;
+  ResourceSet resources = 2;
+}
+
+message Params {
+  repeated ResourceSet production_rate = 1;
+  repeated ResourceSet construction_cost = 2;
+}

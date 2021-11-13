@@ -20,6 +20,9 @@ func NewResources(food, stone, wood, population uint32) *ResourceSet {
 		Wood:       wood,
 		Stone:      stone,
 		Population: population,
+
+		// This is currently not used but will be in the future
+		Tech: 0,
 	}
 }
 

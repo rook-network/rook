@@ -130,16 +130,159 @@ func (Settlement) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_32ee8d6bd64d76dc, []int{2}
 }
 
-type Overview struct {
+// Game is what is the in memory state and includes a map of territories
+// used for faster look up. Full game is not persisted to disk (Overview and
+// State are)
+type Game struct {
+	Players      []string              `protobuf:"bytes,1,rep,name=players,proto3" json:"players,omitempty"`
+	Map          *Map                  `protobuf:"bytes,2,opt,name=map,proto3" json:"map,omitempty"`
+	State        *State                `protobuf:"bytes,3,opt,name=state,proto3" json:"state,omitempty"`
+	ParamVersion uint32                `protobuf:"varint,4,opt,name=param_version,json=paramVersion,proto3" json:"param_version,omitempty"`
+	Territory    map[uint32]*Territory `protobuf:"bytes,5,rep,name=territory,proto3" json:"territory,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+}
+
+func (m *Game) Reset()         { *m = Game{} }
+func (m *Game) String() string { return proto.CompactTextString(m) }
+func (*Game) ProtoMessage()    {}
+func (*Game) Descriptor() ([]byte, []int) {
+	return fileDescriptor_32ee8d6bd64d76dc, []int{0}
+}
+func (m *Game) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Game) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Game.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Game) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Game.Merge(m, src)
+}
+func (m *Game) XXX_Size() int {
+	return m.Size()
+}
+func (m *Game) XXX_DiscardUnknown() {
+	xxx_messageInfo_Game.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Game proto.InternalMessageInfo
+
+func (m *Game) GetPlayers() []string {
+	if m != nil {
+		return m.Players
+	}
+	return nil
+}
+
+func (m *Game) GetMap() *Map {
+	if m != nil {
+		return m.Map
+	}
+	return nil
+}
+
+func (m *Game) GetState() *State {
+	if m != nil {
+		return m.State
+	}
+	return nil
+}
+
+func (m *Game) GetParamVersion() uint32 {
+	if m != nil {
+		return m.ParamVersion
+	}
+	return 0
+}
+
+func (m *Game) GetTerritory() map[uint32]*Territory {
+	if m != nil {
+		return m.Territory
+	}
+	return nil
+}
+
+// GameSnapshot contains a complete snapshot representation of the state of any
+// game. The object is used to trans
+type GameSnapshot struct {
 	Map          *Map   `protobuf:"bytes,1,opt,name=map,proto3" json:"map,omitempty"`
-	ParamVersion uint32 `protobuf:"varint,2,opt,name=param_version,json=paramVersion,proto3" json:"param_version,omitempty"`
+	State        *State `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty"`
+	ParamVersion uint32 `protobuf:"varint,3,opt,name=param_version,json=paramVersion,proto3" json:"param_version,omitempty"`
+}
+
+func (m *GameSnapshot) Reset()         { *m = GameSnapshot{} }
+func (m *GameSnapshot) String() string { return proto.CompactTextString(m) }
+func (*GameSnapshot) ProtoMessage()    {}
+func (*GameSnapshot) Descriptor() ([]byte, []int) {
+	return fileDescriptor_32ee8d6bd64d76dc, []int{1}
+}
+func (m *GameSnapshot) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GameSnapshot) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GameSnapshot.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GameSnapshot) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GameSnapshot.Merge(m, src)
+}
+func (m *GameSnapshot) XXX_Size() int {
+	return m.Size()
+}
+func (m *GameSnapshot) XXX_DiscardUnknown() {
+	xxx_messageInfo_GameSnapshot.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GameSnapshot proto.InternalMessageInfo
+
+func (m *GameSnapshot) GetMap() *Map {
+	if m != nil {
+		return m.Map
+	}
+	return nil
+}
+
+func (m *GameSnapshot) GetState() *State {
+	if m != nil {
+		return m.State
+	}
+	return nil
+}
+
+func (m *GameSnapshot) GetParamVersion() uint32 {
+	if m != nil {
+		return m.ParamVersion
+	}
+	return 0
+}
+
+// Overview is the fixed aspect of the game
+type Overview struct {
+	Players      []string `protobuf:"bytes,1,rep,name=players,proto3" json:"players,omitempty"`
+	Map          *Map     `protobuf:"bytes,2,opt,name=map,proto3" json:"map,omitempty"`
+	ParamVersion uint32   `protobuf:"varint,3,opt,name=param_version,json=paramVersion,proto3" json:"param_version,omitempty"`
 }
 
 func (m *Overview) Reset()         { *m = Overview{} }
 func (m *Overview) String() string { return proto.CompactTextString(m) }
 func (*Overview) ProtoMessage()    {}
 func (*Overview) Descriptor() ([]byte, []int) {
-	return fileDescriptor_32ee8d6bd64d76dc, []int{0}
+	return fileDescriptor_32ee8d6bd64d76dc, []int{2}
 }
 func (m *Overview) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -168,6 +311,13 @@ func (m *Overview) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Overview proto.InternalMessageInfo
 
+func (m *Overview) GetPlayers() []string {
+	if m != nil {
+		return m.Players
+	}
+	return nil
+}
+
 func (m *Overview) GetMap() *Map {
 	if m != nil {
 		return m.Map
@@ -182,17 +332,19 @@ func (m *Overview) GetParamVersion() uint32 {
 	return 0
 }
 
+// State is the variable aspect of the game that
+// changes per step
 type State struct {
-	Players []*Faction  `protobuf:"bytes,1,rep,name=players,proto3" json:"players,omitempty"`
-	Gaia    []*Populace `protobuf:"bytes,2,rep,name=gaia,proto3" json:"gaia,omitempty"`
-	Step    uint64      `protobuf:"varint,3,opt,name=step,proto3" json:"step,omitempty"`
+	Factions []*Faction  `protobuf:"bytes,1,rep,name=factions,proto3" json:"factions,omitempty"`
+	Gaia     []*Populace `protobuf:"bytes,2,rep,name=gaia,proto3" json:"gaia,omitempty"`
+	Step     uint64      `protobuf:"varint,3,opt,name=step,proto3" json:"step,omitempty"`
 }
 
 func (m *State) Reset()         { *m = State{} }
 func (m *State) String() string { return proto.CompactTextString(m) }
 func (*State) ProtoMessage()    {}
 func (*State) Descriptor() ([]byte, []int) {
-	return fileDescriptor_32ee8d6bd64d76dc, []int{1}
+	return fileDescriptor_32ee8d6bd64d76dc, []int{3}
 }
 func (m *State) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -221,9 +373,9 @@ func (m *State) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_State proto.InternalMessageInfo
 
-func (m *State) GetPlayers() []*Faction {
+func (m *State) GetFactions() []*Faction {
 	if m != nil {
-		return m.Players
+		return m.Factions
 	}
 	return nil
 }
@@ -242,6 +394,7 @@ func (m *State) GetStep() uint64 {
 	return 0
 }
 
+// Map represents the 2D grid of various landscapes
 type Map struct {
 	Tiles []Landscape `protobuf:"varint,1,rep,packed,name=tiles,proto3,enum=rook.game.Landscape" json:"tiles,omitempty"`
 	Width uint32      `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`
@@ -251,7 +404,7 @@ func (m *Map) Reset()         { *m = Map{} }
 func (m *Map) String() string { return proto.CompactTextString(m) }
 func (*Map) ProtoMessage()    {}
 func (*Map) Descriptor() ([]byte, []int) {
-	return fileDescriptor_32ee8d6bd64d76dc, []int{2}
+	return fileDescriptor_32ee8d6bd64d76dc, []int{4}
 }
 func (m *Map) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -294,8 +447,10 @@ func (m *Map) GetWidth() uint32 {
 	return 0
 }
 
+// Factions are a combination of resources and populace
+// that are controlled by one or more players
 type Faction struct {
-	Player     string       `protobuf:"bytes,1,opt,name=player,proto3" json:"player,omitempty"`
+	Players    []string     `protobuf:"bytes,1,rep,name=players,proto3" json:"players,omitempty"`
 	Resources  *ResourceSet `protobuf:"bytes,2,opt,name=resources,proto3" json:"resources,omitempty"`
 	Population []*Populace  `protobuf:"bytes,3,rep,name=population,proto3" json:"population,omitempty"`
 }
@@ -304,7 +459,7 @@ func (m *Faction) Reset()         { *m = Faction{} }
 func (m *Faction) String() string { return proto.CompactTextString(m) }
 func (*Faction) ProtoMessage()    {}
 func (*Faction) Descriptor() ([]byte, []int) {
-	return fileDescriptor_32ee8d6bd64d76dc, []int{3}
+	return fileDescriptor_32ee8d6bd64d76dc, []int{5}
 }
 func (m *Faction) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -333,11 +488,11 @@ func (m *Faction) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Faction proto.InternalMessageInfo
 
-func (m *Faction) GetPlayer() string {
+func (m *Faction) GetPlayers() []string {
 	if m != nil {
-		return m.Player
+		return m.Players
 	}
-	return ""
+	return nil
 }
 
 func (m *Faction) GetResources() *ResourceSet {
@@ -354,17 +509,20 @@ func (m *Faction) GetPopulation() []*Populace {
 	return nil
 }
 
+// A populace is a group of people. They may be
+// wandering or part of a settlement
 type Populace struct {
 	Amount     uint32     `protobuf:"varint,1,opt,name=amount,proto3" json:"amount,omitempty"`
 	Position   *Position  `protobuf:"bytes,2,opt,name=position,proto3" json:"position,omitempty"`
 	Settlement Settlement `protobuf:"varint,3,opt,name=settlement,proto3,enum=rook.game.Settlement" json:"settlement,omitempty"`
+	Used       bool       `protobuf:"varint,4,opt,name=used,proto3" json:"used,omitempty"`
 }
 
 func (m *Populace) Reset()         { *m = Populace{} }
 func (m *Populace) String() string { return proto.CompactTextString(m) }
 func (*Populace) ProtoMessage()    {}
 func (*Populace) Descriptor() ([]byte, []int) {
-	return fileDescriptor_32ee8d6bd64d76dc, []int{4}
+	return fileDescriptor_32ee8d6bd64d76dc, []int{6}
 }
 func (m *Populace) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -414,252 +572,11 @@ func (m *Populace) GetSettlement() Settlement {
 	return Settlement_NONE
 }
 
-type Config struct {
-	Initial *InitializationConfig `protobuf:"bytes,1,opt,name=initial,proto3" json:"initial,omitempty"`
-	Map     *MapConfig            `protobuf:"bytes,2,opt,name=map,proto3" json:"map,omitempty"`
-}
-
-func (m *Config) Reset()         { *m = Config{} }
-func (m *Config) String() string { return proto.CompactTextString(m) }
-func (*Config) ProtoMessage()    {}
-func (*Config) Descriptor() ([]byte, []int) {
-	return fileDescriptor_32ee8d6bd64d76dc, []int{5}
-}
-func (m *Config) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Config) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Config.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Config) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Config.Merge(m, src)
-}
-func (m *Config) XXX_Size() int {
-	return m.Size()
-}
-func (m *Config) XXX_DiscardUnknown() {
-	xxx_messageInfo_Config.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Config proto.InternalMessageInfo
-
-func (m *Config) GetInitial() *InitializationConfig {
+func (m *Populace) GetUsed() bool {
 	if m != nil {
-		return m.Initial
+		return m.Used
 	}
-	return nil
-}
-
-func (m *Config) GetMap() *MapConfig {
-	if m != nil {
-		return m.Map
-	}
-	return nil
-}
-
-type MapConfig struct {
-	Width            uint32 `protobuf:"varint,1,opt,name=width,proto3" json:"width,omitempty"`
-	Height           uint32 `protobuf:"varint,2,opt,name=height,proto3" json:"height,omitempty"`
-	Seed             int64  `protobuf:"varint,3,opt,name=seed,proto3" json:"seed,omitempty"`
-	MountainsDensity uint32 `protobuf:"varint,4,opt,name=mountains_density,json=mountainsDensity,proto3" json:"mountains_density,omitempty"`
-	ForestDensity    uint32 `protobuf:"varint,5,opt,name=forest_density,json=forestDensity,proto3" json:"forest_density,omitempty"`
-	LakeDensity      uint32 `protobuf:"varint,6,opt,name=lake_density,json=lakeDensity,proto3" json:"lake_density,omitempty"`
-	PlainsDensity    uint32 `protobuf:"varint,7,opt,name=plains_density,json=plainsDensity,proto3" json:"plains_density,omitempty"`
-}
-
-func (m *MapConfig) Reset()         { *m = MapConfig{} }
-func (m *MapConfig) String() string { return proto.CompactTextString(m) }
-func (*MapConfig) ProtoMessage()    {}
-func (*MapConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_32ee8d6bd64d76dc, []int{6}
-}
-func (m *MapConfig) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MapConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MapConfig.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MapConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MapConfig.Merge(m, src)
-}
-func (m *MapConfig) XXX_Size() int {
-	return m.Size()
-}
-func (m *MapConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_MapConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MapConfig proto.InternalMessageInfo
-
-func (m *MapConfig) GetWidth() uint32 {
-	if m != nil {
-		return m.Width
-	}
-	return 0
-}
-
-func (m *MapConfig) GetHeight() uint32 {
-	if m != nil {
-		return m.Height
-	}
-	return 0
-}
-
-func (m *MapConfig) GetSeed() int64 {
-	if m != nil {
-		return m.Seed
-	}
-	return 0
-}
-
-func (m *MapConfig) GetMountainsDensity() uint32 {
-	if m != nil {
-		return m.MountainsDensity
-	}
-	return 0
-}
-
-func (m *MapConfig) GetForestDensity() uint32 {
-	if m != nil {
-		return m.ForestDensity
-	}
-	return 0
-}
-
-func (m *MapConfig) GetLakeDensity() uint32 {
-	if m != nil {
-		return m.LakeDensity
-	}
-	return 0
-}
-
-func (m *MapConfig) GetPlainsDensity() uint32 {
-	if m != nil {
-		return m.PlainsDensity
-	}
-	return 0
-}
-
-type InitializationConfig struct {
-	Teams     uint32       `protobuf:"varint,1,opt,name=teams,proto3" json:"teams,omitempty"`
-	Resources *ResourceSet `protobuf:"bytes,2,opt,name=resources,proto3" json:"resources,omitempty"`
-}
-
-func (m *InitializationConfig) Reset()         { *m = InitializationConfig{} }
-func (m *InitializationConfig) String() string { return proto.CompactTextString(m) }
-func (*InitializationConfig) ProtoMessage()    {}
-func (*InitializationConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_32ee8d6bd64d76dc, []int{7}
-}
-func (m *InitializationConfig) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *InitializationConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_InitializationConfig.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *InitializationConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_InitializationConfig.Merge(m, src)
-}
-func (m *InitializationConfig) XXX_Size() int {
-	return m.Size()
-}
-func (m *InitializationConfig) XXX_DiscardUnknown() {
-	xxx_messageInfo_InitializationConfig.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_InitializationConfig proto.InternalMessageInfo
-
-func (m *InitializationConfig) GetTeams() uint32 {
-	if m != nil {
-		return m.Teams
-	}
-	return 0
-}
-
-func (m *InitializationConfig) GetResources() *ResourceSet {
-	if m != nil {
-		return m.Resources
-	}
-	return nil
-}
-
-type Params struct {
-	ProductionRate   []*ResourceSet `protobuf:"bytes,1,rep,name=production_rate,json=productionRate,proto3" json:"production_rate,omitempty"`
-	ConstructionCost []*ResourceSet `protobuf:"bytes,2,rep,name=construction_cost,json=constructionCost,proto3" json:"construction_cost,omitempty"`
-}
-
-func (m *Params) Reset()         { *m = Params{} }
-func (m *Params) String() string { return proto.CompactTextString(m) }
-func (*Params) ProtoMessage()    {}
-func (*Params) Descriptor() ([]byte, []int) {
-	return fileDescriptor_32ee8d6bd64d76dc, []int{8}
-}
-func (m *Params) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *Params) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_Params.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *Params) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Params.Merge(m, src)
-}
-func (m *Params) XXX_Size() int {
-	return m.Size()
-}
-func (m *Params) XXX_DiscardUnknown() {
-	xxx_messageInfo_Params.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Params proto.InternalMessageInfo
-
-func (m *Params) GetProductionRate() []*ResourceSet {
-	if m != nil {
-		return m.ProductionRate
-	}
-	return nil
-}
-
-func (m *Params) GetConstructionCost() []*ResourceSet {
-	if m != nil {
-		return m.ConstructionCost
-	}
-	return nil
+	return false
 }
 
 type Position struct {
@@ -671,7 +588,7 @@ func (m *Position) Reset()         { *m = Position{} }
 func (m *Position) String() string { return proto.CompactTextString(m) }
 func (*Position) ProtoMessage()    {}
 func (*Position) Descriptor() ([]byte, []int) {
-	return fileDescriptor_32ee8d6bd64d76dc, []int{9}
+	return fileDescriptor_32ee8d6bd64d76dc, []int{7}
 }
 func (m *Position) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -719,13 +636,14 @@ type ResourceSet struct {
 	Stone      uint32 `protobuf:"varint,2,opt,name=stone,proto3" json:"stone,omitempty"`
 	Wood       uint32 `protobuf:"varint,3,opt,name=wood,proto3" json:"wood,omitempty"`
 	Population uint32 `protobuf:"varint,4,opt,name=population,proto3" json:"population,omitempty"`
+	Tech       uint32 `protobuf:"varint,5,opt,name=tech,proto3" json:"tech,omitempty"`
 }
 
 func (m *ResourceSet) Reset()         { *m = ResourceSet{} }
 func (m *ResourceSet) String() string { return proto.CompactTextString(m) }
 func (*ResourceSet) ProtoMessage()    {}
 func (*ResourceSet) Descriptor() ([]byte, []int) {
-	return fileDescriptor_32ee8d6bd64d76dc, []int{10}
+	return fileDescriptor_32ee8d6bd64d76dc, []int{8}
 }
 func (m *ResourceSet) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -782,81 +700,274 @@ func (m *ResourceSet) GetPopulation() uint32 {
 	return 0
 }
 
+func (m *ResourceSet) GetTech() uint32 {
+	if m != nil {
+		return m.Tech
+	}
+	return 0
+}
+
+type Territory struct {
+	Faction  uint32 `protobuf:"varint,1,opt,name=faction,proto3" json:"faction,omitempty"`
+	Populace uint32 `protobuf:"varint,2,opt,name=populace,proto3" json:"populace,omitempty"`
+}
+
+func (m *Territory) Reset()         { *m = Territory{} }
+func (m *Territory) String() string { return proto.CompactTextString(m) }
+func (*Territory) ProtoMessage()    {}
+func (*Territory) Descriptor() ([]byte, []int) {
+	return fileDescriptor_32ee8d6bd64d76dc, []int{9}
+}
+func (m *Territory) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Territory) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Territory.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Territory) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Territory.Merge(m, src)
+}
+func (m *Territory) XXX_Size() int {
+	return m.Size()
+}
+func (m *Territory) XXX_DiscardUnknown() {
+	xxx_messageInfo_Territory.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Territory proto.InternalMessageInfo
+
+func (m *Territory) GetFaction() uint32 {
+	if m != nil {
+		return m.Faction
+	}
+	return 0
+}
+
+func (m *Territory) GetPopulace() uint32 {
+	if m != nil {
+		return m.Populace
+	}
+	return 0
+}
+
 func init() {
 	proto.RegisterEnum("rook.game.Direction", Direction_name, Direction_value)
 	proto.RegisterEnum("rook.game.Landscape", Landscape_name, Landscape_value)
 	proto.RegisterEnum("rook.game.Settlement", Settlement_name, Settlement_value)
+	proto.RegisterType((*Game)(nil), "rook.game.Game")
+	proto.RegisterMapType((map[uint32]*Territory)(nil), "rook.game.Game.TerritoryEntry")
+	proto.RegisterType((*GameSnapshot)(nil), "rook.game.GameSnapshot")
 	proto.RegisterType((*Overview)(nil), "rook.game.Overview")
 	proto.RegisterType((*State)(nil), "rook.game.State")
 	proto.RegisterType((*Map)(nil), "rook.game.Map")
 	proto.RegisterType((*Faction)(nil), "rook.game.Faction")
 	proto.RegisterType((*Populace)(nil), "rook.game.Populace")
-	proto.RegisterType((*Config)(nil), "rook.game.Config")
-	proto.RegisterType((*MapConfig)(nil), "rook.game.MapConfig")
-	proto.RegisterType((*InitializationConfig)(nil), "rook.game.InitializationConfig")
-	proto.RegisterType((*Params)(nil), "rook.game.Params")
 	proto.RegisterType((*Position)(nil), "rook.game.Position")
 	proto.RegisterType((*ResourceSet)(nil), "rook.game.ResourceSet")
+	proto.RegisterType((*Territory)(nil), "rook.game.Territory")
 }
 
 func init() { proto.RegisterFile("rook/game/game.proto", fileDescriptor_32ee8d6bd64d76dc) }
 
 var fileDescriptor_32ee8d6bd64d76dc = []byte{
-	// 859 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x55, 0x4b, 0x6f, 0x62, 0x37,
-	0x14, 0xc6, 0x5c, 0x1e, 0xe1, 0x10, 0xa8, 0xc7, 0xa5, 0x23, 0x56, 0x94, 0xde, 0xaa, 0xd3, 0x28,
-	0xd3, 0x12, 0x89, 0x69, 0x17, 0x5d, 0x55, 0x0c, 0x21, 0x53, 0x14, 0x5e, 0x63, 0xa0, 0xd5, 0x74,
-	0x13, 0x39, 0xe0, 0x10, 0x2b, 0x70, 0x7d, 0x75, 0x6d, 0x92, 0xd0, 0x9f, 0x50, 0x55, 0x55, 0x7f,
-	0x56, 0x97, 0xb3, 0xec, 0xb2, 0x4a, 0x96, 0xfd, 0x13, 0x95, 0xed, 0x0b, 0xb9, 0xa9, 0x9a, 0xcd,
-	0x6c, 0xd0, 0x79, 0x7c, 0xe7, 0x3b, 0x3e, 0x2f, 0x2e, 0x54, 0x22, 0x29, 0xaf, 0x8e, 0x16, 0x6c,
-	0xc5, 0xed, 0x4f, 0x23, 0x8c, 0xa4, 0x96, 0xa4, 0x60, 0xac, 0x0d, 0x63, 0xf0, 0xdf, 0xc2, 0xde,
-	0xf0, 0x9a, 0x47, 0xd7, 0x82, 0xdf, 0x90, 0x3a, 0x78, 0x2b, 0x16, 0x56, 0x51, 0x1d, 0x1d, 0x14,
-	0x9b, 0xe5, 0xc6, 0x0e, 0xd4, 0xe8, 0xb3, 0x90, 0x1a, 0x17, 0xf9, 0x1c, 0x4a, 0x21, 0x8b, 0xd8,
-	0xea, 0xec, 0x9a, 0x47, 0x4a, 0xc8, 0xa0, 0x9a, 0xae, 0xa3, 0x83, 0x12, 0xdd, 0xb7, 0xc6, 0x1f,
-	0x9d, 0xcd, 0x8f, 0x20, 0x3b, 0xd6, 0x4c, 0x73, 0xf2, 0x15, 0xe4, 0xc3, 0x25, 0xdb, 0xf0, 0x48,
-	0x55, 0x51, 0xdd, 0x3b, 0x28, 0x36, 0x49, 0x82, 0xf3, 0x84, 0xcd, 0xb4, 0x90, 0x01, 0xdd, 0x42,
-	0xc8, 0x97, 0x90, 0x59, 0x30, 0xc1, 0xaa, 0x69, 0x0b, 0xfd, 0x38, 0x01, 0x1d, 0xc9, 0x70, 0xbd,
-	0x64, 0x33, 0x4e, 0x2d, 0x80, 0x10, 0xc8, 0x28, 0xcd, 0xc3, 0xaa, 0x57, 0x47, 0x07, 0x19, 0x6a,
-	0x65, 0xff, 0x0d, 0x78, 0x7d, 0x16, 0x92, 0x43, 0xc8, 0x6a, 0xb1, 0xe4, 0x2e, 0x5f, 0xb9, 0x59,
-	0x49, 0x90, 0xf4, 0x58, 0x30, 0x57, 0x33, 0x16, 0x72, 0xea, 0x20, 0xa4, 0x02, 0xd9, 0x1b, 0x31,
-	0xd7, 0x97, 0x71, 0x0d, 0x4e, 0xf1, 0x7f, 0x43, 0x90, 0x8f, 0x9f, 0x46, 0x9e, 0x43, 0xce, 0x3d,
-	0xce, 0xb6, 0xa4, 0x40, 0x63, 0x8d, 0x7c, 0x03, 0x85, 0x88, 0x2b, 0xb9, 0x8e, 0x66, 0x5c, 0xd9,
-	0xe8, 0x62, 0xf3, 0x79, 0x22, 0x13, 0x8d, 0x7d, 0x63, 0xae, 0xe9, 0x03, 0x90, 0xbc, 0x02, 0x08,
-	0x6d, 0x21, 0x86, 0xbb, 0xea, 0x3d, 0x5d, 0x65, 0x02, 0xe6, 0xff, 0x8a, 0x60, 0x6f, 0xeb, 0x30,
-	0xef, 0x61, 0x2b, 0xb9, 0x0e, 0xb4, 0x7d, 0x4f, 0x89, 0xc6, 0x1a, 0x39, 0x82, 0xbd, 0x50, 0x2a,
-	0xa1, 0xb7, 0x03, 0xf9, 0x2f, 0xaf, 0x73, 0xd1, 0x1d, 0x88, 0x7c, 0x0b, 0xa0, 0xb8, 0xd6, 0x4b,
-	0xbe, 0xe2, 0x81, 0xb6, 0x7d, 0x2c, 0x37, 0x3f, 0x49, 0x84, 0x8c, 0x77, 0x4e, 0x9a, 0x00, 0xfa,
-	0x57, 0x90, 0x6b, 0xcb, 0xe0, 0x42, 0x2c, 0xc8, 0x77, 0x90, 0x17, 0x81, 0xd0, 0x82, 0x2d, 0xe3,
-	0x6d, 0xf9, 0x34, 0x11, 0xdd, 0x75, 0x1e, 0xf1, 0x8b, 0x2d, 0xc1, 0x45, 0xd0, 0x2d, 0x9e, 0xbc,
-	0x70, 0x4b, 0xe6, 0xde, 0x59, 0x79, 0xbc, 0x64, 0x31, 0xd6, 0x00, 0xfc, 0x7f, 0x10, 0x14, 0x76,
-	0xa6, 0x87, 0x61, 0xa1, 0xc4, 0xb0, 0x4c, 0x43, 0x2e, 0xb9, 0x58, 0x5c, 0xea, 0x78, 0x86, 0xb1,
-	0x66, 0x37, 0x84, 0xf3, 0xb9, 0xad, 0xcc, 0xa3, 0x56, 0x26, 0x2f, 0xe1, 0x99, 0xed, 0x16, 0x13,
-	0x81, 0x3a, 0x9b, 0xf3, 0x40, 0x09, 0xbd, 0xa9, 0x66, 0x6c, 0x18, 0xde, 0x39, 0x8e, 0x9d, 0x9d,
-	0x7c, 0x01, 0xe5, 0x0b, 0x19, 0x71, 0xa5, 0x77, 0xc8, 0xac, 0x45, 0x96, 0x9c, 0x75, 0x0b, 0xfb,
-	0x0c, 0xf6, 0x97, 0xec, 0x8a, 0xef, 0x40, 0x39, 0x0b, 0x2a, 0x1a, 0x5b, 0x82, 0x29, 0x5c, 0x3e,
-	0xca, 0x99, 0x77, 0x4c, 0xce, 0x1a, 0xc3, 0xfc, 0x73, 0xa8, 0xfc, 0x5f, 0xdb, 0x4c, 0xdd, 0x9a,
-	0xb3, 0x95, 0xda, 0xd6, 0x6d, 0x95, 0x0f, 0x5b, 0x40, 0xff, 0x77, 0x04, 0xb9, 0x91, 0x39, 0x54,
-	0x45, 0xbe, 0x87, 0x8f, 0xc2, 0x48, 0xce, 0xd7, 0x76, 0xcf, 0xcf, 0x22, 0xa6, 0x79, 0x7c, 0xa1,
-	0x4f, 0xd1, 0x94, 0x1f, 0xe0, 0xd4, 0x9c, 0x76, 0x1b, 0x9e, 0xcd, 0x64, 0xa0, 0x74, 0x14, 0x53,
-	0xcc, 0xa4, 0xd2, 0xf1, 0xe5, 0x3e, 0x45, 0x81, 0x93, 0x01, 0x6d, 0xa9, 0xb4, 0xff, 0xc2, 0xec,
-	0x76, 0xbc, 0x92, 0xfb, 0x80, 0x6e, 0xed, 0xbc, 0x4a, 0x14, 0xdd, 0x1a, 0x6d, 0x3b, 0x1c, 0xb4,
-	0xf1, 0xaf, 0xa0, 0x98, 0x20, 0x32, 0xd3, 0xbd, 0x90, 0x72, 0x1e, 0xb7, 0xc4, 0xca, 0xa6, 0x4f,
-	0x4a, 0xcb, 0x80, 0x6f, 0x8f, 0xd9, 0x2a, 0x06, 0x79, 0x63, 0x90, 0x8e, 0xd7, 0xca, 0xa4, 0xf6,
-	0xe8, 0x0c, 0x5d, 0x8e, 0x84, 0xe5, 0xb0, 0x09, 0x85, 0x63, 0x11, 0x71, 0xf7, 0x0f, 0xb0, 0x07,
-	0x99, 0x5e, 0xe7, 0x64, 0x82, 0x53, 0xa4, 0x00, 0x59, 0xda, 0x7d, 0xf3, 0xc3, 0x04, 0x23, 0x92,
-	0x83, 0xf4, 0x74, 0x84, 0xd3, 0xc6, 0x79, 0x3c, 0xfc, 0x69, 0x80, 0xbd, 0xc3, 0x2e, 0x14, 0x76,
-	0x7f, 0x2f, 0xa4, 0x08, 0xf9, 0xe9, 0xe0, 0x74, 0x60, 0x3c, 0x29, 0x02, 0x90, 0x1b, 0xf5, 0x5a,
-	0xdd, 0xc1, 0x18, 0x23, 0x23, 0x9f, 0x0c, 0x69, 0x67, 0x3c, 0xc1, 0x69, 0x52, 0x82, 0x42, 0x7f,
-	0x38, 0x1d, 0x4c, 0xac, 0xcb, 0xb3, 0x79, 0x5a, 0xa7, 0x1d, 0x9c, 0x39, 0x5c, 0x00, 0x3c, 0x5c,
-	0x9f, 0xb1, 0x0f, 0x86, 0x83, 0x0e, 0x4e, 0x19, 0x69, 0x62, 0x28, 0x91, 0x91, 0xda, 0xdd, 0xc9,
-	0x3b, 0x9c, 0x36, 0x99, 0xda, 0xad, 0x51, 0x77, 0xd2, 0xea, 0x61, 0x8f, 0x94, 0x01, 0x7a, 0xd3,
-	0xfe, 0xeb, 0x0e, 0xed, 0x77, 0x7b, 0x3d, 0x9c, 0x31, 0xd9, 0xde, 0x4e, 0x5b, 0x94, 0xbe, 0xc3,
-	0x59, 0x13, 0x72, 0xd2, 0xa2, 0x7d, 0x9c, 0x33, 0x12, 0x1d, 0x0e, 0x4f, 0x71, 0xfe, 0x75, 0xe7,
-	0xcf, 0xbb, 0x1a, 0x7a, 0x7f, 0x57, 0x43, 0x7f, 0xdf, 0xd5, 0xd0, 0x1f, 0xf7, 0xb5, 0xd4, 0xfb,
-	0xfb, 0x5a, 0xea, 0xaf, 0xfb, 0x5a, 0xea, 0xe7, 0x97, 0x0b, 0xa1, 0x2f, 0xd7, 0xe7, 0x8d, 0x99,
-	0x5c, 0x1d, 0xb1, 0x68, 0xc6, 0x02, 0xfe, 0xb5, 0xda, 0x28, 0xcd, 0x57, 0xea, 0xc8, 0x7e, 0x4d,
-	0x6e, 0xdd, 0xf7, 0x44, 0x6f, 0x42, 0xae, 0xce, 0x73, 0xf6, 0x8b, 0xf2, 0xea, 0xdf, 0x00, 0x00,
-	0x00, 0xff, 0xff, 0x1b, 0x0f, 0x2f, 0x6d, 0x69, 0x06, 0x00, 0x00,
+	// 810 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x55, 0xdd, 0x6a, 0xe3, 0x46,
+	0x14, 0xf6, 0x48, 0xb6, 0x63, 0x1d, 0x27, 0x66, 0x98, 0xa6, 0x8b, 0xd8, 0x0b, 0x63, 0x54, 0xd8,
+	0x86, 0x94, 0x3a, 0xe0, 0x6d, 0xa1, 0x94, 0xde, 0x78, 0x77, 0x9d, 0xd4, 0xc4, 0x3f, 0xe9, 0x58,
+	0x6e, 0xd9, 0xde, 0x94, 0x59, 0x67, 0x36, 0x11, 0xb1, 0x34, 0x42, 0x33, 0x4e, 0xa2, 0x8b, 0xd2,
+	0x37, 0x28, 0x7d, 0x82, 0x42, 0xdf, 0xa6, 0x97, 0x7b, 0xd9, 0xcb, 0x92, 0xbc, 0x48, 0x99, 0x19,
+	0x59, 0x51, 0x28, 0x2d, 0x5b, 0x7a, 0x23, 0xce, 0xcf, 0x77, 0xce, 0x77, 0xe6, 0x3b, 0x23, 0x06,
+	0xf6, 0x33, 0x21, 0xae, 0x8e, 0x2e, 0x58, 0xcc, 0xcd, 0xa7, 0x9f, 0x66, 0x42, 0x09, 0xe2, 0xe9,
+	0x68, 0x5f, 0x07, 0x82, 0xdf, 0x1c, 0xa8, 0x9f, 0xb0, 0x98, 0x13, 0x1f, 0x76, 0xd2, 0x35, 0xcb,
+	0x79, 0x26, 0x7d, 0xd4, 0x73, 0x0f, 0x3c, 0xba, 0x75, 0x49, 0x0f, 0xdc, 0x98, 0xa5, 0xbe, 0xd3,
+	0x43, 0x07, 0xed, 0x41, 0xa7, 0x5f, 0xd6, 0xf6, 0xa7, 0x2c, 0xa5, 0x3a, 0x45, 0x9e, 0x41, 0x43,
+	0x2a, 0xa6, 0xb8, 0xef, 0x1a, 0x0c, 0xae, 0x60, 0x16, 0x3a, 0x4e, 0x6d, 0x9a, 0x7c, 0x04, 0x7b,
+	0x29, 0xcb, 0x58, 0xfc, 0xc3, 0x35, 0xcf, 0x64, 0x24, 0x12, 0xbf, 0xde, 0x43, 0x07, 0x7b, 0x74,
+	0xd7, 0x04, 0xbf, 0xb5, 0x31, 0xf2, 0x15, 0x78, 0x8a, 0x67, 0x59, 0xa4, 0x44, 0x96, 0xfb, 0x8d,
+	0x9e, 0x7b, 0xd0, 0x1e, 0x74, 0x2b, 0x0d, 0xf5, 0xb0, 0xfd, 0x70, 0x0b, 0x18, 0x25, 0x2a, 0xcb,
+	0xe9, 0x43, 0xc1, 0x53, 0x0a, 0x9d, 0xc7, 0x49, 0x82, 0xc1, 0xbd, 0xe2, 0xb9, 0x8f, 0x0c, 0x95,
+	0x36, 0xc9, 0x21, 0x34, 0xae, 0xd9, 0x7a, 0xc3, 0x8b, 0x23, 0xed, 0x57, 0xba, 0x97, 0xb5, 0xd4,
+	0x42, 0xbe, 0x74, 0xbe, 0x40, 0xc1, 0x8f, 0xb0, 0xab, 0x59, 0x17, 0x09, 0x4b, 0xe5, 0xa5, 0x50,
+	0x5b, 0x41, 0xd0, 0x7b, 0x08, 0xe2, 0xfc, 0x47, 0x41, 0xdc, 0xbf, 0x0b, 0x12, 0x5c, 0x41, 0x6b,
+	0x7e, 0xcd, 0xb3, 0xeb, 0x88, 0xdf, 0xfc, 0xaf, 0x2d, 0xbd, 0x17, 0x99, 0x82, 0x86, 0x99, 0x90,
+	0xf4, 0xa1, 0xf5, 0x96, 0xad, 0x54, 0x24, 0x12, 0x4b, 0xd5, 0x1e, 0x90, 0x4a, 0xd3, 0x63, 0x9b,
+	0xa2, 0x25, 0x86, 0x7c, 0x0c, 0xf5, 0x0b, 0x16, 0x31, 0xdf, 0x31, 0xd8, 0x0f, 0x2a, 0xd8, 0x33,
+	0x91, 0x6e, 0xd6, 0x6c, 0xc5, 0xa9, 0x01, 0x10, 0x02, 0x75, 0xa9, 0x78, 0x6a, 0xd8, 0xeb, 0xd4,
+	0xd8, 0xc1, 0x09, 0xb8, 0x53, 0x96, 0xea, 0xc5, 0xa8, 0x68, 0xcd, 0x2d, 0x61, 0xe7, 0xd1, 0x62,
+	0x26, 0x2c, 0x39, 0x97, 0x2b, 0x96, 0x72, 0x6a, 0x21, 0x64, 0x1f, 0x1a, 0x37, 0xd1, 0xb9, 0xba,
+	0x34, 0x27, 0xde, 0xa3, 0xd6, 0x09, 0x7e, 0x46, 0xb0, 0x53, 0xcc, 0xf6, 0x2f, 0x5a, 0x7d, 0x06,
+	0x5e, 0xc6, 0xa5, 0xd8, 0x64, 0x2b, 0x2e, 0x0b, 0xc5, 0x9e, 0x54, 0xb8, 0x68, 0x91, 0x5b, 0x70,
+	0x45, 0x1f, 0x80, 0xe4, 0x39, 0x40, 0x6a, 0x8e, 0xa2, 0xac, 0x78, 0xff, 0x78, 0xce, 0x0a, 0x2c,
+	0xf8, 0x15, 0x41, 0x6b, 0x9b, 0x20, 0x4f, 0xa0, 0xc9, 0x62, 0xb1, 0x49, 0x54, 0x71, 0x1b, 0x0b,
+	0x8f, 0x1c, 0x41, 0x2b, 0x15, 0x32, 0x32, 0x7d, 0xed, 0x38, 0x8f, 0xfb, 0xda, 0x14, 0x2d, 0x41,
+	0xe4, 0x73, 0x00, 0xc9, 0x95, 0x5a, 0xf3, 0x98, 0x27, 0xca, 0x28, 0xd9, 0x19, 0x7c, 0x58, 0xbd,
+	0x64, 0x65, 0x92, 0x56, 0x80, 0x5a, 0xfa, 0x8d, 0xe4, 0xe7, 0xe6, 0xb7, 0x6b, 0x51, 0x63, 0x07,
+	0xcf, 0xf4, 0x7c, 0x45, 0xdb, 0x5d, 0x40, 0xb7, 0xc5, 0xad, 0x40, 0xb7, 0xda, 0xcb, 0x8b, 0x3f,
+	0x14, 0xe5, 0xc1, 0x4f, 0xd0, 0xae, 0xe8, 0xa2, 0x5b, 0xbd, 0x15, 0xe2, 0xbc, 0x38, 0x88, 0xb1,
+	0xf5, 0x4a, 0xa4, 0x12, 0x09, 0xdf, 0xae, 0xc4, 0x38, 0x1a, 0x79, 0xa3, 0x91, 0xb6, 0xaf, 0xb1,
+	0x49, 0xf7, 0x91, 0x94, 0x96, 0xa3, 0x12, 0xd1, 0x35, 0x8a, 0xaf, 0x2e, 0xfd, 0x86, 0xad, 0xd1,
+	0x76, 0x30, 0x04, 0xaf, 0xfc, 0x3b, 0xf5, 0x6e, 0x8b, 0x9b, 0x57, 0x4c, 0xb0, 0x75, 0xc9, 0x53,
+	0xad, 0xa5, 0xd5, 0xbb, 0x98, 0xa3, 0xf4, 0x0f, 0x07, 0xe0, 0xbd, 0x8a, 0x32, 0x6e, 0x81, 0x2d,
+	0xa8, 0x4f, 0x46, 0xc7, 0x21, 0xae, 0x11, 0x0f, 0x1a, 0x74, 0x7c, 0xf2, 0x75, 0x88, 0x11, 0x69,
+	0x82, 0xb3, 0x3c, 0xc3, 0x8e, 0x4e, 0xbe, 0x9a, 0x7f, 0x37, 0xc3, 0xee, 0xe1, 0x18, 0xbc, 0xf2,
+	0xee, 0x91, 0x36, 0xec, 0x2c, 0x67, 0xa7, 0x33, 0x9d, 0xa9, 0x11, 0x80, 0xe6, 0xd9, 0x64, 0x38,
+	0x9e, 0x2d, 0x30, 0xd2, 0xf6, 0xf1, 0x9c, 0x8e, 0x16, 0x21, 0x76, 0xc8, 0x1e, 0x78, 0xd3, 0xf9,
+	0x72, 0x16, 0x9a, 0x94, 0x6b, 0x78, 0x86, 0xa7, 0x23, 0x5c, 0x3f, 0xbc, 0x00, 0x78, 0x58, 0x8c,
+	0x8e, 0xcf, 0xe6, 0xb3, 0x11, 0xae, 0x69, 0x2b, 0xd4, 0x2d, 0x91, 0xb6, 0x5e, 0x8e, 0xc3, 0xd7,
+	0xd8, 0xd1, 0x4c, 0x2f, 0x87, 0x67, 0xe3, 0x70, 0x38, 0xc1, 0x2e, 0xe9, 0x00, 0x4c, 0x96, 0xd3,
+	0x17, 0x23, 0x3a, 0x1d, 0x4f, 0x26, 0xb8, 0xae, 0xd9, 0xbe, 0x59, 0x0e, 0x29, 0x7d, 0x8d, 0x1b,
+	0xba, 0xe4, 0x78, 0x48, 0xa7, 0xb8, 0xa9, 0x2d, 0x3a, 0x9f, 0x9f, 0xe2, 0x9d, 0x17, 0xa3, 0xdf,
+	0xef, 0xba, 0xe8, 0xdd, 0x5d, 0x17, 0xfd, 0x79, 0xd7, 0x45, 0xbf, 0xdc, 0x77, 0x6b, 0xef, 0xee,
+	0xbb, 0xb5, 0x3f, 0xee, 0xbb, 0xb5, 0xef, 0x3f, 0xb9, 0x88, 0xd4, 0xe5, 0xe6, 0x4d, 0x7f, 0x25,
+	0xe2, 0x23, 0x96, 0xad, 0x58, 0xc2, 0x3f, 0x95, 0xb9, 0x54, 0x3c, 0x96, 0x47, 0xe6, 0xa5, 0xb8,
+	0xb5, 0x6f, 0x85, 0xca, 0x53, 0x2e, 0xdf, 0x34, 0xcd, 0x6b, 0xf1, 0xfc, 0xaf, 0x00, 0x00, 0x00,
+	0xff, 0xff, 0xfd, 0x7c, 0x9a, 0x17, 0x45, 0x06, 0x00, 0x00,
+}
+
+func (m *Game) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Game) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Game) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Territory) > 0 {
+		for k := range m.Territory {
+			v := m.Territory[k]
+			baseI := i
+			if v != nil {
+				{
+					size, err := v.MarshalToSizedBuffer(dAtA[:i])
+					if err != nil {
+						return 0, err
+					}
+					i -= size
+					i = encodeVarintGame(dAtA, i, uint64(size))
+				}
+				i--
+				dAtA[i] = 0x12
+			}
+			i = encodeVarintGame(dAtA, i, uint64(k))
+			i--
+			dAtA[i] = 0x8
+			i = encodeVarintGame(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if m.ParamVersion != 0 {
+		i = encodeVarintGame(dAtA, i, uint64(m.ParamVersion))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.State != nil {
+		{
+			size, err := m.State.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGame(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Map != nil {
+		{
+			size, err := m.Map.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGame(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Players) > 0 {
+		for iNdEx := len(m.Players) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Players[iNdEx])
+			copy(dAtA[i:], m.Players[iNdEx])
+			i = encodeVarintGame(dAtA, i, uint64(len(m.Players[iNdEx])))
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *GameSnapshot) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GameSnapshot) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GameSnapshot) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.ParamVersion != 0 {
+		i = encodeVarintGame(dAtA, i, uint64(m.ParamVersion))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.State != nil {
+		{
+			size, err := m.State.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGame(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.Map != nil {
+		{
+			size, err := m.Map.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGame(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *Overview) Marshal() (dAtA []byte, err error) {
@@ -882,7 +993,7 @@ func (m *Overview) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.ParamVersion != 0 {
 		i = encodeVarintGame(dAtA, i, uint64(m.ParamVersion))
 		i--
-		dAtA[i] = 0x10
+		dAtA[i] = 0x18
 	}
 	if m.Map != nil {
 		{
@@ -894,7 +1005,16 @@ func (m *Overview) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintGame(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x12
+	}
+	if len(m.Players) > 0 {
+		for iNdEx := len(m.Players) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Players[iNdEx])
+			copy(dAtA[i:], m.Players[iNdEx])
+			i = encodeVarintGame(dAtA, i, uint64(len(m.Players[iNdEx])))
+			i--
+			dAtA[i] = 0xa
+		}
 	}
 	return len(dAtA) - i, nil
 }
@@ -938,10 +1058,10 @@ func (m *State) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x12
 		}
 	}
-	if len(m.Players) > 0 {
-		for iNdEx := len(m.Players) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.Factions) > 0 {
+		for iNdEx := len(m.Factions) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.Players[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.Factions[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -981,20 +1101,20 @@ func (m *Map) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x10
 	}
 	if len(m.Tiles) > 0 {
-		dAtA3 := make([]byte, len(m.Tiles)*10)
-		var j2 int
+		dAtA8 := make([]byte, len(m.Tiles)*10)
+		var j7 int
 		for _, num := range m.Tiles {
 			for num >= 1<<7 {
-				dAtA3[j2] = uint8(uint64(num)&0x7f | 0x80)
+				dAtA8[j7] = uint8(uint64(num)&0x7f | 0x80)
 				num >>= 7
-				j2++
+				j7++
 			}
-			dAtA3[j2] = uint8(num)
-			j2++
+			dAtA8[j7] = uint8(num)
+			j7++
 		}
-		i -= j2
-		copy(dAtA[i:], dAtA3[:j2])
-		i = encodeVarintGame(dAtA, i, uint64(j2))
+		i -= j7
+		copy(dAtA[i:], dAtA8[:j7])
+		i = encodeVarintGame(dAtA, i, uint64(j7))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -1047,12 +1167,14 @@ func (m *Faction) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.Player) > 0 {
-		i -= len(m.Player)
-		copy(dAtA[i:], m.Player)
-		i = encodeVarintGame(dAtA, i, uint64(len(m.Player)))
-		i--
-		dAtA[i] = 0xa
+	if len(m.Players) > 0 {
+		for iNdEx := len(m.Players) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Players[iNdEx])
+			copy(dAtA[i:], m.Players[iNdEx])
+			i = encodeVarintGame(dAtA, i, uint64(len(m.Players[iNdEx])))
+			i--
+			dAtA[i] = 0xa
+		}
 	}
 	return len(dAtA) - i, nil
 }
@@ -1077,6 +1199,16 @@ func (m *Populace) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.Used {
+		i--
+		if m.Used {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x20
+	}
 	if m.Settlement != 0 {
 		i = encodeVarintGame(dAtA, i, uint64(m.Settlement))
 		i--
@@ -1098,202 +1230,6 @@ func (m *Populace) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i = encodeVarintGame(dAtA, i, uint64(m.Amount))
 		i--
 		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Config) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Config) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Config) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Map != nil {
-		{
-			size, err := m.Map.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintGame(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.Initial != nil {
-		{
-			size, err := m.Initial.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintGame(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *MapConfig) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MapConfig) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MapConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.PlainsDensity != 0 {
-		i = encodeVarintGame(dAtA, i, uint64(m.PlainsDensity))
-		i--
-		dAtA[i] = 0x38
-	}
-	if m.LakeDensity != 0 {
-		i = encodeVarintGame(dAtA, i, uint64(m.LakeDensity))
-		i--
-		dAtA[i] = 0x30
-	}
-	if m.ForestDensity != 0 {
-		i = encodeVarintGame(dAtA, i, uint64(m.ForestDensity))
-		i--
-		dAtA[i] = 0x28
-	}
-	if m.MountainsDensity != 0 {
-		i = encodeVarintGame(dAtA, i, uint64(m.MountainsDensity))
-		i--
-		dAtA[i] = 0x20
-	}
-	if m.Seed != 0 {
-		i = encodeVarintGame(dAtA, i, uint64(m.Seed))
-		i--
-		dAtA[i] = 0x18
-	}
-	if m.Height != 0 {
-		i = encodeVarintGame(dAtA, i, uint64(m.Height))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Width != 0 {
-		i = encodeVarintGame(dAtA, i, uint64(m.Width))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *InitializationConfig) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *InitializationConfig) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *InitializationConfig) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Resources != nil {
-		{
-			size, err := m.Resources.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintGame(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.Teams != 0 {
-		i = encodeVarintGame(dAtA, i, uint64(m.Teams))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *Params) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Params) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *Params) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.ConstructionCost) > 0 {
-		for iNdEx := len(m.ConstructionCost) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.ConstructionCost[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGame(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0x12
-		}
-	}
-	if len(m.ProductionRate) > 0 {
-		for iNdEx := len(m.ProductionRate) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.ProductionRate[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintGame(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
 	}
 	return len(dAtA) - i, nil
 }
@@ -1351,6 +1287,11 @@ func (m *ResourceSet) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.Tech != 0 {
+		i = encodeVarintGame(dAtA, i, uint64(m.Tech))
+		i--
+		dAtA[i] = 0x28
+	}
 	if m.Population != 0 {
 		i = encodeVarintGame(dAtA, i, uint64(m.Population))
 		i--
@@ -1374,6 +1315,39 @@ func (m *ResourceSet) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *Territory) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Territory) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Territory) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Populace != 0 {
+		i = encodeVarintGame(dAtA, i, uint64(m.Populace))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Faction != 0 {
+		i = encodeVarintGame(dAtA, i, uint64(m.Faction))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintGame(dAtA []byte, offset int, v uint64) int {
 	offset -= sovGame(v)
 	base := offset
@@ -1385,12 +1359,77 @@ func encodeVarintGame(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *Game) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Players) > 0 {
+		for _, s := range m.Players {
+			l = len(s)
+			n += 1 + l + sovGame(uint64(l))
+		}
+	}
+	if m.Map != nil {
+		l = m.Map.Size()
+		n += 1 + l + sovGame(uint64(l))
+	}
+	if m.State != nil {
+		l = m.State.Size()
+		n += 1 + l + sovGame(uint64(l))
+	}
+	if m.ParamVersion != 0 {
+		n += 1 + sovGame(uint64(m.ParamVersion))
+	}
+	if len(m.Territory) > 0 {
+		for k, v := range m.Territory {
+			_ = k
+			_ = v
+			l = 0
+			if v != nil {
+				l = v.Size()
+				l += 1 + sovGame(uint64(l))
+			}
+			mapEntrySize := 1 + sovGame(uint64(k)) + l
+			n += mapEntrySize + 1 + sovGame(uint64(mapEntrySize))
+		}
+	}
+	return n
+}
+
+func (m *GameSnapshot) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Map != nil {
+		l = m.Map.Size()
+		n += 1 + l + sovGame(uint64(l))
+	}
+	if m.State != nil {
+		l = m.State.Size()
+		n += 1 + l + sovGame(uint64(l))
+	}
+	if m.ParamVersion != 0 {
+		n += 1 + sovGame(uint64(m.ParamVersion))
+	}
+	return n
+}
+
 func (m *Overview) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
+	if len(m.Players) > 0 {
+		for _, s := range m.Players {
+			l = len(s)
+			n += 1 + l + sovGame(uint64(l))
+		}
+	}
 	if m.Map != nil {
 		l = m.Map.Size()
 		n += 1 + l + sovGame(uint64(l))
@@ -1407,8 +1446,8 @@ func (m *State) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if len(m.Players) > 0 {
-		for _, e := range m.Players {
+	if len(m.Factions) > 0 {
+		for _, e := range m.Factions {
 			l = e.Size()
 			n += 1 + l + sovGame(uint64(l))
 		}
@@ -1450,9 +1489,11 @@ func (m *Faction) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Player)
-	if l > 0 {
-		n += 1 + l + sovGame(uint64(l))
+	if len(m.Players) > 0 {
+		for _, s := range m.Players {
+			l = len(s)
+			n += 1 + l + sovGame(uint64(l))
+		}
 	}
 	if m.Resources != nil {
 		l = m.Resources.Size()
@@ -1483,89 +1524,8 @@ func (m *Populace) Size() (n int) {
 	if m.Settlement != 0 {
 		n += 1 + sovGame(uint64(m.Settlement))
 	}
-	return n
-}
-
-func (m *Config) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Initial != nil {
-		l = m.Initial.Size()
-		n += 1 + l + sovGame(uint64(l))
-	}
-	if m.Map != nil {
-		l = m.Map.Size()
-		n += 1 + l + sovGame(uint64(l))
-	}
-	return n
-}
-
-func (m *MapConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Width != 0 {
-		n += 1 + sovGame(uint64(m.Width))
-	}
-	if m.Height != 0 {
-		n += 1 + sovGame(uint64(m.Height))
-	}
-	if m.Seed != 0 {
-		n += 1 + sovGame(uint64(m.Seed))
-	}
-	if m.MountainsDensity != 0 {
-		n += 1 + sovGame(uint64(m.MountainsDensity))
-	}
-	if m.ForestDensity != 0 {
-		n += 1 + sovGame(uint64(m.ForestDensity))
-	}
-	if m.LakeDensity != 0 {
-		n += 1 + sovGame(uint64(m.LakeDensity))
-	}
-	if m.PlainsDensity != 0 {
-		n += 1 + sovGame(uint64(m.PlainsDensity))
-	}
-	return n
-}
-
-func (m *InitializationConfig) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Teams != 0 {
-		n += 1 + sovGame(uint64(m.Teams))
-	}
-	if m.Resources != nil {
-		l = m.Resources.Size()
-		n += 1 + l + sovGame(uint64(l))
-	}
-	return n
-}
-
-func (m *Params) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.ProductionRate) > 0 {
-		for _, e := range m.ProductionRate {
-			l = e.Size()
-			n += 1 + l + sovGame(uint64(l))
-		}
-	}
-	if len(m.ConstructionCost) > 0 {
-		for _, e := range m.ConstructionCost {
-			l = e.Size()
-			n += 1 + l + sovGame(uint64(l))
-		}
+	if m.Used {
+		n += 2
 	}
 	return n
 }
@@ -1603,6 +1563,24 @@ func (m *ResourceSet) Size() (n int) {
 	if m.Population != 0 {
 		n += 1 + sovGame(uint64(m.Population))
 	}
+	if m.Tech != 0 {
+		n += 1 + sovGame(uint64(m.Tech))
+	}
+	return n
+}
+
+func (m *Territory) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Faction != 0 {
+		n += 1 + sovGame(uint64(m.Faction))
+	}
+	if m.Populace != 0 {
+		n += 1 + sovGame(uint64(m.Populace))
+	}
 	return n
 }
 
@@ -1612,7 +1590,7 @@ func sovGame(x uint64) (n int) {
 func sozGame(x uint64) (n int) {
 	return sovGame(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *Overview) Unmarshal(dAtA []byte) error {
+func (m *Game) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1635,10 +1613,298 @@ func (m *Overview) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: Overview: wiretype end group for non-group")
+			return fmt.Errorf("proto: Game: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Overview: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: Game: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Players", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGame
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGame
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGame
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Players = append(m.Players, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Map", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGame
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGame
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGame
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Map == nil {
+				m.Map = &Map{}
+			}
+			if err := m.Map.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGame
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGame
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGame
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.State == nil {
+				m.State = &State{}
+			}
+			if err := m.State.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ParamVersion", wireType)
+			}
+			m.ParamVersion = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGame
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ParamVersion |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Territory", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGame
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGame
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGame
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Territory == nil {
+				m.Territory = make(map[uint32]*Territory)
+			}
+			var mapkey uint32
+			var mapvalue *Territory
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowGame
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGame
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapkey |= uint32(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+				} else if fieldNum == 2 {
+					var mapmsglen int
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGame
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						mapmsglen |= int(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					if mapmsglen < 0 {
+						return ErrInvalidLengthGame
+					}
+					postmsgIndex := iNdEx + mapmsglen
+					if postmsgIndex < 0 {
+						return ErrInvalidLengthGame
+					}
+					if postmsgIndex > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = &Territory{}
+					if err := mapvalue.Unmarshal(dAtA[iNdEx:postmsgIndex]); err != nil {
+						return err
+					}
+					iNdEx = postmsgIndex
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipGame(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthGame
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Territory[mapkey] = mapvalue
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGame(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGame
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GameSnapshot) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGame
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GameSnapshot: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GameSnapshot: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1678,6 +1944,179 @@ func (m *Overview) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGame
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGame
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGame
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.State == nil {
+				m.State = &State{}
+			}
+			if err := m.State.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ParamVersion", wireType)
+			}
+			m.ParamVersion = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGame
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ParamVersion |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGame(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGame
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Overview) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGame
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Overview: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Overview: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Players", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGame
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGame
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGame
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Players = append(m.Players, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Map", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGame
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGame
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGame
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Map == nil {
+				m.Map = &Map{}
+			}
+			if err := m.Map.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ParamVersion", wireType)
 			}
@@ -1748,7 +2187,7 @@ func (m *State) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Players", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Factions", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1775,8 +2214,8 @@ func (m *State) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Players = append(m.Players, &Faction{})
-			if err := m.Players[len(m.Players)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.Factions = append(m.Factions, &Faction{})
+			if err := m.Factions[len(m.Factions)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2023,7 +2462,7 @@ func (m *Faction) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Player", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Players", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -2051,7 +2490,7 @@ func (m *Faction) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Player = string(dAtA[iNdEx:postIndex])
+			m.Players = append(m.Players, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
@@ -2247,240 +2686,11 @@ func (m *Populace) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGame(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthGame
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Config) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGame
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Config: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Config: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Initial", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGame
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGame
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGame
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Initial == nil {
-				m.Initial = &InitializationConfig{}
-			}
-			if err := m.Initial.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Map", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGame
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGame
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGame
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Map == nil {
-				m.Map = &MapConfig{}
-			}
-			if err := m.Map.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGame(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthGame
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MapConfig) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGame
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MapConfig: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MapConfig: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Width", wireType)
-			}
-			m.Width = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGame
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Width |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Height", wireType)
-			}
-			m.Height = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGame
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Height |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Seed", wireType)
-			}
-			m.Seed = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGame
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Seed |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
 		case 4:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MountainsDensity", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Used", wireType)
 			}
-			m.MountainsDensity = 0
+			var v int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGame
@@ -2490,291 +2700,12 @@ func (m *MapConfig) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.MountainsDensity |= uint32(b&0x7F) << shift
+				v |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ForestDensity", wireType)
-			}
-			m.ForestDensity = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGame
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.ForestDensity |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LakeDensity", wireType)
-			}
-			m.LakeDensity = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGame
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.LakeDensity |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PlainsDensity", wireType)
-			}
-			m.PlainsDensity = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGame
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.PlainsDensity |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGame(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthGame
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *InitializationConfig) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGame
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: InitializationConfig: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: InitializationConfig: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Teams", wireType)
-			}
-			m.Teams = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGame
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Teams |= uint32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Resources", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGame
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGame
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGame
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Resources == nil {
-				m.Resources = &ResourceSet{}
-			}
-			if err := m.Resources.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGame(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthGame
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *Params) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGame
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Params: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Params: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ProductionRate", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGame
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGame
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGame
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ProductionRate = append(m.ProductionRate, &ResourceSet{})
-			if err := m.ProductionRate[len(m.ProductionRate)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ConstructionCost", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGame
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGame
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGame
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ConstructionCost = append(m.ConstructionCost, &ResourceSet{})
-			if err := m.ConstructionCost[len(m.ConstructionCost)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
+			m.Used = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipGame(dAtA[iNdEx:])
@@ -2985,6 +2916,113 @@ func (m *ResourceSet) Unmarshal(dAtA []byte) error {
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Population |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Tech", wireType)
+			}
+			m.Tech = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGame
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Tech |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGame(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGame
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Territory) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGame
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Territory: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Territory: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Faction", wireType)
+			}
+			m.Faction = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGame
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Faction |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Populace", wireType)
+			}
+			m.Populace = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGame
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Populace |= uint32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

@@ -1,19 +1,22 @@
 import styles from './map.module.less';
 import Tile from '../tile'
+import { Map, Landscape } from "../../codec/rook/game/game"
 
 /* eslint-disable-next-line */
 export interface MapProps {
-  tiles: string[]
+  map: Map
 }
 
-export function Map(props: MapProps) {
+export function MapComponent(props: MapProps) {
   return (
     <div className={styles.map}>
-      {props.tiles.map((color: string, index: number) => (
-          <Tile color={color} y={0} x={index*64}/>
-      ))}
+      <div id="map-ref" className={styles.ref}>
+        {props.map.tiles.map((landscape: Landscape, index: number) => (
+            <Tile landscape={landscape} y={0} x={index*64}/>
+        ))}
+      </div>
     </div>
   );
 }
 
-export default Map;
+export default MapComponent;
