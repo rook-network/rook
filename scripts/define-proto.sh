@@ -33,6 +33,9 @@ protoc \
   "$ROOK_PROTO_DIR/rook/matchmaker/tx.proto" \
   "$COSMOS_PROTO_DIR/cosmos/auth/v1beta1/auth.proto" \
   "$COSMOS_PROTO_DIR/cosmos/auth/v1beta1/query.proto" \
+  "$COSMOS_PROTO_DIR/cosmos/authz/v1beta1/authz.proto" \
+  "$COSMOS_PROTO_DIR/cosmos/authz/v1beta1/query.proto" \
+  "$COSMOS_PROTO_DIR/cosmos/authz/v1beta1/tx.proto" \
   "$COSMOS_PROTO_DIR/cosmos/bank/v1beta1/bank.proto" \
   "$COSMOS_PROTO_DIR/cosmos/bank/v1beta1/query.proto" \
   "$COSMOS_PROTO_DIR/cosmos/bank/v1beta1/tx.proto" \

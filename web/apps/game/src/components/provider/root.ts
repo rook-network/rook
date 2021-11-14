@@ -2,9 +2,12 @@ import { SigningStargateClient, QueryClient } from "@cosmjs/stargate"
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc'
 import config from "../../config"
 import { Registry } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing'
-import { GameProvider, registerGameMsgs } from './game'
+import { typeMsgBuild, typeMsgMove } from './game'
+import { GenericAuthorization, Grant } from '../../codec/cosmos/authz/v1beta1/authz'
+import { MsgGrant } from '../../codec/cosmos/authz/v1beta1/tx'
 import _m0 from "protobufjs/minimal";
 import { MatchmakerProvider, registerMatchmakerMsgs } from './matchmaker'
+import { defaultFee } from './types'
 import { 
   ErrKeplrNotEnabled,
   ErrNodeNotConnected,
@@ -12,13 +15,15 @@ import {
   ErrNoAccount
 } from './errors'
 
+const typeGenericAuthorization = "/cosmos.authz.v1beta1.GenericAuthorization"
+const typeMsgGrant = "/cosmos.authz.v1beta1.MsgGrant"
+
 export class Provider {
     private client: SigningStargateClient
     private querier: QueryClient
     private address: string
 
     public readonly matchmaker: MatchmakerProvider
-    public readonly game: GameProvider
     public readonly chainID: string
 
     constructor(client: SigningStargateClient, querier: QueryClient, address: string) {
@@ -27,52 +32,75 @@ export class Provider {
         this.address = address
         this.chainID = config.chainID
         this.matchmaker = new MatchmakerProvider(this.querier, this.client, this.address)
-        this.game = new GameProvider(this.querier, this.client, this.address)
     }
 
     public static async connect(): Promise<Provider> {
-        if (!keplrEnabled() || !window.keplr.experimentalSuggestChain) {
-            throw ErrKeplrNotEnabled
+      if (!keplrEnabled() || !window.keplr.experimentalSuggestChain) {
+          throw ErrKeplrNotEnabled
+      }
+
+      console.log("attempting to connect with keplr wallet")
+
+      try { 
+        suggestChainToKeplr()
+      } catch (err) {
+        console.error(err)
+        throw ErrUnableToSuggestChain(err as string)
+      }
+
+      let tmClient: Tendermint34Client
+      try {
+        tmClient = await Tendermint34Client.connect(config.rpcEndpoint)
+      } catch (err) {
+        console.error(err)
+        throw ErrNodeNotConnected(config.rpcEndpoint)
+      }
+
+      window.keplr.enable(config.chainID)
+
+      const offlineSigner = window.keplr.getOfflineSigner(config.chainID)
+
+      const registry = new Registry()
+      registerMatchmakerMsgs(registry)
+
+      const client = await SigningStargateClient.connectWithSigner(
+          config.rpcEndpoint,
+          offlineSigner,
+          { registry: registry }
+      )
+
+      const querier = QueryClient.withExtensions(tmClient)
+
+      const accounts = await offlineSigner.getAccounts()
+      if (accounts.length === 0)
+          throw ErrNoAccount
+
+      return new Provider(client, querier, accounts[0].address)
+    }
+
+    async authorizePlayerAccount(player: string): Promise<void> {
+      const buildGrant: GenericAuthorization = {
+        msg: typeMsgBuild,
+      }
+      const buildMsg: MsgGrant = {
+        granter: this.address,
+        grantee: player,
+        grant: {
+          authorization: {
+            typeUrl: typeGenericAuthorization,
+            value: GenericAuthorization.encode(buildGrant).finish()
+          }
         }
+      }
+      const buildMsgAny= {
+        typeUrl: typeMsgGrant,
+        value: buildMsg
+      }
 
-        console.log("attempting to connect with keplr wallet")
-
-        try { 
-          suggestChainToKeplr()
-        } catch (err) {
-          console.error(err)
-          throw ErrUnableToSuggestChain(err as string)
-        }
-
-        let tmClient: Tendermint34Client
-        try {
-          tmClient = await Tendermint34Client.connect(config.rpcEndpoint)
-        } catch (err) {
-          console.error(err)
-          throw ErrNodeNotConnected(config.rpcEndpoint)
-        }
-
-        window.keplr.enable(config.chainID)
-
-        const offlineSigner = window.keplr.getOfflineSigner(config.chainID)
-
-        const registry = new Registry()
-        registerMatchmakerMsgs(registry)
-        registerGameMsgs(registry)
-
-        const client = await SigningStargateClient.connectWithSigner(
-            config.rpcEndpoint,
-            offlineSigner,
-            { registry: registry }
-        )
-
-        const querier = QueryClient.withExtensions(tmClient)
-
-        const accounts = await offlineSigner.getAccounts()
-        if (accounts.length === 0)
-            throw ErrNoAccount
-
-        return new Provider(client, querier, accounts[0].address)
+      console.log("sending authorization...")
+      const resp = await this.client.signAndBroadcast(this.address, [buildMsgAny], defaultFee)
+      console.log(resp)
+      return
     }
 
     isConnected() {
@@ -84,6 +112,10 @@ export class Provider {
             return this.address as string
         }
         return ""
+    }
+
+    getQuerier(): QueryClient {
+      return this.querier
     }
 
     async getBalance(): Promise<number> {

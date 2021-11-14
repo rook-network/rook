@@ -1,7 +1,7 @@
 import React from 'react';
 import './app.module.less';
 import Matchmaker from '../components/matchmaker';
-import { Provider } from '../components/provider';
+import { Provider, GameProvider } from '../components/provider';
 import { IndexedMode, Room } from '../codec/rook/matchmaker/matchmaker'
 import { Account } from '../components/account'
 import { NotConnectedCard, ErrorCard } from '../components/card'
@@ -21,7 +21,8 @@ export interface AppState {
 }
 
 class App extends React.Component<any, AppState> {
-  provider: Provider | null = null
+  mainProvider: Provider | null = null
+  playerProvider: GameProvider | null = null
 
   constructor(props: any) {
     super(props)
@@ -48,29 +49,30 @@ class App extends React.Component<any, AppState> {
   }
 
   async connectWallet() {
-    if (this.provider) 
+    if (this.mainProvider) 
       return
     try {
-      this.provider = await Provider.connect()
+      this.mainProvider = await Provider.connect()
+      this.playerProvider = await GameProvider.connect(this.mainProvider)
     } catch (err) {
       console.error(err)
       this.setState({ error: err as Error })
       return
     }
     setTimeout(async () => {
-      if (this.state.modes.length === 0 && this.provider) {
+      if (this.state.modes.length === 0 && this.mainProvider) {
         console.log("retrying....")
-        const resp = await this.provider.matchmaker.query.Modes({})
-        const balance = await this.provider.getBalance()
+        const resp = await this.mainProvider.matchmaker.query.Modes({})
+        const balance = await this.mainProvider.getBalance()
         this.setState({ 
           modes: resp.modes,
           balance: balance
         })
       }
     }, 3000) // 3 seconds
-    const resp = await this.provider.matchmaker.query.Modes({})
-    const address = this.provider.getAddress()
-    const balance = await this.provider.getBalance()
+    const resp = await this.mainProvider.matchmaker.query.Modes({})
+    const address = this.mainProvider.getAddress()
+    const balance = await this.mainProvider.getBalance()
     this.setState({
       modes: resp.modes,
       address: address,
@@ -80,11 +82,11 @@ class App extends React.Component<any, AppState> {
   }
 
   async findGame() {
-    if (!this.provider)
+    if (!this.mainProvider || !this.playerProvider)
       return
 
     try {
-      const resp = await this.provider.game.query.GameByPlayer({player: this.provider.getAddress()})
+      const resp = await this.playerProvider.query.GameByPlayer({player: this.playerProvider.getAddress()})
       this.setState({
         gameID: resp.id
       })
@@ -106,13 +108,13 @@ class App extends React.Component<any, AppState> {
       )
     }
     
-    if (!this.provider) {
+    if (!this.mainProvider || !this.playerProvider) {
       return (
         <NotConnectedCard connectFn={this.connectWallet} /> 
       )
     }
 
-    const isConnected = this.provider !== null
+    const isConnected = this.mainProvider !== null
     return (
       <div>
         <Account 
@@ -123,13 +125,14 @@ class App extends React.Component<any, AppState> {
         { this.state.gameID.eq(0) ?
           <Matchmaker 
             modes={this.state.modes} 
-            provider={this.provider.matchmaker} 
+            provider={this.mainProvider.matchmaker} 
             address={this.state.address}
             gameFn={this.setGame}
           /> :
           <Game 
             gameID={this.state.gameID}
-            provider={this.provider.game}
+            provider={this.playerProvider}
+            address={this.state.address}
           />
         }
       </div>

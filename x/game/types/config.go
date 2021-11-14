@@ -63,13 +63,13 @@ func (cfg InitializationConfig) ValidateBasic() error {
 
 func DefaultMapConfig() *MapConfig {
 	return &MapConfig{
-		Width:  20,
-		Height: 20,
+		Width:  21,
+		Height: 21,
 		// seed needs to be generated
 		MountainsDensity: 3,
-		LakeDensity:      3,
+		LakeDensity:      2,
 		ForestDensity:    4,
-		PlainsDensity:    6,
+		PlainsDensity:    8,
 	}
 }
 
