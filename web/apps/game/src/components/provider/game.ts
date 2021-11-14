@@ -33,7 +33,7 @@ export class GameProvider {
         const serialized = window.localStorage.getItem(mainAddress)
         let wallet: DirectSecp256k1HdWallet
         if (serialized === null) {
-            wallet = await DirectSecp256k1HdWallet.generate()
+            wallet = await DirectSecp256k1HdWallet.generate(12, { prefix: config.bech32prefix })
             window.localStorage.setItem(mainAddress, await wallet.serialize(mainAddress))
         } else {
             wallet = await DirectSecp256k1HdWallet.deserialize(serialized, mainAddress)
