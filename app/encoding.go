@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/arcane-systems/rook/app/params"
 	"github.com/cosmos/cosmos-sdk/std"
+	"github.com/rook-network/rook/app/params"
 )
 
 // MakeEncodingConfig creates an EncodingConfig for testing

@@ -3,10 +3,10 @@ package matchmaker
 import (
 	"fmt"
 
-	"github.com/arcane-systems/rook/x/matchmaker/keeper"
-	"github.com/arcane-systems/rook/x/matchmaker/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/rook-network/rook/x/matchmaker/keeper"
+	"github.com/rook-network/rook/x/matchmaker/types"
 )
 
 // NewHandler ...

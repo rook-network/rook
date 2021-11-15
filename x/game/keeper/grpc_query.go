@@ -3,8 +3,8 @@ package keeper
 import (
 	"context"
 
-	"github.com/arcane-systems/rook/x/game/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/rook-network/rook/x/game/types"
 )
 
 var _ types.QueryServer = Keeper{}

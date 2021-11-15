@@ -1,10 +1,10 @@
 package keeper
 
 import (
-	"github.com/arcane-systems/rook/x/claim/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/rook-network/rook/x/claim/types"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 )

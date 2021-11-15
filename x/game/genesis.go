@@ -1,9 +1,9 @@
 package game
 
 import (
-	"github.com/arcane-systems/rook/x/game/keeper"
-	"github.com/arcane-systems/rook/x/game/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/rook-network/rook/x/game/keeper"
+	"github.com/rook-network/rook/x/game/types"
 )
 
 // InitGenesis initializes the capability module's state from a provided genesis

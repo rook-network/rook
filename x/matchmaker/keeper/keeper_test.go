@@ -15,9 +15,9 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	tmdb "github.com/tendermint/tm-db"
 
-	gameKeeper "github.com/arcane-systems/rook/x/game/keeper"
-	game "github.com/arcane-systems/rook/x/game/types"
-	"github.com/arcane-systems/rook/x/matchmaker/types"
+	gameKeeper "github.com/rook-network/rook/x/game/keeper"
+	game "github.com/rook-network/rook/x/game/types"
+	"github.com/rook-network/rook/x/matchmaker/types"
 )
 
 var (

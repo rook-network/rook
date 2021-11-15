@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/arcane-systems/rook/x/matchmaker/types"
+	"github.com/rook-network/rook/x/matchmaker/types"
 )
 
 var _ types.QueryServer = Keeper{}

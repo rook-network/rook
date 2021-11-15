@@ -7,10 +7,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 
-	"github.com/arcane-systems/rook/app"
-	"github.com/arcane-systems/rook/x/claim/client/cli"
-	"github.com/arcane-systems/rook/x/claim/types"
-	claimtypes "github.com/arcane-systems/rook/x/claim/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
@@ -22,6 +18,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/rook-network/rook/app"
+	"github.com/rook-network/rook/x/claim/client/cli"
+	"github.com/rook-network/rook/x/claim/types"
+	claimtypes "github.com/rook-network/rook/x/claim/types"
 	"github.com/stretchr/testify/suite"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	dbm "github.com/tendermint/tm-db"

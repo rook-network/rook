@@ -3,8 +3,8 @@ package claim
 import (
 	"fmt"
 
-	"github.com/arcane-systems/rook/x/claim/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/rook-network/rook/x/claim/keeper"
 )
 
 // EndBlocker called every block, process inflation, update validator set.

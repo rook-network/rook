@@ -3,10 +3,10 @@ package claim
 import (
 	"fmt"
 
-	"github.com/arcane-systems/rook/x/claim/keeper"
-	"github.com/arcane-systems/rook/x/claim/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/rook-network/rook/x/claim/keeper"
+	"github.com/rook-network/rook/x/claim/types"
 )
 
 // NewHandler returns claim module messages

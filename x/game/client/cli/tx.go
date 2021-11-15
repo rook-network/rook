@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/spf13/cobra"
 
-	"github.com/arcane-systems/rook/x/game/types"
+	"github.com/rook-network/rook/x/game/types"
 )
 
 var (

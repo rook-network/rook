@@ -11,14 +11,14 @@ import (
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/arcane-systems/rook/x/game/client/cli"
-	"github.com/arcane-systems/rook/x/game/keeper"
-	"github.com/arcane-systems/rook/x/game/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/rook-network/rook/x/game/client/cli"
+	"github.com/rook-network/rook/x/game/keeper"
+	"github.com/rook-network/rook/x/game/types"
 	// this line is used by starport scaffolding # ibc/module/import
 )
 

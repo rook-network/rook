@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/arcane-systems/rook/app"
-	"github.com/arcane-systems/rook/cmd/rook/cmd"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+	"github.com/rook-network/rook/app"
+	"github.com/rook-network/rook/cmd/rook/cmd"
 )
 
 func main() {

@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/arcane-systems/rook/x/game/types"
+	"github.com/rook-network/rook/x/game/types"
 )
 
 func (k Keeper) GetLatestParams(ctx sdk.Context) types.Params {

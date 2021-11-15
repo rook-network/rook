@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/arcane-systems/rook/x/game/types"
+	"github.com/rook-network/rook/x/game/types"
 )
 
 var (

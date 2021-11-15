@@ -3,9 +3,9 @@ package keeper
 import (
 	"context"
 
-	"github.com/arcane-systems/rook/x/matchmaker/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/rook-network/rook/x/matchmaker/types"
 )
 
 type msgServer struct {

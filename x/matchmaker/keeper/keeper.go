@@ -8,8 +8,8 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/tendermint/tendermint/libs/log"
 
-	game "github.com/arcane-systems/rook/x/game/types"
-	"github.com/arcane-systems/rook/x/matchmaker/types"
+	game "github.com/rook-network/rook/x/game/types"
+	"github.com/rook-network/rook/x/matchmaker/types"
 )
 
 type Keeper struct {

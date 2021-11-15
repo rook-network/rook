@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/arcane-systems/rook/x/claim/types"
+	"github.com/rook-network/rook/x/claim/types"
 )
 
 type msgServer struct {

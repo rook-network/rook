@@ -23,7 +23,7 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 
-	"github.com/arcane-systems/rook/app"
+	"github.com/rook-network/rook/app"
 )
 
 // DefaultConsensusParams defines the default Tendermint consensus params used in

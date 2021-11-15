@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	game "github.com/arcane-systems/rook/x/game/types"
+	game "github.com/rook-network/rook/x/game/types"
 )
 
 // Set some hard-coded caps on size of rooms and amount of different modes

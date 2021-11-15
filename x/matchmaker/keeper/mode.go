@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 
-	"github.com/arcane-systems/rook/x/matchmaker/types"
+	"github.com/rook-network/rook/x/matchmaker/types"
 )
 
 func (k Keeper) GetAllModes(ctx sdk.Context) []types.Mode {

@@ -3,10 +3,10 @@ package game
 import (
 	"fmt"
 
-	"github.com/arcane-systems/rook/x/game/keeper"
-	"github.com/arcane-systems/rook/x/game/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/rook-network/rook/x/game/keeper"
+	"github.com/rook-network/rook/x/game/types"
 )
 
 // NewHandler ...

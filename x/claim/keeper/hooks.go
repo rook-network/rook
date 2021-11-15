@@ -3,9 +3,9 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/arcane-systems/rook/x/claim/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/rook-network/rook/x/claim/types"
 )
 
 func (k Keeper) AfterTrade(ctx sdk.Context, sender sdk.AccAddress) {
