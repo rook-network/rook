@@ -1,7 +1,7 @@
 syntax = "proto3";
 package rook.game;
 
-option go_package = "github.com/arcane-systems/rook/x/game/types";
+option go_package = "github.com/rook-network/rook/x/game/types";
 
 // Game is what is the in memory state and includes a map of territories
 // used for faster look up. Full game is not persisted to disk (Overview and

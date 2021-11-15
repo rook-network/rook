@@ -29,5 +29,5 @@ Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
   $(find "${dir}" -maxdepth 1 -name '*.proto')
 done
 
-cp -r ./github.com/arcane-systems/rook/* ./
+cp -r ./github.com/rook-network/rook/* ./
 rm -rf ./github.com

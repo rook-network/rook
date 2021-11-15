@@ -1,7 +1,7 @@
 syntax = "proto3";
 package rook.matchmaker;
 
-option go_package = "github.com/arcane-systems/rook/x/matchmaker/types";
+option go_package = "github.com/rook-network/rook/x/matchmaker/types";
 
 // FIXME: These events are currently not used because they add "" to each
 // field and make it difficult to parse and query. Vanilla events are used

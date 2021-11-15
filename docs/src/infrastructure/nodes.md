@@ -38,7 +38,7 @@ go version
 Clone the respository and build the binary
 
 ```bash
-git clone https://github.com/arcane-systems/rook
+git clone https://github.com/rook-network/rook
 cd rook
 git checkout v0.1.0  # make sure you have the correct version
 make install

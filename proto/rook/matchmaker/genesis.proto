@@ -4,7 +4,7 @@ package rook.matchmaker;
 import "gogoproto/gogo.proto";
 import "rook/matchmaker/matchmaker.proto";
 
-option go_package = "github.com/arcane-systems/rook/x/matchmaker/types";
+option go_package = "github.com/rook-network/rook/x/matchmaker/types";
 
 // GenesisState defines the matchmaker module's genesis state.
 message GenesisState {

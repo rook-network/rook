@@ -4,7 +4,7 @@ package rook.claim;
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/arcane-systems/rook/x/claim/types";
+option go_package = "github.com/rook-network/rook/x/claim/types";
 
 service Msg { rpc Activate(MsgActivate) returns (MsgActivateResponse); }
 
