@@ -61,9 +61,16 @@ class GameComponent extends React.Component<GameProps, GameState> {
         game: game,
         params: params,
       })
+      console.log(game.state)
       this.calculateTerritory()
-      this.props.provider.subscribeToGame(gameID, (state: State) => {
+      await this.props.provider.subscribeToGame(gameID, (state: State) => {
         console.log("received a new game update")
+        console.log(state)
+        const game = this.state.game
+        if (!game) return
+        game.state = state
+        this.setState({ game: game})
+        this.calculateTerritory()
       })
     } catch (err) {
       this.setState({ error: err as Error })

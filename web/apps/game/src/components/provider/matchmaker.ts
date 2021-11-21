@@ -54,9 +54,7 @@ export class MatchmakerProvider {
             (event: SocketWrapperMessageEvent) => { 
                 const parsedEvent = JSON.parse(event.data)
                 console.log(parsedEvent)
-                if (!parsedEvent.result) {
-                    return
-                }
+                if (!parsedEvent.result) return
                 this.parseRoomEvent(parsedEvent.result.events)
             },
             (event: SocketWrapperErrorEvent) => { console.error(event)}
@@ -111,7 +109,7 @@ export class MatchmakerProvider {
         console.log("subscribed to room " + id)
     }
 
-    async unsubscribeToRoom(id: Long): Promise<void> {
+    async unsubscribeToRoom(): Promise<void> {
         // unsubscribe (this is perhaps not necessary)
         await this.socket.send(JSON.stringify({
             jsonrpc: "2.0",

@@ -91,7 +91,9 @@ class Matchmaker extends React.Component<MMProps, MMState> {
           this.setState({
             room: room,
           })
-        }, (id: Long) => {
+        }, async (id: Long) => {
+          console.log("unsubscribing from room")
+          await this.props.provider.unsubscribeToRoom()
           console.log("starting game: " + id)
           this.props.gameFn(id)
         })

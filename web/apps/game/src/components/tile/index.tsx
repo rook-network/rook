@@ -31,9 +31,10 @@ import Town from '../../assets/settlements/Town.png';
 const mountains = [Mountains1, Mountains2, Mountains3, Mountains4]
 const forests = [Forest1, Forest2, Forest3, Forest4]
 const lakes = [Lake1, Lake2, Lake3, Lake4]
-const plains = [Plains1, Plains1, Plains1, Plains1, Plains2]
+const plains = [Plains1, Plains1, Plains1, Plains1]
 
 export interface TileProps {
+  index: number
   landscape: Landscape;
   territory: Territory | null;
   size: number
@@ -91,19 +92,19 @@ export function Tile(props: TileProps) {
   } else {
     switch (props.landscape) {
       case Landscape.MOUNTAINS:
-        tile = mountains[randN(mountains.length)]
+        tile = mountains[randN(props.index, mountains.length)]
         break
   
       case Landscape.LAKE:
-        tile = lakes[randN(lakes.length)]
+        tile = lakes[randN(props.index, lakes.length)]
         break;
   
       case Landscape.FOREST:
-        tile = forests[randN(forests.length)]
+        tile = forests[randN(props.index, forests.length)]
         break;
   
       case Landscape.PLAINS: // Landscape.PLAINS:
-        tile = plains[randN(plains.length)]
+        tile = plains[randN(props.index, plains.length)]
         break;
 
       default:
@@ -129,6 +130,6 @@ export function Tile(props: TileProps) {
 
 export default Tile;
 
-function randN(n: number) {
-  return Math.floor(Math.random()*n)
+function randN(seed: number, n: number) {
+  return Math.floor((Math.sin(seed++) + 1)/2 * n)
 }

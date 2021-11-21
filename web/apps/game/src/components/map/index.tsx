@@ -38,6 +38,7 @@ export function MapComponent(props: MapProps) {
       <div className={styles.ref} style={{width: props.map.width*size, height: height*size }}>
         {grid.map((val: number, index: number) => (
             <Tile 
+              index={index}
               landscape={props.map.tiles[val]} 
               y={calcY(index)} x={calcX(index)}
               territory={props.territory[val]}

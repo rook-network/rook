@@ -11,11 +11,18 @@ import { defaultFee } from './types'
 import { Provider } from './root'
 import { State } from '../../codec/rook/game/game'
 import config from '../../config';
+import { runInThisContext } from 'vm';
 
 export const typeMsgCreate = "/rook.game.MsgCreate"
 export const typeMsgBuild = "/rook.game.MsgBuild"
 export const typeMsgMove = "/rook.game.MsgMove"
 export const typeMsgChangeParams = "/rook.game.MsgChamgeParams"
+
+export const eventGame = "game.game"
+export const eventNewBlock = "tendermint/event/NewBlock"
+
+export const attributeGameID = "game_id"
+export const attributeState = "state"
 
 export class GameProvider {
     private readonly address: string
@@ -67,8 +74,8 @@ export class GameProvider {
             config.wsEndpoint,
             (event: SocketWrapperMessageEvent) => {
                 const parsedEvent = JSON.parse(event.data)
-                console.log(parsedEvent)
-                if (!parsedEvent.result) return
+                if (!parsedEvent.result || !parsedEvent.result.data) return
+                if (parsedEvent.result.data.type !== eventNewBlock) return
                 this.parseGameEvent(parsedEvent.result.events)
             },
             (event: SocketWrapperErrorEvent) => { console.error(event) }
@@ -90,20 +97,51 @@ export class GameProvider {
             throw new Error("already subscribed to game events")
         }
 
+        this.onUpdate = onUpdate
+
         await this.socket.connected
 
-        // await this.socket.send(JSON.stringify({
-        //     jsonrpc: "2.0",
-        //     method: "subscribe",
-        //     id: "0",
-        //     params: {
-        //         query: `${eventRoom}.${attributeRoomID}='${id.toString()}'`
-            
-        // }))
+        await this.socket.send(JSON.stringify({
+            jsonrpc: "2.0",
+            method: "subscribe",
+            id: "0",
+            params: {
+                query: `${eventGame}.${attributeGameID}='${id.toString()}'`
+            }
+        }))
+        console.log("subscribed to game " + id.toString())
+        console.log(`${eventGame}.${attributeGameID}='${id.toString()}'`)
     }
 
+    async unsubscribeToGame() : Promise<void> {
+        await this.socket.send(JSON.stringify({
+            jsonrpc: "2.0",
+            method: "unsubscribe",
+            id: "0"
+        }))
+        this.onUpdate = undefined
+
+        this.socket.disconnect()
+    }   
+
     parseGameEvent(events: any) {
-        return
+        if (!this.onUpdate) {
+            console.error("received game update but no subscription set")
+            return
+        }
+
+        if (!events) {
+            console.error("no events")
+            return
+        }
+
+        if (!events["game.game.state"]) {
+            console.error("no event containing game state updates")
+        }
+
+        const state = JSON.parse(events["game.game.state"]) as State
+        console.log(state)
+        this.onUpdate(state)
     }
 
     getAddress(): string {
