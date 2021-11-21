@@ -10,3 +10,6 @@ import Buffer from 'buffer';
 (window as any).global = window;
 
 global.Buffer = global.Buffer || Buffer.Buffer;
+
+console.log("Hello World")
+// console.log(Transform)

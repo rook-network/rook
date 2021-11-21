@@ -4,10 +4,12 @@ import {
     Msg as IGameMsgClient, MsgCreate, MsgBuild, MsgMove, MsgChangeParams,
     MsgCreateResponse, MsgBuildResponse, MsgMoveResponse, MsgChangeParamsResponse
 } from '../../codec/rook/game/tx'
-import { Registry, DirectSecp256k1HdWallet } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing'
+import { SocketWrapper, SocketWrapperMessageEvent, SocketWrapperErrorEvent } from '@cosmjs/socket'
+import { Registry, DirectSecp256k1HdWallet } from '@cosmjs/proto-signing'
 import { SigningStargateClient, QueryClient, createProtobufRpcClient } from '@cosmjs/stargate'
 import { defaultFee } from './types'
 import { Provider } from './root'
+import { State } from '../../codec/rook/game/game'
 import config from '../../config';
 
 export const typeMsgCreate = "/rook.game.MsgCreate"
@@ -15,18 +17,13 @@ export const typeMsgBuild = "/rook.game.MsgBuild"
 export const typeMsgMove = "/rook.game.MsgMove"
 export const typeMsgChangeParams = "/rook.game.MsgChamgeParams"
 
-export function registerGameMsgs(registry: Registry) {
-    registry.register(typeMsgCreate, MsgCreate)
-    registry.register(typeMsgCreate, MsgCreate)
-    registry.register(typeMsgBuild, MsgBuild)
-    registry.register(typeMsgMove, MsgMove)
-    registry.register(typeMsgChangeParams, MsgChangeParams)
-}
-
 export class GameProvider {
     private readonly address: string
     public query: GameQueryClient
     public tx: IGameMsgClient
+
+    private socket: SocketWrapper
+    private onUpdate?: (state: State) => void
 
     public static async connect(provider: Provider) {
         const mainAddress = provider.getAddress()
@@ -40,7 +37,7 @@ export class GameProvider {
         }
 
         const registry = new Registry()
-        registerGameMsgs(registry)
+        GameProvider.register(registry)
 
         const client = await SigningStargateClient.connectWithSigner(
             config.rpcEndpoint,
@@ -52,7 +49,11 @@ export class GameProvider {
         const address = accounts[0].address
         console.log("connected with " + address)
 
-        await provider.authorizePlayerAccount(address)
+        const authorized = await provider.authz.checkPlayerAuthorized(address)
+
+        if (!authorized) {
+            await provider.authz.authorizePlayerAccount(address)
+        }
 
         return new GameProvider(provider.getQuerier(), client, address)
     }
@@ -62,6 +63,47 @@ export class GameProvider {
         this.query = new GameQueryClient(protoRpcClient)
         this.tx = new GameMsgClient(client, address)
         this.address = address
+        this.socket = new SocketWrapper(
+            config.wsEndpoint,
+            (event: SocketWrapperMessageEvent) => {
+                const parsedEvent = JSON.parse(event.data)
+                console.log(parsedEvent)
+                if (!parsedEvent.result) return
+                this.parseGameEvent(parsedEvent.result.events)
+            },
+            (event: SocketWrapperErrorEvent) => { console.error(event) }
+        )
+
+        this.socket.connect()
+    }
+
+    static register(registry: Registry) {
+        registry.register(typeMsgCreate, MsgCreate)
+        registry.register(typeMsgCreate, MsgCreate)
+        registry.register(typeMsgBuild, MsgBuild)
+        registry.register(typeMsgMove, MsgMove)
+        registry.register(typeMsgChangeParams, MsgChangeParams)
+    }
+
+    async subscribeToGame(id: Long, onUpdate: (state: State) => void): Promise<void> {
+        if (this.onUpdate) {
+            throw new Error("already subscribed to game events")
+        }
+
+        await this.socket.connected
+
+        // await this.socket.send(JSON.stringify({
+        //     jsonrpc: "2.0",
+        //     method: "subscribe",
+        //     id: "0",
+        //     params: {
+        //         query: `${eventRoom}.${attributeRoomID}='${id.toString()}'`
+            
+        // }))
+    }
+
+    parseGameEvent(events: any) {
+        return
     }
 
     getAddress(): string {

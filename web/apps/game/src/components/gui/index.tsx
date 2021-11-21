@@ -1,0 +1,1 @@
+export { ResourcesDisplay } from './resources'

@@ -3,9 +3,10 @@ import React from 'react'
 import MapComponent from '../map';
 import { Territory } from '../tile';
 import { GameProvider } from "../provider";
-import { GameSnapshot, Position, Faction, Settlement } from "../../codec/rook/game/game";
+import { GameSnapshot, Position, Faction, Settlement, State } from "../../codec/rook/game/game";
 import { Params } from "../../codec/rook/game/config";
 import { LoadingCard } from '../card/index';
+import { ResourcesDisplay } from '../gui'
 import Long from 'long';
 
 const allyColour = "#0E9594"
@@ -22,6 +23,7 @@ export interface GameState {
   params?: Params
   territory?: (Territory | null)[]
   error?: Error
+  faction?: Faction
   cursor: Position
 }
 
@@ -32,6 +34,7 @@ class GameComponent extends React.Component<GameProps, GameState> {
       game: undefined,
       params: undefined,
       error: undefined,
+      faction: undefined,
       cursor: {x: 0, y: 0}
     }
     this.load = this.load.bind(this)
@@ -59,6 +62,9 @@ class GameComponent extends React.Component<GameProps, GameState> {
         params: params,
       })
       this.calculateTerritory()
+      this.props.provider.subscribeToGame(gameID, (state: State) => {
+        console.log("received a new game update")
+      })
     } catch (err) {
       this.setState({ error: err as Error })
     }
@@ -73,7 +79,8 @@ class GameComponent extends React.Component<GameProps, GameState> {
       const isEnemy = isEnemyFaction(faction, this.props.address)
       if (!isEnemy) {
         this.setState({
-          cursor: initCursor(faction)
+          cursor: initCursor(faction),
+          faction: faction
         })
       }
       for (const populace of faction.population) {
@@ -93,7 +100,8 @@ class GameComponent extends React.Component<GameProps, GameState> {
   render() {
     if (this.state.game === undefined 
       || this.state.game.map === undefined
-      || this.state.territory === undefined) {
+      || this.state.territory === undefined
+      || this.state.faction === undefined) {
       return (
         <LoadingCard 
           message="Loading Game..."
@@ -102,7 +110,10 @@ class GameComponent extends React.Component<GameProps, GameState> {
     }
 
     return (
-      <MapComponent map={this.state.game.map} territory={this.state.territory} cursor={this.state.cursor}/>
+      <>
+        <ResourcesDisplay resources={this.state.faction.resources!}/>
+        <MapComponent map={this.state.game.map} territory={this.state.territory} cursor={this.state.cursor}/>
+      </>
     );
   }
 }

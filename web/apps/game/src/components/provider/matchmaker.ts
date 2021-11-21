@@ -6,7 +6,7 @@ import { SocketWrapper, SocketWrapperMessageEvent, SocketWrapperErrorEvent } fro
 import { Event } from '@cosmjs/tendermint-rpc'
 import { QueryClientImpl as MatchmakerQueryClient} from '../../codec/rook/matchmaker/query'
 import { SigningStargateClient, QueryClient, createProtobufRpcClient, isBroadcastTxSuccess, BroadcastTxSuccess } from "@cosmjs/stargate"
-import { Registry } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing'
+import { Registry } from '@cosmjs/proto-signing'
 import Long from 'long'
 import { defaultFee } from './types'
 import _m0 from "protobufjs/minimal";
@@ -26,15 +26,6 @@ export const attributeRoomID = "room_id"
 export const attributeGameID = "game_id"
 export const attributePlayerJoined = "player_joined"
 export const attributePlayerLeft = "player_left"
-
-export function registerMatchmakerMsgs(registry: Registry) {
-    registry.register(typeMsgFind, MsgFind)
-    registry.register(typeMsgHost, MsgHost)
-    registry.register(typeMsgJoin, MsgJoin)
-    registry.register(typeMsgLeave, MsgLeave)
-    registry.register(typeMsgAddMode, MsgAddMode)
-    registry.register(typeMsgRemoveMode, MsgRemoveMode)
-}
 
 export interface MatchmakerSocket {
     subscribeToRoom(id: number, onUpdate: (room: Room) => void): void,
@@ -73,6 +64,15 @@ export class MatchmakerProvider {
 
         // open websocket connection
         this.socket.connect()
+    }
+
+    static register(registry: Registry) {
+        registry.register(typeMsgFind, MsgFind)
+        registry.register(typeMsgHost, MsgHost)
+        registry.register(typeMsgJoin, MsgJoin)
+        registry.register(typeMsgLeave, MsgLeave)
+        registry.register(typeMsgAddMode, MsgAddMode)
+        registry.register(typeMsgRemoveMode, MsgRemoveMode)
     }
 
     async subscribeToRoom(id: Long, onUpdate: (room: Room) => void, onGameStart: (id: Long) => void): Promise<void> {

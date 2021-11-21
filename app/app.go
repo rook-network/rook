@@ -252,6 +252,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
+		authzkeeper.StoreKey,
 		claimtypes.StoreKey,
 		gametypes.StoreKey,
 		matchmakertypes.StoreKey,

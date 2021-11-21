@@ -1,10 +1,10 @@
 import React from 'react';
 import './app.module.less';
 import Matchmaker from '../components/matchmaker';
-import { Provider, GameProvider } from '../components/provider';
+import { Provider, GameProvider, keplrEnabled } from '../components/provider';
 import { IndexedMode, Room } from '../codec/rook/matchmaker/matchmaker'
 import { Account } from '../components/account'
-import { NotConnectedCard, ErrorCard } from '../components/card'
+import { NotConnectedCard, ErrorCard, LoadingCard } from '../components/card'
 import Game from '../components/game'
 import Long from 'long'
 
@@ -17,6 +17,7 @@ export interface AppState {
   address: string
   balance: number
   gameID: Long
+  loadingMsg?: string
   error?: Error
 }
 
@@ -31,6 +32,7 @@ class App extends React.Component<any, AppState> {
       address: "",
       balance: 0,
       gameID: new Long(0),
+      loadingMsg: "Connecting to Rook account..."
     }
     this.connectWallet = this.connectWallet.bind(this)
     this.setGame = this.setGame.bind(this)
@@ -39,20 +41,24 @@ class App extends React.Component<any, AppState> {
 
   async componentDidMount() {
     // NOTE: we need to add a timeout because else this fails if we do this straight away
-    setTimeout(async () => {
-      try {
-        await this.connectWallet()
-      } catch (err) {
-        console.log(err)
-      }
-    }, 100)
+    if (keplrEnabled()) {
+      setTimeout(async () => {
+        try {
+          await this.connectWallet()
+        } catch (err) {
+          console.log(err)
+        }
+      }, 100)
+    }
   }
 
   async connectWallet() {
     if (this.mainProvider) 
       return
     try {
+      this.setState({ loadingMsg: "Connecting to Rook account..."})
       this.mainProvider = await Provider.connect()
+      this.setState({ loadingMsg: "Setting up player account..."})
       this.playerProvider = await GameProvider.connect(this.mainProvider)
     } catch (err) {
       console.error(err)
@@ -85,13 +91,17 @@ class App extends React.Component<any, AppState> {
     if (!this.mainProvider || !this.playerProvider)
       return
 
+    this.setState({ loadingMsg: "Searching for existing games or rooms..."})
+
     try {
-      const resp = await this.playerProvider.query.GameByPlayer({player: this.playerProvider.getAddress()})
+      const resp = await this.playerProvider.query.GameByPlayer({player: this.state.address})
       this.setState({
-        gameID: resp.id
+        gameID: resp.id,
+        loadingMsg: undefined
       })
     } catch (err) {
       console.log("no current game")
+      this.setState({ loadingMsg: undefined })
     }
   }
 
@@ -102,16 +112,20 @@ class App extends React.Component<any, AppState> {
   }
 
   render() {
+    if (!keplrEnabled()) {
+      return <NotConnectedCard connectFn={this.connectWallet} /> 
+    }
+
     if (this.state.error) {
-      return (
-        <ErrorCard error={this.state.error.message} />
-      )
+      return <ErrorCard error={this.state.error.message} />
+    }
+
+    if (this.state.loadingMsg) {
+      return <LoadingCard message={this.state.loadingMsg} />
     }
     
     if (!this.mainProvider || !this.playerProvider) {
-      return (
-        <NotConnectedCard connectFn={this.connectWallet} /> 
-      )
+      return <LoadingCard message="Connecting to Rook account..."/>
     }
 
     const isConnected = this.mainProvider !== null

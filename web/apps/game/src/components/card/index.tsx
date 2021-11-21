@@ -1,3 +1,4 @@
+import React from 'react';
 import { Component } from 'react';
 import Loader from "react-loader-spinner"
 import { WarningOutlined } from '@ant-design/icons'
