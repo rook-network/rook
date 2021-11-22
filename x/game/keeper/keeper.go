@@ -84,11 +84,8 @@ func (k Keeper) UpdateGames(ctx sdk.Context) {
 		if !ok {
 			panic("param version for game is missing")
 		}
-		ctx.Logger().Error("updating game", "id", id)
 		game.Update(p)
 		memStore.Set(types.GameKey(id), k.cdc.MustMarshal(&game))
-
-		ctx.Logger().Error("Emitting game update event")
 		// emit the events for the updated state
 		ctx.EventManager().EmitEvent(types.NewGameUpdatedEvent(id, game.State))
 	}

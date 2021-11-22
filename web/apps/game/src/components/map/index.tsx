@@ -22,6 +22,9 @@ export function MapComponent(props: MapProps) {
     return Math.floor(index / props.map.width) * size
   }
 
+  
+
+
   console.log(props.cursor)
 
   const height = props.map.tiles.length/props.map.width
@@ -33,16 +36,23 @@ export function MapComponent(props: MapProps) {
   const grid = serialize(shift(createGrid(height, props.map.width), offset))
   console.log(grid)
 
+  const isSelected = (index: number): boolean => {
+    return (Math.floor(index % props.map.width) === centerX 
+      && Math.floor(index / props.map.width) === centerY)
+  }
+
+
   return (
     <div className={styles.map}>
       <div className={styles.ref} style={{width: props.map.width*size, height: height*size }}>
         {grid.map((val: number, index: number) => (
             <Tile 
-              index={index}
+              index={val}
               landscape={props.map.tiles[val]} 
               y={calcY(index)} x={calcX(index)}
               territory={props.territory[val]}
               size={size}
+              selected={isSelected(index)}
             />
         ))}
       </div>

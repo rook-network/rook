@@ -3,7 +3,7 @@ import React from 'react'
 import MapComponent from '../map';
 import { Territory } from '../tile';
 import { GameProvider } from "../provider";
-import { GameSnapshot, Position, Faction, Settlement, State } from "../../codec/rook/game/game";
+import { GameSnapshot, Position, Faction, Settlement, State, Direction } from "../../codec/rook/game/game";
 import { Params } from "../../codec/rook/game/config";
 import { LoadingCard } from '../card/index';
 import { ResourcesDisplay } from '../gui'
@@ -39,6 +39,8 @@ class GameComponent extends React.Component<GameProps, GameState> {
     }
     this.load = this.load.bind(this)
     this.calculateTerritory = this.calculateTerritory.bind(this)
+    this.handleKeyDown = this.handleKeyDown.bind(this)
+    document.addEventListener('keydown', this.handleKeyDown)
   }
 
   async componentDidMount() {
@@ -63,17 +65,69 @@ class GameComponent extends React.Component<GameProps, GameState> {
       })
       console.log(game.state)
       this.calculateTerritory()
-      await this.props.provider.subscribeToGame(gameID, (state: State) => {
-        console.log("received a new game update")
-        console.log(state)
-        const game = this.state.game
-        if (!game) return
-        game.state = state
-        this.setState({ game: game})
-        this.calculateTerritory()
-      })
+      this.updateUsersFaction()
+      this.setState({ cursor: initCursor(this.state.faction)})
+      await this.setupSocket(gameID)
     } catch (err) {
       this.setState({ error: err as Error })
+    }
+  }
+
+  async setupSocket(gameID: Long): Promise<void> {
+    await this.props.provider.subscribeToGame(gameID, (state: State) => {
+      console.log("received a new game update")
+      console.log(state)
+      const game = this.state.game
+      if (!game) return
+      game.state = state
+      this.setState({ game: game})
+      this.calculateTerritory()
+      this.updateUsersFaction()
+    })
+  }
+
+  handleKeyDown(event: Event): void {
+    switch((event as KeyboardEvent).key) {
+      case "ArrowUp":
+        this.state.cursor.y--
+        this.setState({ cursor: this.state.cursor })
+        break;
+      case "ArrowDown":
+        this.state.cursor.y++
+        this.setState({ cursor: this.state.cursor })
+        break;
+      case "ArrowLeft":
+        this.state.cursor.x--
+        this.setState({ cursor: this.state.cursor })
+        break;
+      case "ArrowRight":
+        this.state.cursor.x++
+        this.setState({ cursor: this.state.cursor })
+        break
+      case "w":
+        this.move(Direction.UP)
+        break;
+      case "a":
+        this.move(Direction.LEFT)
+        break;
+      case "s":
+        this.move(Direction.DOWN)
+        break
+      case "d":
+        this.move(Direction.RIGHT)
+        break
+    }
+    return
+  }
+
+  updateUsersFaction() {
+    if (!this.state.game) return
+    for (const faction of this.state.game.state!.factions) {
+      if (isOurFaction(faction, this.props.address)) {
+        this.setState({
+          faction: faction
+        })
+      }
     }
   }
 
@@ -83,25 +137,48 @@ class GameComponent extends React.Component<GameProps, GameState> {
 
     const territory: (Territory | null)[] = new Array(this.state.game.map.tiles.length).fill(null)
     for (const faction of this.state.game.state!.factions) {
-      const isEnemy = isEnemyFaction(faction, this.props.address)
-      if (!isEnemy) {
-        this.setState({
-          cursor: initCursor(faction),
-          faction: faction
-        })
-      }
+      const isUser = isOurFaction(faction, this.props.address)
       for (const populace of faction.population) {
         const pos = positionToIndex(populace.position!, this.state.game.map.width)
         console.log(pos)
         territory[pos] = {
           populace: populace,
-          colour: isEnemy ? enemyColour : allyColour,
+          colour: isUser ? allyColour : enemyColour,
           controllable: true,
         }
       }
     }
     console.log(territory)
     this.setState({ territory: territory })
+  }
+
+  async move(direction: Direction, population?: number): Promise<void> {
+    if (!this.state.faction) return
+    const index = this.findPopulaceIndex(this.state.cursor)
+    if (index === null) return
+    let totalPopulation = this.state.faction.population[index].amount
+    population = population === undefined || population > totalPopulation ? totalPopulation:population;
+
+    const resp = await this.props.provider.tx.Move({
+      creator: this.props.provider.getAddress(),
+      gameId: this.props.gameID,
+      populace: index,
+      direction: direction,
+      population: population
+    })
+    console.log(resp);
+  }
+
+  findPopulaceIndex(position: Position): number | null {
+    if (!this.state.game || !this.state.game.map || !this.state.faction) return null
+    for (let i = 0; i < this.state.faction.population.length; i++) {
+      const populace = this.state.faction.population[i]
+      if (!populace.position) throw new Error("no position for population")
+      if (populace.position.x === position.x && populace.position.y === position.y) {
+        return i
+      }
+    }
+    return null
   }
 
   render() {
@@ -129,22 +206,23 @@ function positionToIndex(pos: Position, width: number): number {
   return pos.y * width + pos.x
 }
 
-function isEnemyFaction(faction: Faction, player: string): boolean {
+function isOurFaction(faction: Faction, player: string): boolean {
   for (const p of faction.players) {
     if (p === player) {
-      return false
+      return true
     }
   }
-  return true
+  return false
 }
 
-function initCursor(faction: Faction): Position {
+function initCursor(faction?: Faction): Position {
+  if (!faction) { return {x: 0, y: 0 }}
   for (const p of faction.population) {
     if (p.settlement === Settlement.CAPITAL) {
       return p.position!
     }
   }
-  throw new Error("not capital found")
+  return { x:0, y:0 }
 }
 
 export default GameComponent;

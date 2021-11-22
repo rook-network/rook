@@ -140,6 +140,36 @@ export class GameProvider {
         }
 
         const state = JSON.parse(events["game.game.state"]) as State
+        // need to sanitize the output because any value with a zero is omitted
+        if (!state.gaia) state.gaia = []
+        for (const faction of state.factions) {
+            if (!faction.resources) {
+                faction.resources = {
+                    food: 0,
+                    stone: 0,
+                    wood: 0,
+                    population: 0,
+                    tech: 0,
+                }
+            }
+            if (!faction.resources.wood) {
+                faction.resources.wood = 0
+            }
+            for (const populace of faction.population) {
+                if (!populace.position) {
+                    populace.position = { x: 0, y: 0 }
+                    continue
+                }
+
+                if (!populace.position.x) {
+                    populace.position.x = 0
+                }
+                if (!populace.position.y) {
+                    populace.position.y = 0
+                }
+            }
+        }
+
         console.log(state)
         this.onUpdate(state)
     }
