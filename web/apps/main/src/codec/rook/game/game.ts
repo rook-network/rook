@@ -318,28 +318,20 @@ export const Game = {
 
   fromJSON(object: any): Game {
     const message = { ...baseGame } as Game;
-    message.players = [];
+    message.players = (object.players ?? []).map((e: any) => String(e));
+    message.map =
+      object.map !== undefined && object.map !== null
+        ? Map.fromJSON(object.map)
+        : undefined;
+    message.state =
+      object.state !== undefined && object.state !== null
+        ? State.fromJSON(object.state)
+        : undefined;
+    message.paramVersion =
+      object.paramVersion !== undefined && object.paramVersion !== null
+        ? Number(object.paramVersion)
+        : 0;
     message.territory = {};
-    if (object.players !== undefined && object.players !== null) {
-      for (const e of object.players) {
-        message.players.push(String(e));
-      }
-    }
-    if (object.map !== undefined && object.map !== null) {
-      message.map = Map.fromJSON(object.map);
-    } else {
-      message.map = undefined;
-    }
-    if (object.state !== undefined && object.state !== null) {
-      message.state = State.fromJSON(object.state);
-    } else {
-      message.state = undefined;
-    }
-    if (object.paramVersion !== undefined && object.paramVersion !== null) {
-      message.paramVersion = Number(object.paramVersion);
-    } else {
-      message.paramVersion = 0;
-    }
     if (object.territory !== undefined && object.territory !== null) {
       Object.entries(object.territory).forEach(([key, value]) => {
         message.territory[Number(key)] = Territory.fromJSON(value);
@@ -372,28 +364,17 @@ export const Game = {
 
   fromPartial(object: DeepPartial<Game>): Game {
     const message = { ...baseGame } as Game;
-    message.players = [];
+    message.players = (object.players ?? []).map((e) => e);
+    message.map =
+      object.map !== undefined && object.map !== null
+        ? Map.fromPartial(object.map)
+        : undefined;
+    message.state =
+      object.state !== undefined && object.state !== null
+        ? State.fromPartial(object.state)
+        : undefined;
+    message.paramVersion = object.paramVersion ?? 0;
     message.territory = {};
-    if (object.players !== undefined && object.players !== null) {
-      for (const e of object.players) {
-        message.players.push(e);
-      }
-    }
-    if (object.map !== undefined && object.map !== null) {
-      message.map = Map.fromPartial(object.map);
-    } else {
-      message.map = undefined;
-    }
-    if (object.state !== undefined && object.state !== null) {
-      message.state = State.fromPartial(object.state);
-    } else {
-      message.state = undefined;
-    }
-    if (object.paramVersion !== undefined && object.paramVersion !== null) {
-      message.paramVersion = object.paramVersion;
-    } else {
-      message.paramVersion = 0;
-    }
     if (object.territory !== undefined && object.territory !== null) {
       Object.entries(object.territory).forEach(([key, value]) => {
         if (value !== undefined) {
@@ -444,16 +425,12 @@ export const Game_TerritoryEntry = {
 
   fromJSON(object: any): Game_TerritoryEntry {
     const message = { ...baseGame_TerritoryEntry } as Game_TerritoryEntry;
-    if (object.key !== undefined && object.key !== null) {
-      message.key = Number(object.key);
-    } else {
-      message.key = 0;
-    }
-    if (object.value !== undefined && object.value !== null) {
-      message.value = Territory.fromJSON(object.value);
-    } else {
-      message.value = undefined;
-    }
+    message.key =
+      object.key !== undefined && object.key !== null ? Number(object.key) : 0;
+    message.value =
+      object.value !== undefined && object.value !== null
+        ? Territory.fromJSON(object.value)
+        : undefined;
     return message;
   },
 
@@ -467,16 +444,11 @@ export const Game_TerritoryEntry = {
 
   fromPartial(object: DeepPartial<Game_TerritoryEntry>): Game_TerritoryEntry {
     const message = { ...baseGame_TerritoryEntry } as Game_TerritoryEntry;
-    if (object.key !== undefined && object.key !== null) {
-      message.key = object.key;
-    } else {
-      message.key = 0;
-    }
-    if (object.value !== undefined && object.value !== null) {
-      message.value = Territory.fromPartial(object.value);
-    } else {
-      message.value = undefined;
-    }
+    message.key = object.key ?? 0;
+    message.value =
+      object.value !== undefined && object.value !== null
+        ? Territory.fromPartial(object.value)
+        : undefined;
     return message;
   },
 };
@@ -526,21 +498,18 @@ export const GameSnapshot = {
 
   fromJSON(object: any): GameSnapshot {
     const message = { ...baseGameSnapshot } as GameSnapshot;
-    if (object.map !== undefined && object.map !== null) {
-      message.map = Map.fromJSON(object.map);
-    } else {
-      message.map = undefined;
-    }
-    if (object.state !== undefined && object.state !== null) {
-      message.state = State.fromJSON(object.state);
-    } else {
-      message.state = undefined;
-    }
-    if (object.paramVersion !== undefined && object.paramVersion !== null) {
-      message.paramVersion = Number(object.paramVersion);
-    } else {
-      message.paramVersion = 0;
-    }
+    message.map =
+      object.map !== undefined && object.map !== null
+        ? Map.fromJSON(object.map)
+        : undefined;
+    message.state =
+      object.state !== undefined && object.state !== null
+        ? State.fromJSON(object.state)
+        : undefined;
+    message.paramVersion =
+      object.paramVersion !== undefined && object.paramVersion !== null
+        ? Number(object.paramVersion)
+        : 0;
     return message;
   },
 
@@ -557,21 +526,15 @@ export const GameSnapshot = {
 
   fromPartial(object: DeepPartial<GameSnapshot>): GameSnapshot {
     const message = { ...baseGameSnapshot } as GameSnapshot;
-    if (object.map !== undefined && object.map !== null) {
-      message.map = Map.fromPartial(object.map);
-    } else {
-      message.map = undefined;
-    }
-    if (object.state !== undefined && object.state !== null) {
-      message.state = State.fromPartial(object.state);
-    } else {
-      message.state = undefined;
-    }
-    if (object.paramVersion !== undefined && object.paramVersion !== null) {
-      message.paramVersion = object.paramVersion;
-    } else {
-      message.paramVersion = 0;
-    }
+    message.map =
+      object.map !== undefined && object.map !== null
+        ? Map.fromPartial(object.map)
+        : undefined;
+    message.state =
+      object.state !== undefined && object.state !== null
+        ? State.fromPartial(object.state)
+        : undefined;
+    message.paramVersion = object.paramVersion ?? 0;
     return message;
   },
 };
@@ -622,22 +585,15 @@ export const Overview = {
 
   fromJSON(object: any): Overview {
     const message = { ...baseOverview } as Overview;
-    message.players = [];
-    if (object.players !== undefined && object.players !== null) {
-      for (const e of object.players) {
-        message.players.push(String(e));
-      }
-    }
-    if (object.map !== undefined && object.map !== null) {
-      message.map = Map.fromJSON(object.map);
-    } else {
-      message.map = undefined;
-    }
-    if (object.paramVersion !== undefined && object.paramVersion !== null) {
-      message.paramVersion = Number(object.paramVersion);
-    } else {
-      message.paramVersion = 0;
-    }
+    message.players = (object.players ?? []).map((e: any) => String(e));
+    message.map =
+      object.map !== undefined && object.map !== null
+        ? Map.fromJSON(object.map)
+        : undefined;
+    message.paramVersion =
+      object.paramVersion !== undefined && object.paramVersion !== null
+        ? Number(object.paramVersion)
+        : 0;
     return message;
   },
 
@@ -657,22 +613,12 @@ export const Overview = {
 
   fromPartial(object: DeepPartial<Overview>): Overview {
     const message = { ...baseOverview } as Overview;
-    message.players = [];
-    if (object.players !== undefined && object.players !== null) {
-      for (const e of object.players) {
-        message.players.push(e);
-      }
-    }
-    if (object.map !== undefined && object.map !== null) {
-      message.map = Map.fromPartial(object.map);
-    } else {
-      message.map = undefined;
-    }
-    if (object.paramVersion !== undefined && object.paramVersion !== null) {
-      message.paramVersion = object.paramVersion;
-    } else {
-      message.paramVersion = 0;
-    }
+    message.players = (object.players ?? []).map((e) => e);
+    message.map =
+      object.map !== undefined && object.map !== null
+        ? Map.fromPartial(object.map)
+        : undefined;
+    message.paramVersion = object.paramVersion ?? 0;
     return message;
   },
 };
@@ -721,23 +667,14 @@ export const State = {
 
   fromJSON(object: any): State {
     const message = { ...baseState } as State;
-    message.factions = [];
-    message.gaia = [];
-    if (object.factions !== undefined && object.factions !== null) {
-      for (const e of object.factions) {
-        message.factions.push(Faction.fromJSON(e));
-      }
-    }
-    if (object.gaia !== undefined && object.gaia !== null) {
-      for (const e of object.gaia) {
-        message.gaia.push(Populace.fromJSON(e));
-      }
-    }
-    if (object.step !== undefined && object.step !== null) {
-      message.step = Long.fromString(object.step);
-    } else {
-      message.step = Long.UZERO;
-    }
+    message.factions = (object.factions ?? []).map((e: any) =>
+      Faction.fromJSON(e)
+    );
+    message.gaia = (object.gaia ?? []).map((e: any) => Populace.fromJSON(e));
+    message.step =
+      object.step !== undefined && object.step !== null
+        ? Long.fromString(object.step)
+        : Long.UZERO;
     return message;
   },
 
@@ -762,18 +699,10 @@ export const State = {
 
   fromPartial(object: DeepPartial<State>): State {
     const message = { ...baseState } as State;
-    message.factions = [];
-    message.gaia = [];
-    if (object.factions !== undefined && object.factions !== null) {
-      for (const e of object.factions) {
-        message.factions.push(Faction.fromPartial(e));
-      }
-    }
-    if (object.gaia !== undefined && object.gaia !== null) {
-      for (const e of object.gaia) {
-        message.gaia.push(Populace.fromPartial(e));
-      }
-    }
+    message.factions = (object.factions ?? []).map((e) =>
+      Faction.fromPartial(e)
+    );
+    message.gaia = (object.gaia ?? []).map((e) => Populace.fromPartial(e));
     if (object.step !== undefined && object.step !== null) {
       message.step = object.step as Long;
     } else {
@@ -829,17 +758,11 @@ export const Map = {
 
   fromJSON(object: any): Map {
     const message = { ...baseMap } as Map;
-    message.tiles = [];
-    if (object.tiles !== undefined && object.tiles !== null) {
-      for (const e of object.tiles) {
-        message.tiles.push(landscapeFromJSON(e));
-      }
-    }
-    if (object.width !== undefined && object.width !== null) {
-      message.width = Number(object.width);
-    } else {
-      message.width = 0;
-    }
+    message.tiles = (object.tiles ?? []).map((e: any) => landscapeFromJSON(e));
+    message.width =
+      object.width !== undefined && object.width !== null
+        ? Number(object.width)
+        : 0;
     return message;
   },
 
@@ -856,17 +779,8 @@ export const Map = {
 
   fromPartial(object: DeepPartial<Map>): Map {
     const message = { ...baseMap } as Map;
-    message.tiles = [];
-    if (object.tiles !== undefined && object.tiles !== null) {
-      for (const e of object.tiles) {
-        message.tiles.push(e);
-      }
-    }
-    if (object.width !== undefined && object.width !== null) {
-      message.width = object.width;
-    } else {
-      message.width = 0;
-    }
+    message.tiles = (object.tiles ?? []).map((e) => e);
+    message.width = object.width ?? 0;
     return message;
   },
 };
@@ -918,23 +832,14 @@ export const Faction = {
 
   fromJSON(object: any): Faction {
     const message = { ...baseFaction } as Faction;
-    message.players = [];
-    message.population = [];
-    if (object.players !== undefined && object.players !== null) {
-      for (const e of object.players) {
-        message.players.push(String(e));
-      }
-    }
-    if (object.resources !== undefined && object.resources !== null) {
-      message.resources = ResourceSet.fromJSON(object.resources);
-    } else {
-      message.resources = undefined;
-    }
-    if (object.population !== undefined && object.population !== null) {
-      for (const e of object.population) {
-        message.population.push(Populace.fromJSON(e));
-      }
-    }
+    message.players = (object.players ?? []).map((e: any) => String(e));
+    message.resources =
+      object.resources !== undefined && object.resources !== null
+        ? ResourceSet.fromJSON(object.resources)
+        : undefined;
+    message.population = (object.population ?? []).map((e: any) =>
+      Populace.fromJSON(e)
+    );
     return message;
   },
 
@@ -961,23 +866,14 @@ export const Faction = {
 
   fromPartial(object: DeepPartial<Faction>): Faction {
     const message = { ...baseFaction } as Faction;
-    message.players = [];
-    message.population = [];
-    if (object.players !== undefined && object.players !== null) {
-      for (const e of object.players) {
-        message.players.push(e);
-      }
-    }
-    if (object.resources !== undefined && object.resources !== null) {
-      message.resources = ResourceSet.fromPartial(object.resources);
-    } else {
-      message.resources = undefined;
-    }
-    if (object.population !== undefined && object.population !== null) {
-      for (const e of object.population) {
-        message.population.push(Populace.fromPartial(e));
-      }
-    }
+    message.players = (object.players ?? []).map((e) => e);
+    message.resources =
+      object.resources !== undefined && object.resources !== null
+        ? ResourceSet.fromPartial(object.resources)
+        : undefined;
+    message.population = (object.population ?? []).map((e) =>
+      Populace.fromPartial(e)
+    );
     return message;
   },
 };
@@ -1033,26 +929,22 @@ export const Populace = {
 
   fromJSON(object: any): Populace {
     const message = { ...basePopulace } as Populace;
-    if (object.amount !== undefined && object.amount !== null) {
-      message.amount = Number(object.amount);
-    } else {
-      message.amount = 0;
-    }
-    if (object.position !== undefined && object.position !== null) {
-      message.position = Position.fromJSON(object.position);
-    } else {
-      message.position = undefined;
-    }
-    if (object.settlement !== undefined && object.settlement !== null) {
-      message.settlement = settlementFromJSON(object.settlement);
-    } else {
-      message.settlement = 0;
-    }
-    if (object.used !== undefined && object.used !== null) {
-      message.used = Boolean(object.used);
-    } else {
-      message.used = false;
-    }
+    message.amount =
+      object.amount !== undefined && object.amount !== null
+        ? Number(object.amount)
+        : 0;
+    message.position =
+      object.position !== undefined && object.position !== null
+        ? Position.fromJSON(object.position)
+        : undefined;
+    message.settlement =
+      object.settlement !== undefined && object.settlement !== null
+        ? settlementFromJSON(object.settlement)
+        : 0;
+    message.used =
+      object.used !== undefined && object.used !== null
+        ? Boolean(object.used)
+        : false;
     return message;
   },
 
@@ -1071,26 +963,13 @@ export const Populace = {
 
   fromPartial(object: DeepPartial<Populace>): Populace {
     const message = { ...basePopulace } as Populace;
-    if (object.amount !== undefined && object.amount !== null) {
-      message.amount = object.amount;
-    } else {
-      message.amount = 0;
-    }
-    if (object.position !== undefined && object.position !== null) {
-      message.position = Position.fromPartial(object.position);
-    } else {
-      message.position = undefined;
-    }
-    if (object.settlement !== undefined && object.settlement !== null) {
-      message.settlement = object.settlement;
-    } else {
-      message.settlement = 0;
-    }
-    if (object.used !== undefined && object.used !== null) {
-      message.used = object.used;
-    } else {
-      message.used = false;
-    }
+    message.amount = object.amount ?? 0;
+    message.position =
+      object.position !== undefined && object.position !== null
+        ? Position.fromPartial(object.position)
+        : undefined;
+    message.settlement = object.settlement ?? 0;
+    message.used = object.used ?? false;
     return message;
   },
 };
@@ -1134,16 +1013,10 @@ export const Position = {
 
   fromJSON(object: any): Position {
     const message = { ...basePosition } as Position;
-    if (object.x !== undefined && object.x !== null) {
-      message.x = Number(object.x);
-    } else {
-      message.x = 0;
-    }
-    if (object.y !== undefined && object.y !== null) {
-      message.y = Number(object.y);
-    } else {
-      message.y = 0;
-    }
+    message.x =
+      object.x !== undefined && object.x !== null ? Number(object.x) : 0;
+    message.y =
+      object.y !== undefined && object.y !== null ? Number(object.y) : 0;
     return message;
   },
 
@@ -1156,16 +1029,8 @@ export const Position = {
 
   fromPartial(object: DeepPartial<Position>): Position {
     const message = { ...basePosition } as Position;
-    if (object.x !== undefined && object.x !== null) {
-      message.x = object.x;
-    } else {
-      message.x = 0;
-    }
-    if (object.y !== undefined && object.y !== null) {
-      message.y = object.y;
-    } else {
-      message.y = 0;
-    }
+    message.x = object.x ?? 0;
+    message.y = object.y ?? 0;
     return message;
   },
 };
@@ -1233,31 +1098,26 @@ export const ResourceSet = {
 
   fromJSON(object: any): ResourceSet {
     const message = { ...baseResourceSet } as ResourceSet;
-    if (object.food !== undefined && object.food !== null) {
-      message.food = Number(object.food);
-    } else {
-      message.food = 0;
-    }
-    if (object.stone !== undefined && object.stone !== null) {
-      message.stone = Number(object.stone);
-    } else {
-      message.stone = 0;
-    }
-    if (object.wood !== undefined && object.wood !== null) {
-      message.wood = Number(object.wood);
-    } else {
-      message.wood = 0;
-    }
-    if (object.population !== undefined && object.population !== null) {
-      message.population = Number(object.population);
-    } else {
-      message.population = 0;
-    }
-    if (object.tech !== undefined && object.tech !== null) {
-      message.tech = Number(object.tech);
-    } else {
-      message.tech = 0;
-    }
+    message.food =
+      object.food !== undefined && object.food !== null
+        ? Number(object.food)
+        : 0;
+    message.stone =
+      object.stone !== undefined && object.stone !== null
+        ? Number(object.stone)
+        : 0;
+    message.wood =
+      object.wood !== undefined && object.wood !== null
+        ? Number(object.wood)
+        : 0;
+    message.population =
+      object.population !== undefined && object.population !== null
+        ? Number(object.population)
+        : 0;
+    message.tech =
+      object.tech !== undefined && object.tech !== null
+        ? Number(object.tech)
+        : 0;
     return message;
   },
 
@@ -1273,31 +1133,11 @@ export const ResourceSet = {
 
   fromPartial(object: DeepPartial<ResourceSet>): ResourceSet {
     const message = { ...baseResourceSet } as ResourceSet;
-    if (object.food !== undefined && object.food !== null) {
-      message.food = object.food;
-    } else {
-      message.food = 0;
-    }
-    if (object.stone !== undefined && object.stone !== null) {
-      message.stone = object.stone;
-    } else {
-      message.stone = 0;
-    }
-    if (object.wood !== undefined && object.wood !== null) {
-      message.wood = object.wood;
-    } else {
-      message.wood = 0;
-    }
-    if (object.population !== undefined && object.population !== null) {
-      message.population = object.population;
-    } else {
-      message.population = 0;
-    }
-    if (object.tech !== undefined && object.tech !== null) {
-      message.tech = object.tech;
-    } else {
-      message.tech = 0;
-    }
+    message.food = object.food ?? 0;
+    message.stone = object.stone ?? 0;
+    message.wood = object.wood ?? 0;
+    message.population = object.population ?? 0;
+    message.tech = object.tech ?? 0;
     return message;
   },
 };
@@ -1341,16 +1181,14 @@ export const Territory = {
 
   fromJSON(object: any): Territory {
     const message = { ...baseTerritory } as Territory;
-    if (object.faction !== undefined && object.faction !== null) {
-      message.faction = Number(object.faction);
-    } else {
-      message.faction = 0;
-    }
-    if (object.populace !== undefined && object.populace !== null) {
-      message.populace = Number(object.populace);
-    } else {
-      message.populace = 0;
-    }
+    message.faction =
+      object.faction !== undefined && object.faction !== null
+        ? Number(object.faction)
+        : 0;
+    message.populace =
+      object.populace !== undefined && object.populace !== null
+        ? Number(object.populace)
+        : 0;
     return message;
   },
 
@@ -1363,16 +1201,8 @@ export const Territory = {
 
   fromPartial(object: DeepPartial<Territory>): Territory {
     const message = { ...baseTerritory } as Territory;
-    if (object.faction !== undefined && object.faction !== null) {
-      message.faction = object.faction;
-    } else {
-      message.faction = 0;
-    }
-    if (object.populace !== undefined && object.populace !== null) {
-      message.populace = object.populace;
-    } else {
-      message.populace = 0;
-    }
+    message.faction = object.faction ?? 0;
+    message.populace = object.populace ?? 0;
     return message;
   },
 };

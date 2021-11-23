@@ -155,12 +155,9 @@ export const SignatureDescriptors = {
 
   fromJSON(object: any): SignatureDescriptors {
     const message = { ...baseSignatureDescriptors } as SignatureDescriptors;
-    message.signatures = [];
-    if (object.signatures !== undefined && object.signatures !== null) {
-      for (const e of object.signatures) {
-        message.signatures.push(SignatureDescriptor.fromJSON(e));
-      }
-    }
+    message.signatures = (object.signatures ?? []).map((e: any) =>
+      SignatureDescriptor.fromJSON(e)
+    );
     return message;
   },
 
@@ -178,12 +175,9 @@ export const SignatureDescriptors = {
 
   fromPartial(object: DeepPartial<SignatureDescriptors>): SignatureDescriptors {
     const message = { ...baseSignatureDescriptors } as SignatureDescriptors;
-    message.signatures = [];
-    if (object.signatures !== undefined && object.signatures !== null) {
-      for (const e of object.signatures) {
-        message.signatures.push(SignatureDescriptor.fromPartial(e));
-      }
-    }
+    message.signatures = (object.signatures ?? []).map((e) =>
+      SignatureDescriptor.fromPartial(e)
+    );
     return message;
   },
 };
@@ -239,21 +233,18 @@ export const SignatureDescriptor = {
 
   fromJSON(object: any): SignatureDescriptor {
     const message = { ...baseSignatureDescriptor } as SignatureDescriptor;
-    if (object.publicKey !== undefined && object.publicKey !== null) {
-      message.publicKey = Any.fromJSON(object.publicKey);
-    } else {
-      message.publicKey = undefined;
-    }
-    if (object.data !== undefined && object.data !== null) {
-      message.data = SignatureDescriptor_Data.fromJSON(object.data);
-    } else {
-      message.data = undefined;
-    }
-    if (object.sequence !== undefined && object.sequence !== null) {
-      message.sequence = Long.fromString(object.sequence);
-    } else {
-      message.sequence = Long.UZERO;
-    }
+    message.publicKey =
+      object.publicKey !== undefined && object.publicKey !== null
+        ? Any.fromJSON(object.publicKey)
+        : undefined;
+    message.data =
+      object.data !== undefined && object.data !== null
+        ? SignatureDescriptor_Data.fromJSON(object.data)
+        : undefined;
+    message.sequence =
+      object.sequence !== undefined && object.sequence !== null
+        ? Long.fromString(object.sequence)
+        : Long.UZERO;
     return message;
   },
 
@@ -274,16 +265,14 @@ export const SignatureDescriptor = {
 
   fromPartial(object: DeepPartial<SignatureDescriptor>): SignatureDescriptor {
     const message = { ...baseSignatureDescriptor } as SignatureDescriptor;
-    if (object.publicKey !== undefined && object.publicKey !== null) {
-      message.publicKey = Any.fromPartial(object.publicKey);
-    } else {
-      message.publicKey = undefined;
-    }
-    if (object.data !== undefined && object.data !== null) {
-      message.data = SignatureDescriptor_Data.fromPartial(object.data);
-    } else {
-      message.data = undefined;
-    }
+    message.publicKey =
+      object.publicKey !== undefined && object.publicKey !== null
+        ? Any.fromPartial(object.publicKey)
+        : undefined;
+    message.data =
+      object.data !== undefined && object.data !== null
+        ? SignatureDescriptor_Data.fromPartial(object.data)
+        : undefined;
     if (object.sequence !== undefined && object.sequence !== null) {
       message.sequence = object.sequence as Long;
     } else {
@@ -351,16 +340,14 @@ export const SignatureDescriptor_Data = {
     const message = {
       ...baseSignatureDescriptor_Data,
     } as SignatureDescriptor_Data;
-    if (object.single !== undefined && object.single !== null) {
-      message.single = SignatureDescriptor_Data_Single.fromJSON(object.single);
-    } else {
-      message.single = undefined;
-    }
-    if (object.multi !== undefined && object.multi !== null) {
-      message.multi = SignatureDescriptor_Data_Multi.fromJSON(object.multi);
-    } else {
-      message.multi = undefined;
-    }
+    message.single =
+      object.single !== undefined && object.single !== null
+        ? SignatureDescriptor_Data_Single.fromJSON(object.single)
+        : undefined;
+    message.multi =
+      object.multi !== undefined && object.multi !== null
+        ? SignatureDescriptor_Data_Multi.fromJSON(object.multi)
+        : undefined;
     return message;
   },
 
@@ -383,18 +370,14 @@ export const SignatureDescriptor_Data = {
     const message = {
       ...baseSignatureDescriptor_Data,
     } as SignatureDescriptor_Data;
-    if (object.single !== undefined && object.single !== null) {
-      message.single = SignatureDescriptor_Data_Single.fromPartial(
-        object.single
-      );
-    } else {
-      message.single = undefined;
-    }
-    if (object.multi !== undefined && object.multi !== null) {
-      message.multi = SignatureDescriptor_Data_Multi.fromPartial(object.multi);
-    } else {
-      message.multi = undefined;
-    }
+    message.single =
+      object.single !== undefined && object.single !== null
+        ? SignatureDescriptor_Data_Single.fromPartial(object.single)
+        : undefined;
+    message.multi =
+      object.multi !== undefined && object.multi !== null
+        ? SignatureDescriptor_Data_Multi.fromPartial(object.multi)
+        : undefined;
     return message;
   },
 };
@@ -446,15 +429,14 @@ export const SignatureDescriptor_Data_Single = {
     const message = {
       ...baseSignatureDescriptor_Data_Single,
     } as SignatureDescriptor_Data_Single;
-    message.signature = new Uint8Array();
-    if (object.mode !== undefined && object.mode !== null) {
-      message.mode = signModeFromJSON(object.mode);
-    } else {
-      message.mode = 0;
-    }
-    if (object.signature !== undefined && object.signature !== null) {
-      message.signature = bytesFromBase64(object.signature);
-    }
+    message.mode =
+      object.mode !== undefined && object.mode !== null
+        ? signModeFromJSON(object.mode)
+        : 0;
+    message.signature =
+      object.signature !== undefined && object.signature !== null
+        ? bytesFromBase64(object.signature)
+        : new Uint8Array();
     return message;
   },
 
@@ -474,16 +456,8 @@ export const SignatureDescriptor_Data_Single = {
     const message = {
       ...baseSignatureDescriptor_Data_Single,
     } as SignatureDescriptor_Data_Single;
-    if (object.mode !== undefined && object.mode !== null) {
-      message.mode = object.mode;
-    } else {
-      message.mode = 0;
-    }
-    if (object.signature !== undefined && object.signature !== null) {
-      message.signature = object.signature;
-    } else {
-      message.signature = new Uint8Array();
-    }
+    message.mode = object.mode ?? 0;
+    message.signature = object.signature ?? new Uint8Array();
     return message;
   },
 };
@@ -540,17 +514,13 @@ export const SignatureDescriptor_Data_Multi = {
     const message = {
       ...baseSignatureDescriptor_Data_Multi,
     } as SignatureDescriptor_Data_Multi;
-    message.signatures = [];
-    if (object.bitarray !== undefined && object.bitarray !== null) {
-      message.bitarray = CompactBitArray.fromJSON(object.bitarray);
-    } else {
-      message.bitarray = undefined;
-    }
-    if (object.signatures !== undefined && object.signatures !== null) {
-      for (const e of object.signatures) {
-        message.signatures.push(SignatureDescriptor_Data.fromJSON(e));
-      }
-    }
+    message.bitarray =
+      object.bitarray !== undefined && object.bitarray !== null
+        ? CompactBitArray.fromJSON(object.bitarray)
+        : undefined;
+    message.signatures = (object.signatures ?? []).map((e: any) =>
+      SignatureDescriptor_Data.fromJSON(e)
+    );
     return message;
   },
 
@@ -576,17 +546,13 @@ export const SignatureDescriptor_Data_Multi = {
     const message = {
       ...baseSignatureDescriptor_Data_Multi,
     } as SignatureDescriptor_Data_Multi;
-    message.signatures = [];
-    if (object.bitarray !== undefined && object.bitarray !== null) {
-      message.bitarray = CompactBitArray.fromPartial(object.bitarray);
-    } else {
-      message.bitarray = undefined;
-    }
-    if (object.signatures !== undefined && object.signatures !== null) {
-      for (const e of object.signatures) {
-        message.signatures.push(SignatureDescriptor_Data.fromPartial(e));
-      }
-    }
+    message.bitarray =
+      object.bitarray !== undefined && object.bitarray !== null
+        ? CompactBitArray.fromPartial(object.bitarray)
+        : undefined;
+    message.signatures = (object.signatures ?? []).map((e) =>
+      SignatureDescriptor_Data.fromPartial(e)
+    );
     return message;
   },
 };

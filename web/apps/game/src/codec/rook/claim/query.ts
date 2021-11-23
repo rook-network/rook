@@ -150,14 +150,11 @@ export const QueryModuleAccountBalanceResponse = {
     const message = {
       ...baseQueryModuleAccountBalanceResponse,
     } as QueryModuleAccountBalanceResponse;
-    if (
+    message.moduleAccountBalance =
       object.moduleAccountBalance !== undefined &&
       object.moduleAccountBalance !== null
-    ) {
-      message.moduleAccountBalance = Coin.fromJSON(object.moduleAccountBalance);
-    } else {
-      message.moduleAccountBalance = undefined;
-    }
+        ? Coin.fromJSON(object.moduleAccountBalance)
+        : undefined;
     return message;
   },
 
@@ -176,16 +173,11 @@ export const QueryModuleAccountBalanceResponse = {
     const message = {
       ...baseQueryModuleAccountBalanceResponse,
     } as QueryModuleAccountBalanceResponse;
-    if (
+    message.moduleAccountBalance =
       object.moduleAccountBalance !== undefined &&
       object.moduleAccountBalance !== null
-    ) {
-      message.moduleAccountBalance = Coin.fromPartial(
-        object.moduleAccountBalance
-      );
-    } else {
-      message.moduleAccountBalance = undefined;
-    }
+        ? Coin.fromPartial(object.moduleAccountBalance)
+        : undefined;
     return message;
   },
 };
@@ -264,11 +256,10 @@ export const QueryParamsResponse = {
 
   fromJSON(object: any): QueryParamsResponse {
     const message = { ...baseQueryParamsResponse } as QueryParamsResponse;
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromJSON(object.params);
-    } else {
-      message.params = undefined;
-    }
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromJSON(object.params)
+        : undefined;
     return message;
   },
 
@@ -281,11 +272,10 @@ export const QueryParamsResponse = {
 
   fromPartial(object: DeepPartial<QueryParamsResponse>): QueryParamsResponse {
     const message = { ...baseQueryParamsResponse } as QueryParamsResponse;
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromPartial(object.params);
-    } else {
-      message.params = undefined;
-    }
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromPartial(object.params)
+        : undefined;
     return message;
   },
 };
@@ -330,11 +320,10 @@ export const QueryClaimRecordRequest = {
     const message = {
       ...baseQueryClaimRecordRequest,
     } as QueryClaimRecordRequest;
-    if (object.address !== undefined && object.address !== null) {
-      message.address = String(object.address);
-    } else {
-      message.address = "";
-    }
+    message.address =
+      object.address !== undefined && object.address !== null
+        ? String(object.address)
+        : "";
     return message;
   },
 
@@ -350,11 +339,7 @@ export const QueryClaimRecordRequest = {
     const message = {
       ...baseQueryClaimRecordRequest,
     } as QueryClaimRecordRequest;
-    if (object.address !== undefined && object.address !== null) {
-      message.address = object.address;
-    } else {
-      message.address = "";
-    }
+    message.address = object.address ?? "";
     return message;
   },
 };
@@ -402,11 +387,10 @@ export const QueryClaimRecordResponse = {
     const message = {
       ...baseQueryClaimRecordResponse,
     } as QueryClaimRecordResponse;
-    if (object.claimRecord !== undefined && object.claimRecord !== null) {
-      message.claimRecord = ClaimRecord.fromJSON(object.claimRecord);
-    } else {
-      message.claimRecord = undefined;
-    }
+    message.claimRecord =
+      object.claimRecord !== undefined && object.claimRecord !== null
+        ? ClaimRecord.fromJSON(object.claimRecord)
+        : undefined;
     return message;
   },
 
@@ -425,11 +409,10 @@ export const QueryClaimRecordResponse = {
     const message = {
       ...baseQueryClaimRecordResponse,
     } as QueryClaimRecordResponse;
-    if (object.claimRecord !== undefined && object.claimRecord !== null) {
-      message.claimRecord = ClaimRecord.fromPartial(object.claimRecord);
-    } else {
-      message.claimRecord = undefined;
-    }
+    message.claimRecord =
+      object.claimRecord !== undefined && object.claimRecord !== null
+        ? ClaimRecord.fromPartial(object.claimRecord)
+        : undefined;
     return message;
   },
 };
@@ -480,16 +463,14 @@ export const QueryClaimableForActionRequest = {
     const message = {
       ...baseQueryClaimableForActionRequest,
     } as QueryClaimableForActionRequest;
-    if (object.address !== undefined && object.address !== null) {
-      message.address = String(object.address);
-    } else {
-      message.address = "";
-    }
-    if (object.action !== undefined && object.action !== null) {
-      message.action = actionFromJSON(object.action);
-    } else {
-      message.action = 0;
-    }
+    message.address =
+      object.address !== undefined && object.address !== null
+        ? String(object.address)
+        : "";
+    message.action =
+      object.action !== undefined && object.action !== null
+        ? actionFromJSON(object.action)
+        : 0;
     return message;
   },
 
@@ -506,16 +487,8 @@ export const QueryClaimableForActionRequest = {
     const message = {
       ...baseQueryClaimableForActionRequest,
     } as QueryClaimableForActionRequest;
-    if (object.address !== undefined && object.address !== null) {
-      message.address = object.address;
-    } else {
-      message.address = "";
-    }
-    if (object.action !== undefined && object.action !== null) {
-      message.action = object.action;
-    } else {
-      message.action = 0;
-    }
+    message.address = object.address ?? "";
+    message.action = object.action ?? 0;
     return message;
   },
 };
@@ -560,11 +533,10 @@ export const QueryClaimableForActionResponse = {
     const message = {
       ...baseQueryClaimableForActionResponse,
     } as QueryClaimableForActionResponse;
-    if (object.coins !== undefined && object.coins !== null) {
-      message.coins = Coin.fromJSON(object.coins);
-    } else {
-      message.coins = undefined;
-    }
+    message.coins =
+      object.coins !== undefined && object.coins !== null
+        ? Coin.fromJSON(object.coins)
+        : undefined;
     return message;
   },
 
@@ -581,11 +553,10 @@ export const QueryClaimableForActionResponse = {
     const message = {
       ...baseQueryClaimableForActionResponse,
     } as QueryClaimableForActionResponse;
-    if (object.coins !== undefined && object.coins !== null) {
-      message.coins = Coin.fromPartial(object.coins);
-    } else {
-      message.coins = undefined;
-    }
+    message.coins =
+      object.coins !== undefined && object.coins !== null
+        ? Coin.fromPartial(object.coins)
+        : undefined;
     return message;
   },
 };
@@ -630,11 +601,10 @@ export const QueryTotalClaimableRequest = {
     const message = {
       ...baseQueryTotalClaimableRequest,
     } as QueryTotalClaimableRequest;
-    if (object.address !== undefined && object.address !== null) {
-      message.address = String(object.address);
-    } else {
-      message.address = "";
-    }
+    message.address =
+      object.address !== undefined && object.address !== null
+        ? String(object.address)
+        : "";
     return message;
   },
 
@@ -650,11 +620,7 @@ export const QueryTotalClaimableRequest = {
     const message = {
       ...baseQueryTotalClaimableRequest,
     } as QueryTotalClaimableRequest;
-    if (object.address !== undefined && object.address !== null) {
-      message.address = object.address;
-    } else {
-      message.address = "";
-    }
+    message.address = object.address ?? "";
     return message;
   },
 };
@@ -699,11 +665,10 @@ export const QueryTotalClaimableResponse = {
     const message = {
       ...baseQueryTotalClaimableResponse,
     } as QueryTotalClaimableResponse;
-    if (object.coins !== undefined && object.coins !== null) {
-      message.coins = Coin.fromJSON(object.coins);
-    } else {
-      message.coins = undefined;
-    }
+    message.coins =
+      object.coins !== undefined && object.coins !== null
+        ? Coin.fromJSON(object.coins)
+        : undefined;
     return message;
   },
 
@@ -720,11 +685,10 @@ export const QueryTotalClaimableResponse = {
     const message = {
       ...baseQueryTotalClaimableResponse,
     } as QueryTotalClaimableResponse;
-    if (object.coins !== undefined && object.coins !== null) {
-      message.coins = Coin.fromPartial(object.coins);
-    } else {
-      message.coins = undefined;
-    }
+    message.coins =
+      object.coins !== undefined && object.coins !== null
+        ? Coin.fromPartial(object.coins)
+        : undefined;
     return message;
   },
 };

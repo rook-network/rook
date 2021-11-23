@@ -81,11 +81,10 @@ export const QueryAccountsRequest = {
 
   fromJSON(object: any): QueryAccountsRequest {
     const message = { ...baseQueryAccountsRequest } as QueryAccountsRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
+    message.pagination =
+      object.pagination !== undefined && object.pagination !== null
+        ? PageRequest.fromJSON(object.pagination)
+        : undefined;
     return message;
   },
 
@@ -100,11 +99,10 @@ export const QueryAccountsRequest = {
 
   fromPartial(object: DeepPartial<QueryAccountsRequest>): QueryAccountsRequest {
     const message = { ...baseQueryAccountsRequest } as QueryAccountsRequest;
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageRequest.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
+    message.pagination =
+      object.pagination !== undefined && object.pagination !== null
+        ? PageRequest.fromPartial(object.pagination)
+        : undefined;
     return message;
   },
 };
@@ -155,17 +153,11 @@ export const QueryAccountsResponse = {
 
   fromJSON(object: any): QueryAccountsResponse {
     const message = { ...baseQueryAccountsResponse } as QueryAccountsResponse;
-    message.accounts = [];
-    if (object.accounts !== undefined && object.accounts !== null) {
-      for (const e of object.accounts) {
-        message.accounts.push(Any.fromJSON(e));
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromJSON(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
+    message.accounts = (object.accounts ?? []).map((e: any) => Any.fromJSON(e));
+    message.pagination =
+      object.pagination !== undefined && object.pagination !== null
+        ? PageResponse.fromJSON(object.pagination)
+        : undefined;
     return message;
   },
 
@@ -189,17 +181,11 @@ export const QueryAccountsResponse = {
     object: DeepPartial<QueryAccountsResponse>
   ): QueryAccountsResponse {
     const message = { ...baseQueryAccountsResponse } as QueryAccountsResponse;
-    message.accounts = [];
-    if (object.accounts !== undefined && object.accounts !== null) {
-      for (const e of object.accounts) {
-        message.accounts.push(Any.fromPartial(e));
-      }
-    }
-    if (object.pagination !== undefined && object.pagination !== null) {
-      message.pagination = PageResponse.fromPartial(object.pagination);
-    } else {
-      message.pagination = undefined;
-    }
+    message.accounts = (object.accounts ?? []).map((e) => Any.fromPartial(e));
+    message.pagination =
+      object.pagination !== undefined && object.pagination !== null
+        ? PageResponse.fromPartial(object.pagination)
+        : undefined;
     return message;
   },
 };
@@ -237,11 +223,10 @@ export const QueryAccountRequest = {
 
   fromJSON(object: any): QueryAccountRequest {
     const message = { ...baseQueryAccountRequest } as QueryAccountRequest;
-    if (object.address !== undefined && object.address !== null) {
-      message.address = String(object.address);
-    } else {
-      message.address = "";
-    }
+    message.address =
+      object.address !== undefined && object.address !== null
+        ? String(object.address)
+        : "";
     return message;
   },
 
@@ -253,11 +238,7 @@ export const QueryAccountRequest = {
 
   fromPartial(object: DeepPartial<QueryAccountRequest>): QueryAccountRequest {
     const message = { ...baseQueryAccountRequest } as QueryAccountRequest;
-    if (object.address !== undefined && object.address !== null) {
-      message.address = object.address;
-    } else {
-      message.address = "";
-    }
+    message.address = object.address ?? "";
     return message;
   },
 };
@@ -298,11 +279,10 @@ export const QueryAccountResponse = {
 
   fromJSON(object: any): QueryAccountResponse {
     const message = { ...baseQueryAccountResponse } as QueryAccountResponse;
-    if (object.account !== undefined && object.account !== null) {
-      message.account = Any.fromJSON(object.account);
-    } else {
-      message.account = undefined;
-    }
+    message.account =
+      object.account !== undefined && object.account !== null
+        ? Any.fromJSON(object.account)
+        : undefined;
     return message;
   },
 
@@ -315,11 +295,10 @@ export const QueryAccountResponse = {
 
   fromPartial(object: DeepPartial<QueryAccountResponse>): QueryAccountResponse {
     const message = { ...baseQueryAccountResponse } as QueryAccountResponse;
-    if (object.account !== undefined && object.account !== null) {
-      message.account = Any.fromPartial(object.account);
-    } else {
-      message.account = undefined;
-    }
+    message.account =
+      object.account !== undefined && object.account !== null
+        ? Any.fromPartial(object.account)
+        : undefined;
     return message;
   },
 };
@@ -398,11 +377,10 @@ export const QueryParamsResponse = {
 
   fromJSON(object: any): QueryParamsResponse {
     const message = { ...baseQueryParamsResponse } as QueryParamsResponse;
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromJSON(object.params);
-    } else {
-      message.params = undefined;
-    }
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromJSON(object.params)
+        : undefined;
     return message;
   },
 
@@ -415,11 +393,10 @@ export const QueryParamsResponse = {
 
   fromPartial(object: DeepPartial<QueryParamsResponse>): QueryParamsResponse {
     const message = { ...baseQueryParamsResponse } as QueryParamsResponse;
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromPartial(object.params);
-    } else {
-      message.params = undefined;
-    }
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromPartial(object.params)
+        : undefined;
     return message;
   },
 };

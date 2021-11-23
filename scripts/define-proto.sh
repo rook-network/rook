@@ -47,6 +47,9 @@ protoc \
   "$COSMOS_PROTO_DIR/cosmos/distribution/v1beta1/distribution.proto" \
   "$COSMOS_PROTO_DIR/cosmos/distribution/v1beta1/query.proto" \
   "$COSMOS_PROTO_DIR/cosmos/distribution/v1beta1/tx.proto" \
+  "$COSMOS_PROTO_DIR/cosmos/feegrant/v1beta1/feegrant.proto" \
+  "$COSMOS_PROTO_DIR/cosmos/feegrant/v1beta1/query.proto" \
+  "$COSMOS_PROTO_DIR/cosmos/feegrant/v1beta1/tx.proto" \
   "$COSMOS_PROTO_DIR/cosmos/staking/v1beta1/query.proto" \
   "$COSMOS_PROTO_DIR/cosmos/staking/v1beta1/staking.proto" \
   "$COSMOS_PROTO_DIR/cosmos/staking/v1beta1/tx.proto" \

@@ -75,16 +75,14 @@ export const Config = {
 
   fromJSON(object: any): Config {
     const message = { ...baseConfig } as Config;
-    if (object.initial !== undefined && object.initial !== null) {
-      message.initial = InitializationConfig.fromJSON(object.initial);
-    } else {
-      message.initial = undefined;
-    }
-    if (object.map !== undefined && object.map !== null) {
-      message.map = MapConfig.fromJSON(object.map);
-    } else {
-      message.map = undefined;
-    }
+    message.initial =
+      object.initial !== undefined && object.initial !== null
+        ? InitializationConfig.fromJSON(object.initial)
+        : undefined;
+    message.map =
+      object.map !== undefined && object.map !== null
+        ? MapConfig.fromJSON(object.map)
+        : undefined;
     return message;
   },
 
@@ -101,16 +99,14 @@ export const Config = {
 
   fromPartial(object: DeepPartial<Config>): Config {
     const message = { ...baseConfig } as Config;
-    if (object.initial !== undefined && object.initial !== null) {
-      message.initial = InitializationConfig.fromPartial(object.initial);
-    } else {
-      message.initial = undefined;
-    }
-    if (object.map !== undefined && object.map !== null) {
-      message.map = MapConfig.fromPartial(object.map);
-    } else {
-      message.map = undefined;
-    }
+    message.initial =
+      object.initial !== undefined && object.initial !== null
+        ? InitializationConfig.fromPartial(object.initial)
+        : undefined;
+    message.map =
+      object.map !== undefined && object.map !== null
+        ? MapConfig.fromPartial(object.map)
+        : undefined;
     return message;
   },
 };
@@ -192,44 +188,34 @@ export const MapConfig = {
 
   fromJSON(object: any): MapConfig {
     const message = { ...baseMapConfig } as MapConfig;
-    if (object.width !== undefined && object.width !== null) {
-      message.width = Number(object.width);
-    } else {
-      message.width = 0;
-    }
-    if (object.height !== undefined && object.height !== null) {
-      message.height = Number(object.height);
-    } else {
-      message.height = 0;
-    }
-    if (object.seed !== undefined && object.seed !== null) {
-      message.seed = Long.fromString(object.seed);
-    } else {
-      message.seed = Long.ZERO;
-    }
-    if (
-      object.mountainsDensity !== undefined &&
-      object.mountainsDensity !== null
-    ) {
-      message.mountainsDensity = Number(object.mountainsDensity);
-    } else {
-      message.mountainsDensity = 0;
-    }
-    if (object.forestDensity !== undefined && object.forestDensity !== null) {
-      message.forestDensity = Number(object.forestDensity);
-    } else {
-      message.forestDensity = 0;
-    }
-    if (object.lakeDensity !== undefined && object.lakeDensity !== null) {
-      message.lakeDensity = Number(object.lakeDensity);
-    } else {
-      message.lakeDensity = 0;
-    }
-    if (object.plainsDensity !== undefined && object.plainsDensity !== null) {
-      message.plainsDensity = Number(object.plainsDensity);
-    } else {
-      message.plainsDensity = 0;
-    }
+    message.width =
+      object.width !== undefined && object.width !== null
+        ? Number(object.width)
+        : 0;
+    message.height =
+      object.height !== undefined && object.height !== null
+        ? Number(object.height)
+        : 0;
+    message.seed =
+      object.seed !== undefined && object.seed !== null
+        ? Long.fromString(object.seed)
+        : Long.ZERO;
+    message.mountainsDensity =
+      object.mountainsDensity !== undefined && object.mountainsDensity !== null
+        ? Number(object.mountainsDensity)
+        : 0;
+    message.forestDensity =
+      object.forestDensity !== undefined && object.forestDensity !== null
+        ? Number(object.forestDensity)
+        : 0;
+    message.lakeDensity =
+      object.lakeDensity !== undefined && object.lakeDensity !== null
+        ? Number(object.lakeDensity)
+        : 0;
+    message.plainsDensity =
+      object.plainsDensity !== undefined && object.plainsDensity !== null
+        ? Number(object.plainsDensity)
+        : 0;
     return message;
   },
 
@@ -252,44 +238,17 @@ export const MapConfig = {
 
   fromPartial(object: DeepPartial<MapConfig>): MapConfig {
     const message = { ...baseMapConfig } as MapConfig;
-    if (object.width !== undefined && object.width !== null) {
-      message.width = object.width;
-    } else {
-      message.width = 0;
-    }
-    if (object.height !== undefined && object.height !== null) {
-      message.height = object.height;
-    } else {
-      message.height = 0;
-    }
+    message.width = object.width ?? 0;
+    message.height = object.height ?? 0;
     if (object.seed !== undefined && object.seed !== null) {
       message.seed = object.seed as Long;
     } else {
       message.seed = Long.ZERO;
     }
-    if (
-      object.mountainsDensity !== undefined &&
-      object.mountainsDensity !== null
-    ) {
-      message.mountainsDensity = object.mountainsDensity;
-    } else {
-      message.mountainsDensity = 0;
-    }
-    if (object.forestDensity !== undefined && object.forestDensity !== null) {
-      message.forestDensity = object.forestDensity;
-    } else {
-      message.forestDensity = 0;
-    }
-    if (object.lakeDensity !== undefined && object.lakeDensity !== null) {
-      message.lakeDensity = object.lakeDensity;
-    } else {
-      message.lakeDensity = 0;
-    }
-    if (object.plainsDensity !== undefined && object.plainsDensity !== null) {
-      message.plainsDensity = object.plainsDensity;
-    } else {
-      message.plainsDensity = 0;
-    }
+    message.mountainsDensity = object.mountainsDensity ?? 0;
+    message.forestDensity = object.forestDensity ?? 0;
+    message.lakeDensity = object.lakeDensity ?? 0;
+    message.plainsDensity = object.plainsDensity ?? 0;
     return message;
   },
 };
@@ -336,16 +295,14 @@ export const InitializationConfig = {
 
   fromJSON(object: any): InitializationConfig {
     const message = { ...baseInitializationConfig } as InitializationConfig;
-    if (object.teams !== undefined && object.teams !== null) {
-      message.teams = Number(object.teams);
-    } else {
-      message.teams = 0;
-    }
-    if (object.resources !== undefined && object.resources !== null) {
-      message.resources = ResourceSet.fromJSON(object.resources);
-    } else {
-      message.resources = undefined;
-    }
+    message.teams =
+      object.teams !== undefined && object.teams !== null
+        ? Number(object.teams)
+        : 0;
+    message.resources =
+      object.resources !== undefined && object.resources !== null
+        ? ResourceSet.fromJSON(object.resources)
+        : undefined;
     return message;
   },
 
@@ -361,16 +318,11 @@ export const InitializationConfig = {
 
   fromPartial(object: DeepPartial<InitializationConfig>): InitializationConfig {
     const message = { ...baseInitializationConfig } as InitializationConfig;
-    if (object.teams !== undefined && object.teams !== null) {
-      message.teams = object.teams;
-    } else {
-      message.teams = 0;
-    }
-    if (object.resources !== undefined && object.resources !== null) {
-      message.resources = ResourceSet.fromPartial(object.resources);
-    } else {
-      message.resources = undefined;
-    }
+    message.teams = object.teams ?? 0;
+    message.resources =
+      object.resources !== undefined && object.resources !== null
+        ? ResourceSet.fromPartial(object.resources)
+        : undefined;
     return message;
   },
 };
@@ -420,21 +372,12 @@ export const Params = {
 
   fromJSON(object: any): Params {
     const message = { ...baseParams } as Params;
-    message.productionRate = [];
-    message.constructionCost = [];
-    if (object.productionRate !== undefined && object.productionRate !== null) {
-      for (const e of object.productionRate) {
-        message.productionRate.push(ResourceSet.fromJSON(e));
-      }
-    }
-    if (
-      object.constructionCost !== undefined &&
-      object.constructionCost !== null
-    ) {
-      for (const e of object.constructionCost) {
-        message.constructionCost.push(ResourceSet.fromJSON(e));
-      }
-    }
+    message.productionRate = (object.productionRate ?? []).map((e: any) =>
+      ResourceSet.fromJSON(e)
+    );
+    message.constructionCost = (object.constructionCost ?? []).map((e: any) =>
+      ResourceSet.fromJSON(e)
+    );
     return message;
   },
 
@@ -459,21 +402,12 @@ export const Params = {
 
   fromPartial(object: DeepPartial<Params>): Params {
     const message = { ...baseParams } as Params;
-    message.productionRate = [];
-    message.constructionCost = [];
-    if (object.productionRate !== undefined && object.productionRate !== null) {
-      for (const e of object.productionRate) {
-        message.productionRate.push(ResourceSet.fromPartial(e));
-      }
-    }
-    if (
-      object.constructionCost !== undefined &&
-      object.constructionCost !== null
-    ) {
-      for (const e of object.constructionCost) {
-        message.constructionCost.push(ResourceSet.fromPartial(e));
-      }
-    }
+    message.productionRate = (object.productionRate ?? []).map((e) =>
+      ResourceSet.fromPartial(e)
+    );
+    message.constructionCost = (object.constructionCost ?? []).map((e) =>
+      ResourceSet.fromPartial(e)
+    );
     return message;
   },
 };

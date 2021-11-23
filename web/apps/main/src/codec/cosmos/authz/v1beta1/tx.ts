@@ -97,21 +97,18 @@ export const MsgGrant = {
 
   fromJSON(object: any): MsgGrant {
     const message = { ...baseMsgGrant } as MsgGrant;
-    if (object.granter !== undefined && object.granter !== null) {
-      message.granter = String(object.granter);
-    } else {
-      message.granter = "";
-    }
-    if (object.grantee !== undefined && object.grantee !== null) {
-      message.grantee = String(object.grantee);
-    } else {
-      message.grantee = "";
-    }
-    if (object.grant !== undefined && object.grant !== null) {
-      message.grant = Grant.fromJSON(object.grant);
-    } else {
-      message.grant = undefined;
-    }
+    message.granter =
+      object.granter !== undefined && object.granter !== null
+        ? String(object.granter)
+        : "";
+    message.grantee =
+      object.grantee !== undefined && object.grantee !== null
+        ? String(object.grantee)
+        : "";
+    message.grant =
+      object.grant !== undefined && object.grant !== null
+        ? Grant.fromJSON(object.grant)
+        : undefined;
     return message;
   },
 
@@ -126,21 +123,12 @@ export const MsgGrant = {
 
   fromPartial(object: DeepPartial<MsgGrant>): MsgGrant {
     const message = { ...baseMsgGrant } as MsgGrant;
-    if (object.granter !== undefined && object.granter !== null) {
-      message.granter = object.granter;
-    } else {
-      message.granter = "";
-    }
-    if (object.grantee !== undefined && object.grantee !== null) {
-      message.grantee = object.grantee;
-    } else {
-      message.grantee = "";
-    }
-    if (object.grant !== undefined && object.grant !== null) {
-      message.grant = Grant.fromPartial(object.grant);
-    } else {
-      message.grant = undefined;
-    }
+    message.granter = object.granter ?? "";
+    message.grantee = object.grantee ?? "";
+    message.grant =
+      object.grant !== undefined && object.grant !== null
+        ? Grant.fromPartial(object.grant)
+        : undefined;
     return message;
   },
 };
@@ -179,12 +167,9 @@ export const MsgExecResponse = {
 
   fromJSON(object: any): MsgExecResponse {
     const message = { ...baseMsgExecResponse } as MsgExecResponse;
-    message.results = [];
-    if (object.results !== undefined && object.results !== null) {
-      for (const e of object.results) {
-        message.results.push(bytesFromBase64(e));
-      }
-    }
+    message.results = (object.results ?? []).map((e: any) =>
+      bytesFromBase64(e)
+    );
     return message;
   },
 
@@ -202,12 +187,7 @@ export const MsgExecResponse = {
 
   fromPartial(object: DeepPartial<MsgExecResponse>): MsgExecResponse {
     const message = { ...baseMsgExecResponse } as MsgExecResponse;
-    message.results = [];
-    if (object.results !== undefined && object.results !== null) {
-      for (const e of object.results) {
-        message.results.push(e);
-      }
-    }
+    message.results = (object.results ?? []).map((e) => e);
     return message;
   },
 };
@@ -252,17 +232,11 @@ export const MsgExec = {
 
   fromJSON(object: any): MsgExec {
     const message = { ...baseMsgExec } as MsgExec;
-    message.msgs = [];
-    if (object.grantee !== undefined && object.grantee !== null) {
-      message.grantee = String(object.grantee);
-    } else {
-      message.grantee = "";
-    }
-    if (object.msgs !== undefined && object.msgs !== null) {
-      for (const e of object.msgs) {
-        message.msgs.push(Any.fromJSON(e));
-      }
-    }
+    message.grantee =
+      object.grantee !== undefined && object.grantee !== null
+        ? String(object.grantee)
+        : "";
+    message.msgs = (object.msgs ?? []).map((e: any) => Any.fromJSON(e));
     return message;
   },
 
@@ -279,17 +253,8 @@ export const MsgExec = {
 
   fromPartial(object: DeepPartial<MsgExec>): MsgExec {
     const message = { ...baseMsgExec } as MsgExec;
-    message.msgs = [];
-    if (object.grantee !== undefined && object.grantee !== null) {
-      message.grantee = object.grantee;
-    } else {
-      message.grantee = "";
-    }
-    if (object.msgs !== undefined && object.msgs !== null) {
-      for (const e of object.msgs) {
-        message.msgs.push(Any.fromPartial(e));
-      }
-    }
+    message.grantee = object.grantee ?? "";
+    message.msgs = (object.msgs ?? []).map((e) => Any.fromPartial(e));
     return message;
   },
 };
@@ -380,21 +345,18 @@ export const MsgRevoke = {
 
   fromJSON(object: any): MsgRevoke {
     const message = { ...baseMsgRevoke } as MsgRevoke;
-    if (object.granter !== undefined && object.granter !== null) {
-      message.granter = String(object.granter);
-    } else {
-      message.granter = "";
-    }
-    if (object.grantee !== undefined && object.grantee !== null) {
-      message.grantee = String(object.grantee);
-    } else {
-      message.grantee = "";
-    }
-    if (object.msgTypeUrl !== undefined && object.msgTypeUrl !== null) {
-      message.msgTypeUrl = String(object.msgTypeUrl);
-    } else {
-      message.msgTypeUrl = "";
-    }
+    message.granter =
+      object.granter !== undefined && object.granter !== null
+        ? String(object.granter)
+        : "";
+    message.grantee =
+      object.grantee !== undefined && object.grantee !== null
+        ? String(object.grantee)
+        : "";
+    message.msgTypeUrl =
+      object.msgTypeUrl !== undefined && object.msgTypeUrl !== null
+        ? String(object.msgTypeUrl)
+        : "";
     return message;
   },
 
@@ -408,21 +370,9 @@ export const MsgRevoke = {
 
   fromPartial(object: DeepPartial<MsgRevoke>): MsgRevoke {
     const message = { ...baseMsgRevoke } as MsgRevoke;
-    if (object.granter !== undefined && object.granter !== null) {
-      message.granter = object.granter;
-    } else {
-      message.granter = "";
-    }
-    if (object.grantee !== undefined && object.grantee !== null) {
-      message.grantee = object.grantee;
-    } else {
-      message.grantee = "";
-    }
-    if (object.msgTypeUrl !== undefined && object.msgTypeUrl !== null) {
-      message.msgTypeUrl = object.msgTypeUrl;
-    } else {
-      message.msgTypeUrl = "";
-    }
+    message.granter = object.granter ?? "";
+    message.grantee = object.grantee ?? "";
+    message.msgTypeUrl = object.msgTypeUrl ?? "";
     return message;
   },
 };

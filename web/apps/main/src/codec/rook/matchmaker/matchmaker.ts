@@ -184,58 +184,40 @@ export const Room = {
 
   fromJSON(object: any): Room {
     const message = { ...baseRoom } as Room;
-    message.players = [];
-    message.pending = [];
-    if (object.config !== undefined && object.config !== null) {
-      message.config = Config.fromJSON(object.config);
-    } else {
-      message.config = undefined;
-    }
-    if (object.modeId !== undefined && object.modeId !== null) {
-      message.modeId = Number(object.modeId);
-    } else {
-      message.modeId = undefined;
-    }
-    if (object.players !== undefined && object.players !== null) {
-      for (const e of object.players) {
-        message.players.push(String(e));
-      }
-    }
-    if (object.pending !== undefined && object.pending !== null) {
-      for (const e of object.pending) {
-        message.pending.push(String(e));
-      }
-    }
-    if (object.public !== undefined && object.public !== null) {
-      message.public = Boolean(object.public);
-    } else {
-      message.public = false;
-    }
-    if (object.quorum !== undefined && object.quorum !== null) {
-      message.quorum = Number(object.quorum);
-    } else {
-      message.quorum = 0;
-    }
-    if (object.capacity !== undefined && object.capacity !== null) {
-      message.capacity = Number(object.capacity);
-    } else {
-      message.capacity = 0;
-    }
-    if (object.created !== undefined && object.created !== null) {
-      message.created = fromJsonTimestamp(object.created);
-    } else {
-      message.created = undefined;
-    }
-    if (object.ready !== undefined && object.ready !== null) {
-      message.ready = fromJsonTimestamp(object.ready);
-    } else {
-      message.ready = undefined;
-    }
-    if (object.scheduled !== undefined && object.scheduled !== null) {
-      message.scheduled = fromJsonTimestamp(object.scheduled);
-    } else {
-      message.scheduled = undefined;
-    }
+    message.config =
+      object.config !== undefined && object.config !== null
+        ? Config.fromJSON(object.config)
+        : undefined;
+    message.modeId =
+      object.modeId !== undefined && object.modeId !== null
+        ? Number(object.modeId)
+        : undefined;
+    message.players = (object.players ?? []).map((e: any) => String(e));
+    message.pending = (object.pending ?? []).map((e: any) => String(e));
+    message.public =
+      object.public !== undefined && object.public !== null
+        ? Boolean(object.public)
+        : false;
+    message.quorum =
+      object.quorum !== undefined && object.quorum !== null
+        ? Number(object.quorum)
+        : 0;
+    message.capacity =
+      object.capacity !== undefined && object.capacity !== null
+        ? Number(object.capacity)
+        : 0;
+    message.created =
+      object.created !== undefined && object.created !== null
+        ? fromJsonTimestamp(object.created)
+        : undefined;
+    message.ready =
+      object.ready !== undefined && object.ready !== null
+        ? fromJsonTimestamp(object.ready)
+        : undefined;
+    message.scheduled =
+      object.scheduled !== undefined && object.scheduled !== null
+        ? fromJsonTimestamp(object.scheduled)
+        : undefined;
     return message;
   },
 
@@ -267,58 +249,19 @@ export const Room = {
 
   fromPartial(object: DeepPartial<Room>): Room {
     const message = { ...baseRoom } as Room;
-    message.players = [];
-    message.pending = [];
-    if (object.config !== undefined && object.config !== null) {
-      message.config = Config.fromPartial(object.config);
-    } else {
-      message.config = undefined;
-    }
-    if (object.modeId !== undefined && object.modeId !== null) {
-      message.modeId = object.modeId;
-    } else {
-      message.modeId = undefined;
-    }
-    if (object.players !== undefined && object.players !== null) {
-      for (const e of object.players) {
-        message.players.push(e);
-      }
-    }
-    if (object.pending !== undefined && object.pending !== null) {
-      for (const e of object.pending) {
-        message.pending.push(e);
-      }
-    }
-    if (object.public !== undefined && object.public !== null) {
-      message.public = object.public;
-    } else {
-      message.public = false;
-    }
-    if (object.quorum !== undefined && object.quorum !== null) {
-      message.quorum = object.quorum;
-    } else {
-      message.quorum = 0;
-    }
-    if (object.capacity !== undefined && object.capacity !== null) {
-      message.capacity = object.capacity;
-    } else {
-      message.capacity = 0;
-    }
-    if (object.created !== undefined && object.created !== null) {
-      message.created = object.created;
-    } else {
-      message.created = undefined;
-    }
-    if (object.ready !== undefined && object.ready !== null) {
-      message.ready = object.ready;
-    } else {
-      message.ready = undefined;
-    }
-    if (object.scheduled !== undefined && object.scheduled !== null) {
-      message.scheduled = object.scheduled;
-    } else {
-      message.scheduled = undefined;
-    }
+    message.config =
+      object.config !== undefined && object.config !== null
+        ? Config.fromPartial(object.config)
+        : undefined;
+    message.modeId = object.modeId ?? undefined;
+    message.players = (object.players ?? []).map((e) => e);
+    message.pending = (object.pending ?? []).map((e) => e);
+    message.public = object.public ?? false;
+    message.quorum = object.quorum ?? 0;
+    message.capacity = object.capacity ?? 0;
+    message.created = object.created ?? undefined;
+    message.ready = object.ready ?? undefined;
+    message.scheduled = object.scheduled ?? undefined;
     return message;
   },
 };
@@ -362,16 +305,14 @@ export const IndexedRoom = {
 
   fromJSON(object: any): IndexedRoom {
     const message = { ...baseIndexedRoom } as IndexedRoom;
-    if (object.roomId !== undefined && object.roomId !== null) {
-      message.roomId = Long.fromString(object.roomId);
-    } else {
-      message.roomId = Long.UZERO;
-    }
-    if (object.room !== undefined && object.room !== null) {
-      message.room = Room.fromJSON(object.room);
-    } else {
-      message.room = undefined;
-    }
+    message.roomId =
+      object.roomId !== undefined && object.roomId !== null
+        ? Long.fromString(object.roomId)
+        : Long.UZERO;
+    message.room =
+      object.room !== undefined && object.room !== null
+        ? Room.fromJSON(object.room)
+        : undefined;
     return message;
   },
 
@@ -391,11 +332,10 @@ export const IndexedRoom = {
     } else {
       message.roomId = Long.UZERO;
     }
-    if (object.room !== undefined && object.room !== null) {
-      message.room = Room.fromPartial(object.room);
-    } else {
-      message.room = undefined;
-    }
+    message.room =
+      object.room !== undefined && object.room !== null
+        ? Room.fromPartial(object.room)
+        : undefined;
     return message;
   },
 };
@@ -442,21 +382,18 @@ export const Mode = {
 
   fromJSON(object: any): Mode {
     const message = { ...baseMode } as Mode;
-    if (object.config !== undefined && object.config !== null) {
-      message.config = Config.fromJSON(object.config);
-    } else {
-      message.config = undefined;
-    }
-    if (object.quorum !== undefined && object.quorum !== null) {
-      message.quorum = Number(object.quorum);
-    } else {
-      message.quorum = 0;
-    }
-    if (object.capacity !== undefined && object.capacity !== null) {
-      message.capacity = Number(object.capacity);
-    } else {
-      message.capacity = 0;
-    }
+    message.config =
+      object.config !== undefined && object.config !== null
+        ? Config.fromJSON(object.config)
+        : undefined;
+    message.quorum =
+      object.quorum !== undefined && object.quorum !== null
+        ? Number(object.quorum)
+        : 0;
+    message.capacity =
+      object.capacity !== undefined && object.capacity !== null
+        ? Number(object.capacity)
+        : 0;
     return message;
   },
 
@@ -471,21 +408,12 @@ export const Mode = {
 
   fromPartial(object: DeepPartial<Mode>): Mode {
     const message = { ...baseMode } as Mode;
-    if (object.config !== undefined && object.config !== null) {
-      message.config = Config.fromPartial(object.config);
-    } else {
-      message.config = undefined;
-    }
-    if (object.quorum !== undefined && object.quorum !== null) {
-      message.quorum = object.quorum;
-    } else {
-      message.quorum = 0;
-    }
-    if (object.capacity !== undefined && object.capacity !== null) {
-      message.capacity = object.capacity;
-    } else {
-      message.capacity = 0;
-    }
+    message.config =
+      object.config !== undefined && object.config !== null
+        ? Config.fromPartial(object.config)
+        : undefined;
+    message.quorum = object.quorum ?? 0;
+    message.capacity = object.capacity ?? 0;
     return message;
   },
 };
@@ -535,21 +463,18 @@ export const IndexedMode = {
 
   fromJSON(object: any): IndexedMode {
     const message = { ...baseIndexedMode } as IndexedMode;
-    if (object.modeId !== undefined && object.modeId !== null) {
-      message.modeId = Number(object.modeId);
-    } else {
-      message.modeId = 0;
-    }
-    if (object.mode !== undefined && object.mode !== null) {
-      message.mode = Mode.fromJSON(object.mode);
-    } else {
-      message.mode = undefined;
-    }
-    if (object.gameId !== undefined && object.gameId !== null) {
-      message.gameId = Long.fromString(object.gameId);
-    } else {
-      message.gameId = Long.UZERO;
-    }
+    message.modeId =
+      object.modeId !== undefined && object.modeId !== null
+        ? Number(object.modeId)
+        : 0;
+    message.mode =
+      object.mode !== undefined && object.mode !== null
+        ? Mode.fromJSON(object.mode)
+        : undefined;
+    message.gameId =
+      object.gameId !== undefined && object.gameId !== null
+        ? Long.fromString(object.gameId)
+        : Long.UZERO;
     return message;
   },
 
@@ -565,16 +490,11 @@ export const IndexedMode = {
 
   fromPartial(object: DeepPartial<IndexedMode>): IndexedMode {
     const message = { ...baseIndexedMode } as IndexedMode;
-    if (object.modeId !== undefined && object.modeId !== null) {
-      message.modeId = object.modeId;
-    } else {
-      message.modeId = 0;
-    }
-    if (object.mode !== undefined && object.mode !== null) {
-      message.mode = Mode.fromPartial(object.mode);
-    } else {
-      message.mode = undefined;
-    }
+    message.modeId = object.modeId ?? 0;
+    message.mode =
+      object.mode !== undefined && object.mode !== null
+        ? Mode.fromPartial(object.mode)
+        : undefined;
     if (object.gameId !== undefined && object.gameId !== null) {
       message.gameId = object.gameId as Long;
     } else {
@@ -626,19 +546,15 @@ export const Params = {
 
   fromJSON(object: any): Params {
     const message = { ...baseParams } as Params;
-    if (object.roomLifespan !== undefined && object.roomLifespan !== null) {
-      message.roomLifespan = Duration.fromJSON(object.roomLifespan);
-    } else {
-      message.roomLifespan = undefined;
-    }
-    if (
+    message.roomLifespan =
+      object.roomLifespan !== undefined && object.roomLifespan !== null
+        ? Duration.fromJSON(object.roomLifespan)
+        : undefined;
+    message.prestartWaitPeriod =
       object.prestartWaitPeriod !== undefined &&
       object.prestartWaitPeriod !== null
-    ) {
-      message.prestartWaitPeriod = Duration.fromJSON(object.prestartWaitPeriod);
-    } else {
-      message.prestartWaitPeriod = undefined;
-    }
+        ? Duration.fromJSON(object.prestartWaitPeriod)
+        : undefined;
     return message;
   },
 
@@ -657,21 +573,15 @@ export const Params = {
 
   fromPartial(object: DeepPartial<Params>): Params {
     const message = { ...baseParams } as Params;
-    if (object.roomLifespan !== undefined && object.roomLifespan !== null) {
-      message.roomLifespan = Duration.fromPartial(object.roomLifespan);
-    } else {
-      message.roomLifespan = undefined;
-    }
-    if (
+    message.roomLifespan =
+      object.roomLifespan !== undefined && object.roomLifespan !== null
+        ? Duration.fromPartial(object.roomLifespan)
+        : undefined;
+    message.prestartWaitPeriod =
       object.prestartWaitPeriod !== undefined &&
       object.prestartWaitPeriod !== null
-    ) {
-      message.prestartWaitPeriod = Duration.fromPartial(
-        object.prestartWaitPeriod
-      );
-    } else {
-      message.prestartWaitPeriod = undefined;
-    }
+        ? Duration.fromPartial(object.prestartWaitPeriod)
+        : undefined;
     return message;
   },
 };

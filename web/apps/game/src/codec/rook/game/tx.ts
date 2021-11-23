@@ -114,31 +114,26 @@ export const MsgMove = {
 
   fromJSON(object: any): MsgMove {
     const message = { ...baseMsgMove } as MsgMove;
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = String(object.creator);
-    } else {
-      message.creator = "";
-    }
-    if (object.gameId !== undefined && object.gameId !== null) {
-      message.gameId = Long.fromString(object.gameId);
-    } else {
-      message.gameId = Long.UZERO;
-    }
-    if (object.populace !== undefined && object.populace !== null) {
-      message.populace = Number(object.populace);
-    } else {
-      message.populace = 0;
-    }
-    if (object.direction !== undefined && object.direction !== null) {
-      message.direction = directionFromJSON(object.direction);
-    } else {
-      message.direction = 0;
-    }
-    if (object.population !== undefined && object.population !== null) {
-      message.population = Number(object.population);
-    } else {
-      message.population = 0;
-    }
+    message.creator =
+      object.creator !== undefined && object.creator !== null
+        ? String(object.creator)
+        : "";
+    message.gameId =
+      object.gameId !== undefined && object.gameId !== null
+        ? Long.fromString(object.gameId)
+        : Long.UZERO;
+    message.populace =
+      object.populace !== undefined && object.populace !== null
+        ? Number(object.populace)
+        : 0;
+    message.direction =
+      object.direction !== undefined && object.direction !== null
+        ? directionFromJSON(object.direction)
+        : 0;
+    message.population =
+      object.population !== undefined && object.population !== null
+        ? Number(object.population)
+        : 0;
     return message;
   },
 
@@ -156,31 +151,15 @@ export const MsgMove = {
 
   fromPartial(object: DeepPartial<MsgMove>): MsgMove {
     const message = { ...baseMsgMove } as MsgMove;
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = object.creator;
-    } else {
-      message.creator = "";
-    }
+    message.creator = object.creator ?? "";
     if (object.gameId !== undefined && object.gameId !== null) {
       message.gameId = object.gameId as Long;
     } else {
       message.gameId = Long.UZERO;
     }
-    if (object.populace !== undefined && object.populace !== null) {
-      message.populace = object.populace;
-    } else {
-      message.populace = 0;
-    }
-    if (object.direction !== undefined && object.direction !== null) {
-      message.direction = object.direction;
-    } else {
-      message.direction = 0;
-    }
-    if (object.population !== undefined && object.population !== null) {
-      message.population = object.population;
-    } else {
-      message.population = 0;
-    }
+    message.populace = object.populace ?? 0;
+    message.direction = object.direction ?? 0;
+    message.population = object.population ?? 0;
     return message;
   },
 };
@@ -282,26 +261,22 @@ export const MsgBuild = {
 
   fromJSON(object: any): MsgBuild {
     const message = { ...baseMsgBuild } as MsgBuild;
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = String(object.creator);
-    } else {
-      message.creator = "";
-    }
-    if (object.gameId !== undefined && object.gameId !== null) {
-      message.gameId = Long.fromString(object.gameId);
-    } else {
-      message.gameId = Long.UZERO;
-    }
-    if (object.populace !== undefined && object.populace !== null) {
-      message.populace = Number(object.populace);
-    } else {
-      message.populace = 0;
-    }
-    if (object.settlement !== undefined && object.settlement !== null) {
-      message.settlement = settlementFromJSON(object.settlement);
-    } else {
-      message.settlement = 0;
-    }
+    message.creator =
+      object.creator !== undefined && object.creator !== null
+        ? String(object.creator)
+        : "";
+    message.gameId =
+      object.gameId !== undefined && object.gameId !== null
+        ? Long.fromString(object.gameId)
+        : Long.UZERO;
+    message.populace =
+      object.populace !== undefined && object.populace !== null
+        ? Number(object.populace)
+        : 0;
+    message.settlement =
+      object.settlement !== undefined && object.settlement !== null
+        ? settlementFromJSON(object.settlement)
+        : 0;
     return message;
   },
 
@@ -318,26 +293,14 @@ export const MsgBuild = {
 
   fromPartial(object: DeepPartial<MsgBuild>): MsgBuild {
     const message = { ...baseMsgBuild } as MsgBuild;
-    if (object.creator !== undefined && object.creator !== null) {
-      message.creator = object.creator;
-    } else {
-      message.creator = "";
-    }
+    message.creator = object.creator ?? "";
     if (object.gameId !== undefined && object.gameId !== null) {
       message.gameId = object.gameId as Long;
     } else {
       message.gameId = Long.UZERO;
     }
-    if (object.populace !== undefined && object.populace !== null) {
-      message.populace = object.populace;
-    } else {
-      message.populace = 0;
-    }
-    if (object.settlement !== undefined && object.settlement !== null) {
-      message.settlement = object.settlement;
-    } else {
-      message.settlement = 0;
-    }
+    message.populace = object.populace ?? 0;
+    message.settlement = object.settlement ?? 0;
     return message;
   },
 };
@@ -423,17 +386,11 @@ export const MsgCreate = {
 
   fromJSON(object: any): MsgCreate {
     const message = { ...baseMsgCreate } as MsgCreate;
-    message.players = [];
-    if (object.players !== undefined && object.players !== null) {
-      for (const e of object.players) {
-        message.players.push(String(e));
-      }
-    }
-    if (object.config !== undefined && object.config !== null) {
-      message.config = Config.fromJSON(object.config);
-    } else {
-      message.config = undefined;
-    }
+    message.players = (object.players ?? []).map((e: any) => String(e));
+    message.config =
+      object.config !== undefined && object.config !== null
+        ? Config.fromJSON(object.config)
+        : undefined;
     return message;
   },
 
@@ -451,17 +408,11 @@ export const MsgCreate = {
 
   fromPartial(object: DeepPartial<MsgCreate>): MsgCreate {
     const message = { ...baseMsgCreate } as MsgCreate;
-    message.players = [];
-    if (object.players !== undefined && object.players !== null) {
-      for (const e of object.players) {
-        message.players.push(e);
-      }
-    }
-    if (object.config !== undefined && object.config !== null) {
-      message.config = Config.fromPartial(object.config);
-    } else {
-      message.config = undefined;
-    }
+    message.players = (object.players ?? []).map((e) => e);
+    message.config =
+      object.config !== undefined && object.config !== null
+        ? Config.fromPartial(object.config)
+        : undefined;
     return message;
   },
 };
@@ -499,11 +450,10 @@ export const MsgCreateResponse = {
 
   fromJSON(object: any): MsgCreateResponse {
     const message = { ...baseMsgCreateResponse } as MsgCreateResponse;
-    if (object.gameId !== undefined && object.gameId !== null) {
-      message.gameId = Long.fromString(object.gameId);
-    } else {
-      message.gameId = Long.UZERO;
-    }
+    message.gameId =
+      object.gameId !== undefined && object.gameId !== null
+        ? Long.fromString(object.gameId)
+        : Long.UZERO;
     return message;
   },
 
@@ -564,16 +514,14 @@ export const MsgChangeParams = {
 
   fromJSON(object: any): MsgChangeParams {
     const message = { ...baseMsgChangeParams } as MsgChangeParams;
-    if (object.authority !== undefined && object.authority !== null) {
-      message.authority = String(object.authority);
-    } else {
-      message.authority = "";
-    }
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromJSON(object.params);
-    } else {
-      message.params = undefined;
-    }
+    message.authority =
+      object.authority !== undefined && object.authority !== null
+        ? String(object.authority)
+        : "";
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromJSON(object.params)
+        : undefined;
     return message;
   },
 
@@ -587,16 +535,11 @@ export const MsgChangeParams = {
 
   fromPartial(object: DeepPartial<MsgChangeParams>): MsgChangeParams {
     const message = { ...baseMsgChangeParams } as MsgChangeParams;
-    if (object.authority !== undefined && object.authority !== null) {
-      message.authority = object.authority;
-    } else {
-      message.authority = "";
-    }
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromPartial(object.params);
-    } else {
-      message.params = undefined;
-    }
+    message.authority = object.authority ?? "";
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromPartial(object.params)
+        : undefined;
     return message;
   },
 };
@@ -641,11 +584,10 @@ export const MsgChangeParamsResponse = {
     const message = {
       ...baseMsgChangeParamsResponse,
     } as MsgChangeParamsResponse;
-    if (object.version !== undefined && object.version !== null) {
-      message.version = Number(object.version);
-    } else {
-      message.version = 0;
-    }
+    message.version =
+      object.version !== undefined && object.version !== null
+        ? Number(object.version)
+        : 0;
     return message;
   },
 
@@ -661,11 +603,7 @@ export const MsgChangeParamsResponse = {
     const message = {
       ...baseMsgChangeParamsResponse,
     } as MsgChangeParamsResponse;
-    if (object.version !== undefined && object.version !== null) {
-      message.version = object.version;
-    } else {
-      message.version = 0;
-    }
+    message.version = object.version ?? 0;
     return message;
   },
 };

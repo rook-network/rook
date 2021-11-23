@@ -130,30 +130,26 @@ export const PageRequest = {
 
   fromJSON(object: any): PageRequest {
     const message = { ...basePageRequest } as PageRequest;
-    message.key = new Uint8Array();
-    if (object.key !== undefined && object.key !== null) {
-      message.key = bytesFromBase64(object.key);
-    }
-    if (object.offset !== undefined && object.offset !== null) {
-      message.offset = Long.fromString(object.offset);
-    } else {
-      message.offset = Long.UZERO;
-    }
-    if (object.limit !== undefined && object.limit !== null) {
-      message.limit = Long.fromString(object.limit);
-    } else {
-      message.limit = Long.UZERO;
-    }
-    if (object.countTotal !== undefined && object.countTotal !== null) {
-      message.countTotal = Boolean(object.countTotal);
-    } else {
-      message.countTotal = false;
-    }
-    if (object.reverse !== undefined && object.reverse !== null) {
-      message.reverse = Boolean(object.reverse);
-    } else {
-      message.reverse = false;
-    }
+    message.key =
+      object.key !== undefined && object.key !== null
+        ? bytesFromBase64(object.key)
+        : new Uint8Array();
+    message.offset =
+      object.offset !== undefined && object.offset !== null
+        ? Long.fromString(object.offset)
+        : Long.UZERO;
+    message.limit =
+      object.limit !== undefined && object.limit !== null
+        ? Long.fromString(object.limit)
+        : Long.UZERO;
+    message.countTotal =
+      object.countTotal !== undefined && object.countTotal !== null
+        ? Boolean(object.countTotal)
+        : false;
+    message.reverse =
+      object.reverse !== undefined && object.reverse !== null
+        ? Boolean(object.reverse)
+        : false;
     return message;
   },
 
@@ -174,11 +170,7 @@ export const PageRequest = {
 
   fromPartial(object: DeepPartial<PageRequest>): PageRequest {
     const message = { ...basePageRequest } as PageRequest;
-    if (object.key !== undefined && object.key !== null) {
-      message.key = object.key;
-    } else {
-      message.key = new Uint8Array();
-    }
+    message.key = object.key ?? new Uint8Array();
     if (object.offset !== undefined && object.offset !== null) {
       message.offset = object.offset as Long;
     } else {
@@ -189,16 +181,8 @@ export const PageRequest = {
     } else {
       message.limit = Long.UZERO;
     }
-    if (object.countTotal !== undefined && object.countTotal !== null) {
-      message.countTotal = object.countTotal;
-    } else {
-      message.countTotal = false;
-    }
-    if (object.reverse !== undefined && object.reverse !== null) {
-      message.reverse = object.reverse;
-    } else {
-      message.reverse = false;
-    }
+    message.countTotal = object.countTotal ?? false;
+    message.reverse = object.reverse ?? false;
     return message;
   },
 };
@@ -243,15 +227,14 @@ export const PageResponse = {
 
   fromJSON(object: any): PageResponse {
     const message = { ...basePageResponse } as PageResponse;
-    message.nextKey = new Uint8Array();
-    if (object.nextKey !== undefined && object.nextKey !== null) {
-      message.nextKey = bytesFromBase64(object.nextKey);
-    }
-    if (object.total !== undefined && object.total !== null) {
-      message.total = Long.fromString(object.total);
-    } else {
-      message.total = Long.UZERO;
-    }
+    message.nextKey =
+      object.nextKey !== undefined && object.nextKey !== null
+        ? bytesFromBase64(object.nextKey)
+        : new Uint8Array();
+    message.total =
+      object.total !== undefined && object.total !== null
+        ? Long.fromString(object.total)
+        : Long.UZERO;
     return message;
   },
 
@@ -268,11 +251,7 @@ export const PageResponse = {
 
   fromPartial(object: DeepPartial<PageResponse>): PageResponse {
     const message = { ...basePageResponse } as PageResponse;
-    if (object.nextKey !== undefined && object.nextKey !== null) {
-      message.nextKey = object.nextKey;
-    } else {
-      message.nextKey = new Uint8Array();
-    }
+    message.nextKey = object.nextKey ?? new Uint8Array();
     if (object.total !== undefined && object.total !== null) {
       message.total = object.total as Long;
     } else {

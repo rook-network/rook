@@ -47,11 +47,10 @@ export const MsgActivate = {
 
   fromJSON(object: any): MsgActivate {
     const message = { ...baseMsgActivate } as MsgActivate;
-    if (object.claimee !== undefined && object.claimee !== null) {
-      message.claimee = String(object.claimee);
-    } else {
-      message.claimee = "";
-    }
+    message.claimee =
+      object.claimee !== undefined && object.claimee !== null
+        ? String(object.claimee)
+        : "";
     return message;
   },
 
@@ -63,11 +62,7 @@ export const MsgActivate = {
 
   fromPartial(object: DeepPartial<MsgActivate>): MsgActivate {
     const message = { ...baseMsgActivate } as MsgActivate;
-    if (object.claimee !== undefined && object.claimee !== null) {
-      message.claimee = object.claimee;
-    } else {
-      message.claimee = "";
-    }
+    message.claimee = object.claimee ?? "";
     return message;
   },
 };
@@ -105,11 +100,10 @@ export const MsgActivateResponse = {
 
   fromJSON(object: any): MsgActivateResponse {
     const message = { ...baseMsgActivateResponse } as MsgActivateResponse;
-    if (object.claimed !== undefined && object.claimed !== null) {
-      message.claimed = Coin.fromJSON(object.claimed);
-    } else {
-      message.claimed = undefined;
-    }
+    message.claimed =
+      object.claimed !== undefined && object.claimed !== null
+        ? Coin.fromJSON(object.claimed)
+        : undefined;
     return message;
   },
 
@@ -124,11 +118,10 @@ export const MsgActivateResponse = {
 
   fromPartial(object: DeepPartial<MsgActivateResponse>): MsgActivateResponse {
     const message = { ...baseMsgActivateResponse } as MsgActivateResponse;
-    if (object.claimed !== undefined && object.claimed !== null) {
-      message.claimed = Coin.fromPartial(object.claimed);
-    } else {
-      message.claimed = undefined;
-    }
+    message.claimed =
+      object.claimed !== undefined && object.claimed !== null
+        ? Coin.fromPartial(object.claimed)
+        : undefined;
     return message;
   },
 };

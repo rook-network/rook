@@ -2,6 +2,8 @@ import { QueryClient, SigningStargateClient, createProtobufRpcClient } from '@co
 import { GenericAuthorization } from '../../codec/cosmos/authz/v1beta1/authz'
 import { QueryClientImpl as AuthzQueryClient } from '../../codec/cosmos/authz/v1beta1/query'
 import { MsgGrant } from '../../codec/cosmos/authz/v1beta1/tx'
+import { MsgGrantAllowance } from '../../codec/cosmos/feegrant/v1beta1/tx'
+import { BasicAllowance, AllowedMsgAllowance } from '../../codec/cosmos/feegrant/v1beta1/feegrant'
 import { Any } from '../../codec/google/protobuf/any'
 import { typeMsgBuild, typeMsgMove } from './game'
 import { defaultFee } from './types'
@@ -9,6 +11,9 @@ import { Registry } from '@cosmjs/proto-signing'
 
 const typeGenericAuthorization = "/cosmos.authz.v1beta1.GenericAuthorization"
 const typeMsgGrant = "/cosmos.authz.v1beta1.MsgGrant"
+const typeMsgGrantAllowance = "/cosmos.feegrant.v1beta1.MsgGrantAllowance"
+const typeBasicAllowance = "/cosmos.feegrant.v1beta1.BasicAllowance"
+const typeAlloweMsgAllowance = "/cosmos.feegrant.v1beta1.AllowMsgAllowance"
 
 const buildGrant: GenericAuthorization = {
   msg: typeMsgBuild,
@@ -16,6 +21,18 @@ const buildGrant: GenericAuthorization = {
 
 const moveGrant: GenericAuthorization = {
   msg: typeMsgMove,
+}
+
+const basicAllowance: BasicAllowance = {
+  spendLimit: []
+}
+
+const playerAllowance: AllowedMsgAllowance = {
+  allowance: {
+    typeUrl: typeBasicAllowance,
+    value: BasicAllowance.encode(basicAllowance).finish(),
+  },
+  allowedMessages: [typeMsgMove, typeMsgBuild]
 }
 
 export class AuthorizationProvider {
@@ -36,6 +53,10 @@ export class AuthorizationProvider {
 
   async authorizePlayerAccount(player: string): Promise<void> {
     const messages = [
+      {
+        typeUrl: typeMsgGrantAllowance,
+        value: this.createFeeAllowanceMsg(player)
+      },
       {
         typeUrl: typeMsgGrant,
         value: this.createBuildGrantMsg(player)
@@ -101,6 +122,17 @@ export class AuthorizationProvider {
           typeUrl: typeGenericAuthorization,
           value: GenericAuthorization.encode(moveGrant).finish()
         }
+      }
+    }
+  }
+
+  createFeeAllowanceMsg(player: string): MsgGrantAllowance {
+    return { 
+      granter: this.address,
+      grantee: player,
+      allowance: {
+        typeUrl: typeAlloweMsgAllowance,
+        value: AllowedMsgAllowance.encode(playerAllowance).finish()
       }
     }
   }

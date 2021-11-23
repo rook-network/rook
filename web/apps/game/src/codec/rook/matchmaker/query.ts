@@ -133,12 +133,9 @@ export const QueryGetRoomsResponse = {
 
   fromJSON(object: any): QueryGetRoomsResponse {
     const message = { ...baseQueryGetRoomsResponse } as QueryGetRoomsResponse;
-    message.rooms = [];
-    if (object.rooms !== undefined && object.rooms !== null) {
-      for (const e of object.rooms) {
-        message.rooms.push(IndexedRoom.fromJSON(e));
-      }
-    }
+    message.rooms = (object.rooms ?? []).map((e: any) =>
+      IndexedRoom.fromJSON(e)
+    );
     return message;
   },
 
@@ -158,12 +155,7 @@ export const QueryGetRoomsResponse = {
     object: DeepPartial<QueryGetRoomsResponse>
   ): QueryGetRoomsResponse {
     const message = { ...baseQueryGetRoomsResponse } as QueryGetRoomsResponse;
-    message.rooms = [];
-    if (object.rooms !== undefined && object.rooms !== null) {
-      for (const e of object.rooms) {
-        message.rooms.push(IndexedRoom.fromPartial(e));
-      }
-    }
+    message.rooms = (object.rooms ?? []).map((e) => IndexedRoom.fromPartial(e));
     return message;
   },
 };
@@ -201,11 +193,10 @@ export const QueryGetRoomRequest = {
 
   fromJSON(object: any): QueryGetRoomRequest {
     const message = { ...baseQueryGetRoomRequest } as QueryGetRoomRequest;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
-    } else {
-      message.id = Long.UZERO;
-    }
+    message.id =
+      object.id !== undefined && object.id !== null
+        ? Long.fromString(object.id)
+        : Long.UZERO;
     return message;
   },
 
@@ -263,11 +254,10 @@ export const QueryGetRoomResponse = {
 
   fromJSON(object: any): QueryGetRoomResponse {
     const message = { ...baseQueryGetRoomResponse } as QueryGetRoomResponse;
-    if (object.room !== undefined && object.room !== null) {
-      message.room = Room.fromJSON(object.room);
-    } else {
-      message.room = undefined;
-    }
+    message.room =
+      object.room !== undefined && object.room !== null
+        ? Room.fromJSON(object.room)
+        : undefined;
     return message;
   },
 
@@ -280,11 +270,10 @@ export const QueryGetRoomResponse = {
 
   fromPartial(object: DeepPartial<QueryGetRoomResponse>): QueryGetRoomResponse {
     const message = { ...baseQueryGetRoomResponse } as QueryGetRoomResponse;
-    if (object.room !== undefined && object.room !== null) {
-      message.room = Room.fromPartial(object.room);
-    } else {
-      message.room = undefined;
-    }
+    message.room =
+      object.room !== undefined && object.room !== null
+        ? Room.fromPartial(object.room)
+        : undefined;
     return message;
   },
 };
@@ -329,11 +318,10 @@ export const QueryRoomByPlayerRequest = {
     const message = {
       ...baseQueryRoomByPlayerRequest,
     } as QueryRoomByPlayerRequest;
-    if (object.player !== undefined && object.player !== null) {
-      message.player = String(object.player);
-    } else {
-      message.player = "";
-    }
+    message.player =
+      object.player !== undefined && object.player !== null
+        ? String(object.player)
+        : "";
     return message;
   },
 
@@ -349,11 +337,7 @@ export const QueryRoomByPlayerRequest = {
     const message = {
       ...baseQueryRoomByPlayerRequest,
     } as QueryRoomByPlayerRequest;
-    if (object.player !== undefined && object.player !== null) {
-      message.player = object.player;
-    } else {
-      message.player = "";
-    }
+    message.player = object.player ?? "";
     return message;
   },
 };
@@ -398,11 +382,10 @@ export const QueryRoomByPlayerResponse = {
     const message = {
       ...baseQueryRoomByPlayerResponse,
     } as QueryRoomByPlayerResponse;
-    if (object.room !== undefined && object.room !== null) {
-      message.room = IndexedRoom.fromJSON(object.room);
-    } else {
-      message.room = undefined;
-    }
+    message.room =
+      object.room !== undefined && object.room !== null
+        ? IndexedRoom.fromJSON(object.room)
+        : undefined;
     return message;
   },
 
@@ -419,11 +402,10 @@ export const QueryRoomByPlayerResponse = {
     const message = {
       ...baseQueryRoomByPlayerResponse,
     } as QueryRoomByPlayerResponse;
-    if (object.room !== undefined && object.room !== null) {
-      message.room = IndexedRoom.fromPartial(object.room);
-    } else {
-      message.room = undefined;
-    }
+    message.room =
+      object.room !== undefined && object.room !== null
+        ? IndexedRoom.fromPartial(object.room)
+        : undefined;
     return message;
   },
 };
@@ -468,11 +450,10 @@ export const QueryGetInvitationsRequest = {
     const message = {
       ...baseQueryGetInvitationsRequest,
     } as QueryGetInvitationsRequest;
-    if (object.player !== undefined && object.player !== null) {
-      message.player = String(object.player);
-    } else {
-      message.player = "";
-    }
+    message.player =
+      object.player !== undefined && object.player !== null
+        ? String(object.player)
+        : "";
     return message;
   },
 
@@ -488,11 +469,7 @@ export const QueryGetInvitationsRequest = {
     const message = {
       ...baseQueryGetInvitationsRequest,
     } as QueryGetInvitationsRequest;
-    if (object.player !== undefined && object.player !== null) {
-      message.player = object.player;
-    } else {
-      message.player = "";
-    }
+    message.player = object.player ?? "";
     return message;
   },
 };
@@ -538,12 +515,9 @@ export const QueryGetInvitationsResponse = {
     const message = {
       ...baseQueryGetInvitationsResponse,
     } as QueryGetInvitationsResponse;
-    message.rooms = [];
-    if (object.rooms !== undefined && object.rooms !== null) {
-      for (const e of object.rooms) {
-        message.rooms.push(IndexedRoom.fromJSON(e));
-      }
-    }
+    message.rooms = (object.rooms ?? []).map((e: any) =>
+      IndexedRoom.fromJSON(e)
+    );
     return message;
   },
 
@@ -565,12 +539,7 @@ export const QueryGetInvitationsResponse = {
     const message = {
       ...baseQueryGetInvitationsResponse,
     } as QueryGetInvitationsResponse;
-    message.rooms = [];
-    if (object.rooms !== undefined && object.rooms !== null) {
-      for (const e of object.rooms) {
-        message.rooms.push(IndexedRoom.fromPartial(e));
-      }
-    }
+    message.rooms = (object.rooms ?? []).map((e) => IndexedRoom.fromPartial(e));
     return message;
   },
 };
@@ -656,12 +625,9 @@ export const QueryGetModesResponse = {
 
   fromJSON(object: any): QueryGetModesResponse {
     const message = { ...baseQueryGetModesResponse } as QueryGetModesResponse;
-    message.modes = [];
-    if (object.modes !== undefined && object.modes !== null) {
-      for (const e of object.modes) {
-        message.modes.push(IndexedMode.fromJSON(e));
-      }
-    }
+    message.modes = (object.modes ?? []).map((e: any) =>
+      IndexedMode.fromJSON(e)
+    );
     return message;
   },
 
@@ -681,12 +647,7 @@ export const QueryGetModesResponse = {
     object: DeepPartial<QueryGetModesResponse>
   ): QueryGetModesResponse {
     const message = { ...baseQueryGetModesResponse } as QueryGetModesResponse;
-    message.modes = [];
-    if (object.modes !== undefined && object.modes !== null) {
-      for (const e of object.modes) {
-        message.modes.push(IndexedMode.fromPartial(e));
-      }
-    }
+    message.modes = (object.modes ?? []).map((e) => IndexedMode.fromPartial(e));
     return message;
   },
 };
@@ -771,11 +732,10 @@ export const QueryGetParamsResponse = {
 
   fromJSON(object: any): QueryGetParamsResponse {
     const message = { ...baseQueryGetParamsResponse } as QueryGetParamsResponse;
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromJSON(object.params);
-    } else {
-      message.params = undefined;
-    }
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromJSON(object.params)
+        : undefined;
     return message;
   },
 
@@ -790,11 +750,10 @@ export const QueryGetParamsResponse = {
     object: DeepPartial<QueryGetParamsResponse>
   ): QueryGetParamsResponse {
     const message = { ...baseQueryGetParamsResponse } as QueryGetParamsResponse;
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromPartial(object.params);
-    } else {
-      message.params = undefined;
-    }
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromPartial(object.params)
+        : undefined;
     return message;
   },
 };

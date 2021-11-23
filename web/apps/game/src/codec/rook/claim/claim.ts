@@ -138,30 +138,18 @@ export const ClaimRecord = {
 
   fromJSON(object: any): ClaimRecord {
     const message = { ...baseClaimRecord } as ClaimRecord;
-    message.actionCompleted = [];
-    if (object.address !== undefined && object.address !== null) {
-      message.address = String(object.address);
-    } else {
-      message.address = "";
-    }
-    if (
+    message.address =
+      object.address !== undefined && object.address !== null
+        ? String(object.address)
+        : "";
+    message.initialClaimableAmount =
       object.initialClaimableAmount !== undefined &&
       object.initialClaimableAmount !== null
-    ) {
-      message.initialClaimableAmount = Long.fromString(
-        object.initialClaimableAmount
-      );
-    } else {
-      message.initialClaimableAmount = Long.ZERO;
-    }
-    if (
-      object.actionCompleted !== undefined &&
-      object.actionCompleted !== null
-    ) {
-      for (const e of object.actionCompleted) {
-        message.actionCompleted.push(Boolean(e));
-      }
-    }
+        ? Long.fromString(object.initialClaimableAmount)
+        : Long.ZERO;
+    message.actionCompleted = (object.actionCompleted ?? []).map((e: any) =>
+      Boolean(e)
+    );
     return message;
   },
 
@@ -182,12 +170,7 @@ export const ClaimRecord = {
 
   fromPartial(object: DeepPartial<ClaimRecord>): ClaimRecord {
     const message = { ...baseClaimRecord } as ClaimRecord;
-    message.actionCompleted = [];
-    if (object.address !== undefined && object.address !== null) {
-      message.address = object.address;
-    } else {
-      message.address = "";
-    }
+    message.address = object.address ?? "";
     if (
       object.initialClaimableAmount !== undefined &&
       object.initialClaimableAmount !== null
@@ -196,14 +179,7 @@ export const ClaimRecord = {
     } else {
       message.initialClaimableAmount = Long.ZERO;
     }
-    if (
-      object.actionCompleted !== undefined &&
-      object.actionCompleted !== null
-    ) {
-      for (const e of object.actionCompleted) {
-        message.actionCompleted.push(e);
-      }
-    }
+    message.actionCompleted = (object.actionCompleted ?? []).map((e) => e);
     return message;
   },
 };
@@ -270,35 +246,23 @@ export const Params = {
 
   fromJSON(object: any): Params {
     const message = { ...baseParams } as Params;
-    if (
-      object.airdropStartTime !== undefined &&
-      object.airdropStartTime !== null
-    ) {
-      message.airdropStartTime = fromJsonTimestamp(object.airdropStartTime);
-    } else {
-      message.airdropStartTime = undefined;
-    }
-    if (
+    message.airdropStartTime =
+      object.airdropStartTime !== undefined && object.airdropStartTime !== null
+        ? fromJsonTimestamp(object.airdropStartTime)
+        : undefined;
+    message.durationUntilDecay =
       object.durationUntilDecay !== undefined &&
       object.durationUntilDecay !== null
-    ) {
-      message.durationUntilDecay = Duration.fromJSON(object.durationUntilDecay);
-    } else {
-      message.durationUntilDecay = undefined;
-    }
-    if (
-      object.durationOfDecay !== undefined &&
-      object.durationOfDecay !== null
-    ) {
-      message.durationOfDecay = Duration.fromJSON(object.durationOfDecay);
-    } else {
-      message.durationOfDecay = undefined;
-    }
-    if (object.claimDenom !== undefined && object.claimDenom !== null) {
-      message.claimDenom = String(object.claimDenom);
-    } else {
-      message.claimDenom = "";
-    }
+        ? Duration.fromJSON(object.durationUntilDecay)
+        : undefined;
+    message.durationOfDecay =
+      object.durationOfDecay !== undefined && object.durationOfDecay !== null
+        ? Duration.fromJSON(object.durationOfDecay)
+        : undefined;
+    message.claimDenom =
+      object.claimDenom !== undefined && object.claimDenom !== null
+        ? String(object.claimDenom)
+        : "";
     return message;
   },
 
@@ -320,37 +284,17 @@ export const Params = {
 
   fromPartial(object: DeepPartial<Params>): Params {
     const message = { ...baseParams } as Params;
-    if (
-      object.airdropStartTime !== undefined &&
-      object.airdropStartTime !== null
-    ) {
-      message.airdropStartTime = object.airdropStartTime;
-    } else {
-      message.airdropStartTime = undefined;
-    }
-    if (
+    message.airdropStartTime = object.airdropStartTime ?? undefined;
+    message.durationUntilDecay =
       object.durationUntilDecay !== undefined &&
       object.durationUntilDecay !== null
-    ) {
-      message.durationUntilDecay = Duration.fromPartial(
-        object.durationUntilDecay
-      );
-    } else {
-      message.durationUntilDecay = undefined;
-    }
-    if (
-      object.durationOfDecay !== undefined &&
-      object.durationOfDecay !== null
-    ) {
-      message.durationOfDecay = Duration.fromPartial(object.durationOfDecay);
-    } else {
-      message.durationOfDecay = undefined;
-    }
-    if (object.claimDenom !== undefined && object.claimDenom !== null) {
-      message.claimDenom = object.claimDenom;
-    } else {
-      message.claimDenom = "";
-    }
+        ? Duration.fromPartial(object.durationUntilDecay)
+        : undefined;
+    message.durationOfDecay =
+      object.durationOfDecay !== undefined && object.durationOfDecay !== null
+        ? Duration.fromPartial(object.durationOfDecay)
+        : undefined;
+    message.claimDenom = object.claimDenom ?? "";
     return message;
   },
 };

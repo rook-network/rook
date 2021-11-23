@@ -152,16 +152,14 @@ export const Timestamp = {
 
   fromJSON(object: any): Timestamp {
     const message = { ...baseTimestamp } as Timestamp;
-    if (object.seconds !== undefined && object.seconds !== null) {
-      message.seconds = Long.fromString(object.seconds);
-    } else {
-      message.seconds = Long.ZERO;
-    }
-    if (object.nanos !== undefined && object.nanos !== null) {
-      message.nanos = Number(object.nanos);
-    } else {
-      message.nanos = 0;
-    }
+    message.seconds =
+      object.seconds !== undefined && object.seconds !== null
+        ? Long.fromString(object.seconds)
+        : Long.ZERO;
+    message.nanos =
+      object.nanos !== undefined && object.nanos !== null
+        ? Number(object.nanos)
+        : 0;
     return message;
   },
 
@@ -180,11 +178,7 @@ export const Timestamp = {
     } else {
       message.seconds = Long.ZERO;
     }
-    if (object.nanos !== undefined && object.nanos !== null) {
-      message.nanos = object.nanos;
-    } else {
-      message.nanos = 0;
-    }
+    message.nanos = object.nanos ?? 0;
     return message;
   },
 };

@@ -130,12 +130,7 @@ export const QueryGamesResponse = {
 
   fromJSON(object: any): QueryGamesResponse {
     const message = { ...baseQueryGamesResponse } as QueryGamesResponse;
-    message.ids = [];
-    if (object.ids !== undefined && object.ids !== null) {
-      for (const e of object.ids) {
-        message.ids.push(Long.fromString(e));
-      }
-    }
+    message.ids = (object.ids ?? []).map((e: any) => Long.fromString(e));
     return message;
   },
 
@@ -151,12 +146,7 @@ export const QueryGamesResponse = {
 
   fromPartial(object: DeepPartial<QueryGamesResponse>): QueryGamesResponse {
     const message = { ...baseQueryGamesResponse } as QueryGamesResponse;
-    message.ids = [];
-    if (object.ids !== undefined && object.ids !== null) {
-      for (const e of object.ids) {
-        message.ids.push(e);
-      }
-    }
+    message.ids = (object.ids ?? []).map((e) => e);
     return message;
   },
 };
@@ -197,11 +187,10 @@ export const QueryGameStateRequest = {
 
   fromJSON(object: any): QueryGameStateRequest {
     const message = { ...baseQueryGameStateRequest } as QueryGameStateRequest;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
-    } else {
-      message.id = Long.UZERO;
-    }
+    message.id =
+      object.id !== undefined && object.id !== null
+        ? Long.fromString(object.id)
+        : Long.UZERO;
     return message;
   },
 
@@ -261,11 +250,10 @@ export const QueryGameStateResponse = {
 
   fromJSON(object: any): QueryGameStateResponse {
     const message = { ...baseQueryGameStateResponse } as QueryGameStateResponse;
-    if (object.state !== undefined && object.state !== null) {
-      message.state = State.fromJSON(object.state);
-    } else {
-      message.state = undefined;
-    }
+    message.state =
+      object.state !== undefined && object.state !== null
+        ? State.fromJSON(object.state)
+        : undefined;
     return message;
   },
 
@@ -280,11 +268,10 @@ export const QueryGameStateResponse = {
     object: DeepPartial<QueryGameStateResponse>
   ): QueryGameStateResponse {
     const message = { ...baseQueryGameStateResponse } as QueryGameStateResponse;
-    if (object.state !== undefined && object.state !== null) {
-      message.state = State.fromPartial(object.state);
-    } else {
-      message.state = undefined;
-    }
+    message.state =
+      object.state !== undefined && object.state !== null
+        ? State.fromPartial(object.state)
+        : undefined;
     return message;
   },
 };
@@ -325,11 +312,10 @@ export const QueryGameByIDRequest = {
 
   fromJSON(object: any): QueryGameByIDRequest {
     const message = { ...baseQueryGameByIDRequest } as QueryGameByIDRequest;
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
-    } else {
-      message.id = Long.UZERO;
-    }
+    message.id =
+      object.id !== undefined && object.id !== null
+        ? Long.fromString(object.id)
+        : Long.UZERO;
     return message;
   },
 
@@ -387,11 +373,10 @@ export const QueryGameByIDResponse = {
 
   fromJSON(object: any): QueryGameByIDResponse {
     const message = { ...baseQueryGameByIDResponse } as QueryGameByIDResponse;
-    if (object.game !== undefined && object.game !== null) {
-      message.game = GameSnapshot.fromJSON(object.game);
-    } else {
-      message.game = undefined;
-    }
+    message.game =
+      object.game !== undefined && object.game !== null
+        ? GameSnapshot.fromJSON(object.game)
+        : undefined;
     return message;
   },
 
@@ -406,11 +391,10 @@ export const QueryGameByIDResponse = {
     object: DeepPartial<QueryGameByIDResponse>
   ): QueryGameByIDResponse {
     const message = { ...baseQueryGameByIDResponse } as QueryGameByIDResponse;
-    if (object.game !== undefined && object.game !== null) {
-      message.game = GameSnapshot.fromPartial(object.game);
-    } else {
-      message.game = undefined;
-    }
+    message.game =
+      object.game !== undefined && object.game !== null
+        ? GameSnapshot.fromPartial(object.game)
+        : undefined;
     return message;
   },
 };
@@ -455,11 +439,10 @@ export const QueryGameByPlayerRequest = {
     const message = {
       ...baseQueryGameByPlayerRequest,
     } as QueryGameByPlayerRequest;
-    if (object.player !== undefined && object.player !== null) {
-      message.player = String(object.player);
-    } else {
-      message.player = "";
-    }
+    message.player =
+      object.player !== undefined && object.player !== null
+        ? String(object.player)
+        : "";
     return message;
   },
 
@@ -475,11 +458,7 @@ export const QueryGameByPlayerRequest = {
     const message = {
       ...baseQueryGameByPlayerRequest,
     } as QueryGameByPlayerRequest;
-    if (object.player !== undefined && object.player !== null) {
-      message.player = object.player;
-    } else {
-      message.player = "";
-    }
+    message.player = object.player ?? "";
     return message;
   },
 };
@@ -530,16 +509,14 @@ export const QueryGameByPlayerResponse = {
     const message = {
       ...baseQueryGameByPlayerResponse,
     } as QueryGameByPlayerResponse;
-    if (object.game !== undefined && object.game !== null) {
-      message.game = GameSnapshot.fromJSON(object.game);
-    } else {
-      message.game = undefined;
-    }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Long.fromString(object.id);
-    } else {
-      message.id = Long.UZERO;
-    }
+    message.game =
+      object.game !== undefined && object.game !== null
+        ? GameSnapshot.fromJSON(object.game)
+        : undefined;
+    message.id =
+      object.id !== undefined && object.id !== null
+        ? Long.fromString(object.id)
+        : Long.UZERO;
     return message;
   },
 
@@ -558,11 +535,10 @@ export const QueryGameByPlayerResponse = {
     const message = {
       ...baseQueryGameByPlayerResponse,
     } as QueryGameByPlayerResponse;
-    if (object.game !== undefined && object.game !== null) {
-      message.game = GameSnapshot.fromPartial(object.game);
-    } else {
-      message.game = undefined;
-    }
+    message.game =
+      object.game !== undefined && object.game !== null
+        ? GameSnapshot.fromPartial(object.game)
+        : undefined;
     if (object.id !== undefined && object.id !== null) {
       message.id = object.id as Long;
     } else {
@@ -605,11 +581,10 @@ export const QueryParamsRequest = {
 
   fromJSON(object: any): QueryParamsRequest {
     const message = { ...baseQueryParamsRequest } as QueryParamsRequest;
-    if (object.version !== undefined && object.version !== null) {
-      message.version = Number(object.version);
-    } else {
-      message.version = 0;
-    }
+    message.version =
+      object.version !== undefined && object.version !== null
+        ? Number(object.version)
+        : 0;
     return message;
   },
 
@@ -621,11 +596,7 @@ export const QueryParamsRequest = {
 
   fromPartial(object: DeepPartial<QueryParamsRequest>): QueryParamsRequest {
     const message = { ...baseQueryParamsRequest } as QueryParamsRequest;
-    if (object.version !== undefined && object.version !== null) {
-      message.version = object.version;
-    } else {
-      message.version = 0;
-    }
+    message.version = object.version ?? 0;
     return message;
   },
 };
@@ -669,16 +640,14 @@ export const QueryParamsResponse = {
 
   fromJSON(object: any): QueryParamsResponse {
     const message = { ...baseQueryParamsResponse } as QueryParamsResponse;
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromJSON(object.params);
-    } else {
-      message.params = undefined;
-    }
-    if (object.version !== undefined && object.version !== null) {
-      message.version = Number(object.version);
-    } else {
-      message.version = 0;
-    }
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromJSON(object.params)
+        : undefined;
+    message.version =
+      object.version !== undefined && object.version !== null
+        ? Number(object.version)
+        : 0;
     return message;
   },
 
@@ -692,16 +661,11 @@ export const QueryParamsResponse = {
 
   fromPartial(object: DeepPartial<QueryParamsResponse>): QueryParamsResponse {
     const message = { ...baseQueryParamsResponse } as QueryParamsResponse;
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromPartial(object.params);
-    } else {
-      message.params = undefined;
-    }
-    if (object.version !== undefined && object.version !== null) {
-      message.version = object.version;
-    } else {
-      message.version = 0;
-    }
+    message.params =
+      object.params !== undefined && object.params !== null
+        ? Params.fromPartial(object.params)
+        : undefined;
+    message.version = object.version ?? 0;
     return message;
   },
 };

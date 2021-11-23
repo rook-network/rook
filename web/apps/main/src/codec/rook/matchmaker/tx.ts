@@ -136,37 +136,27 @@ export const MsgHost = {
 
   fromJSON(object: any): MsgHost {
     const message = { ...baseMsgHost } as MsgHost;
-    message.invitees = [];
-    if (object.host !== undefined && object.host !== null) {
-      message.host = String(object.host);
-    } else {
-      message.host = "";
-    }
-    if (object.mode !== undefined && object.mode !== null) {
-      message.mode = Mode.fromJSON(object.mode);
-    } else {
-      message.mode = undefined;
-    }
-    if (object.modeId !== undefined && object.modeId !== null) {
-      message.modeId = Number(object.modeId);
-    } else {
-      message.modeId = undefined;
-    }
-    if (object.invitees !== undefined && object.invitees !== null) {
-      for (const e of object.invitees) {
-        message.invitees.push(String(e));
-      }
-    }
-    if (object.public !== undefined && object.public !== null) {
-      message.public = Boolean(object.public);
-    } else {
-      message.public = false;
-    }
-    if (object.scheduled !== undefined && object.scheduled !== null) {
-      message.scheduled = fromJsonTimestamp(object.scheduled);
-    } else {
-      message.scheduled = undefined;
-    }
+    message.host =
+      object.host !== undefined && object.host !== null
+        ? String(object.host)
+        : "";
+    message.mode =
+      object.mode !== undefined && object.mode !== null
+        ? Mode.fromJSON(object.mode)
+        : undefined;
+    message.modeId =
+      object.modeId !== undefined && object.modeId !== null
+        ? Number(object.modeId)
+        : undefined;
+    message.invitees = (object.invitees ?? []).map((e: any) => String(e));
+    message.public =
+      object.public !== undefined && object.public !== null
+        ? Boolean(object.public)
+        : false;
+    message.scheduled =
+      object.scheduled !== undefined && object.scheduled !== null
+        ? fromJsonTimestamp(object.scheduled)
+        : undefined;
     return message;
   },
 
@@ -189,37 +179,15 @@ export const MsgHost = {
 
   fromPartial(object: DeepPartial<MsgHost>): MsgHost {
     const message = { ...baseMsgHost } as MsgHost;
-    message.invitees = [];
-    if (object.host !== undefined && object.host !== null) {
-      message.host = object.host;
-    } else {
-      message.host = "";
-    }
-    if (object.mode !== undefined && object.mode !== null) {
-      message.mode = Mode.fromPartial(object.mode);
-    } else {
-      message.mode = undefined;
-    }
-    if (object.modeId !== undefined && object.modeId !== null) {
-      message.modeId = object.modeId;
-    } else {
-      message.modeId = undefined;
-    }
-    if (object.invitees !== undefined && object.invitees !== null) {
-      for (const e of object.invitees) {
-        message.invitees.push(e);
-      }
-    }
-    if (object.public !== undefined && object.public !== null) {
-      message.public = object.public;
-    } else {
-      message.public = false;
-    }
-    if (object.scheduled !== undefined && object.scheduled !== null) {
-      message.scheduled = object.scheduled;
-    } else {
-      message.scheduled = undefined;
-    }
+    message.host = object.host ?? "";
+    message.mode =
+      object.mode !== undefined && object.mode !== null
+        ? Mode.fromPartial(object.mode)
+        : undefined;
+    message.modeId = object.modeId ?? undefined;
+    message.invitees = (object.invitees ?? []).map((e) => e);
+    message.public = object.public ?? false;
+    message.scheduled = object.scheduled ?? undefined;
     return message;
   },
 };
@@ -257,11 +225,10 @@ export const MsgHostResponse = {
 
   fromJSON(object: any): MsgHostResponse {
     const message = { ...baseMsgHostResponse } as MsgHostResponse;
-    if (object.roomId !== undefined && object.roomId !== null) {
-      message.roomId = Long.fromString(object.roomId);
-    } else {
-      message.roomId = Long.UZERO;
-    }
+    message.roomId =
+      object.roomId !== undefined && object.roomId !== null
+        ? Long.fromString(object.roomId)
+        : Long.UZERO;
     return message;
   },
 
@@ -322,16 +289,14 @@ export const MsgJoin = {
 
   fromJSON(object: any): MsgJoin {
     const message = { ...baseMsgJoin } as MsgJoin;
-    if (object.player !== undefined && object.player !== null) {
-      message.player = String(object.player);
-    } else {
-      message.player = "";
-    }
-    if (object.roomId !== undefined && object.roomId !== null) {
-      message.roomId = Long.fromString(object.roomId);
-    } else {
-      message.roomId = Long.UZERO;
-    }
+    message.player =
+      object.player !== undefined && object.player !== null
+        ? String(object.player)
+        : "";
+    message.roomId =
+      object.roomId !== undefined && object.roomId !== null
+        ? Long.fromString(object.roomId)
+        : Long.UZERO;
     return message;
   },
 
@@ -345,11 +310,7 @@ export const MsgJoin = {
 
   fromPartial(object: DeepPartial<MsgJoin>): MsgJoin {
     const message = { ...baseMsgJoin } as MsgJoin;
-    if (object.player !== undefined && object.player !== null) {
-      message.player = object.player;
-    } else {
-      message.player = "";
-    }
+    message.player = object.player ?? "";
     if (object.roomId !== undefined && object.roomId !== null) {
       message.roomId = object.roomId as Long;
     } else {
@@ -439,16 +400,14 @@ export const MsgFind = {
 
   fromJSON(object: any): MsgFind {
     const message = { ...baseMsgFind } as MsgFind;
-    if (object.player !== undefined && object.player !== null) {
-      message.player = String(object.player);
-    } else {
-      message.player = "";
-    }
-    if (object.mode !== undefined && object.mode !== null) {
-      message.mode = Number(object.mode);
-    } else {
-      message.mode = 0;
-    }
+    message.player =
+      object.player !== undefined && object.player !== null
+        ? String(object.player)
+        : "";
+    message.mode =
+      object.mode !== undefined && object.mode !== null
+        ? Number(object.mode)
+        : 0;
     return message;
   },
 
@@ -461,16 +420,8 @@ export const MsgFind = {
 
   fromPartial(object: DeepPartial<MsgFind>): MsgFind {
     const message = { ...baseMsgFind } as MsgFind;
-    if (object.player !== undefined && object.player !== null) {
-      message.player = object.player;
-    } else {
-      message.player = "";
-    }
-    if (object.mode !== undefined && object.mode !== null) {
-      message.mode = object.mode;
-    } else {
-      message.mode = 0;
-    }
+    message.player = object.player ?? "";
+    message.mode = object.mode ?? 0;
     return message;
   },
 };
@@ -508,11 +459,10 @@ export const MsgFindResponse = {
 
   fromJSON(object: any): MsgFindResponse {
     const message = { ...baseMsgFindResponse } as MsgFindResponse;
-    if (object.roomId !== undefined && object.roomId !== null) {
-      message.roomId = Long.fromString(object.roomId);
-    } else {
-      message.roomId = Long.UZERO;
-    }
+    message.roomId =
+      object.roomId !== undefined && object.roomId !== null
+        ? Long.fromString(object.roomId)
+        : Long.UZERO;
     return message;
   },
 
@@ -573,16 +523,14 @@ export const MsgLeave = {
 
   fromJSON(object: any): MsgLeave {
     const message = { ...baseMsgLeave } as MsgLeave;
-    if (object.player !== undefined && object.player !== null) {
-      message.player = String(object.player);
-    } else {
-      message.player = "";
-    }
-    if (object.roomId !== undefined && object.roomId !== null) {
-      message.roomId = Long.fromString(object.roomId);
-    } else {
-      message.roomId = Long.UZERO;
-    }
+    message.player =
+      object.player !== undefined && object.player !== null
+        ? String(object.player)
+        : "";
+    message.roomId =
+      object.roomId !== undefined && object.roomId !== null
+        ? Long.fromString(object.roomId)
+        : Long.UZERO;
     return message;
   },
 
@@ -596,11 +544,7 @@ export const MsgLeave = {
 
   fromPartial(object: DeepPartial<MsgLeave>): MsgLeave {
     const message = { ...baseMsgLeave } as MsgLeave;
-    if (object.player !== undefined && object.player !== null) {
-      message.player = object.player;
-    } else {
-      message.player = "";
-    }
+    message.player = object.player ?? "";
     if (object.roomId !== undefined && object.roomId !== null) {
       message.roomId = object.roomId as Long;
     } else {
@@ -690,16 +634,14 @@ export const MsgAddMode = {
 
   fromJSON(object: any): MsgAddMode {
     const message = { ...baseMsgAddMode } as MsgAddMode;
-    if (object.authority !== undefined && object.authority !== null) {
-      message.authority = String(object.authority);
-    } else {
-      message.authority = "";
-    }
-    if (object.mode !== undefined && object.mode !== null) {
-      message.mode = Mode.fromJSON(object.mode);
-    } else {
-      message.mode = undefined;
-    }
+    message.authority =
+      object.authority !== undefined && object.authority !== null
+        ? String(object.authority)
+        : "";
+    message.mode =
+      object.mode !== undefined && object.mode !== null
+        ? Mode.fromJSON(object.mode)
+        : undefined;
     return message;
   },
 
@@ -713,16 +655,11 @@ export const MsgAddMode = {
 
   fromPartial(object: DeepPartial<MsgAddMode>): MsgAddMode {
     const message = { ...baseMsgAddMode } as MsgAddMode;
-    if (object.authority !== undefined && object.authority !== null) {
-      message.authority = object.authority;
-    } else {
-      message.authority = "";
-    }
-    if (object.mode !== undefined && object.mode !== null) {
-      message.mode = Mode.fromPartial(object.mode);
-    } else {
-      message.mode = undefined;
-    }
+    message.authority = object.authority ?? "";
+    message.mode =
+      object.mode !== undefined && object.mode !== null
+        ? Mode.fromPartial(object.mode)
+        : undefined;
     return message;
   },
 };
@@ -760,11 +697,10 @@ export const MsgAddModeResponse = {
 
   fromJSON(object: any): MsgAddModeResponse {
     const message = { ...baseMsgAddModeResponse } as MsgAddModeResponse;
-    if (object.modeId !== undefined && object.modeId !== null) {
-      message.modeId = Number(object.modeId);
-    } else {
-      message.modeId = 0;
-    }
+    message.modeId =
+      object.modeId !== undefined && object.modeId !== null
+        ? Number(object.modeId)
+        : 0;
     return message;
   },
 
@@ -776,11 +712,7 @@ export const MsgAddModeResponse = {
 
   fromPartial(object: DeepPartial<MsgAddModeResponse>): MsgAddModeResponse {
     const message = { ...baseMsgAddModeResponse } as MsgAddModeResponse;
-    if (object.modeId !== undefined && object.modeId !== null) {
-      message.modeId = object.modeId;
-    } else {
-      message.modeId = 0;
-    }
+    message.modeId = object.modeId ?? 0;
     return message;
   },
 };
@@ -824,16 +756,12 @@ export const MsgRemoveMode = {
 
   fromJSON(object: any): MsgRemoveMode {
     const message = { ...baseMsgRemoveMode } as MsgRemoveMode;
-    if (object.authority !== undefined && object.authority !== null) {
-      message.authority = String(object.authority);
-    } else {
-      message.authority = "";
-    }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = Number(object.id);
-    } else {
-      message.id = 0;
-    }
+    message.authority =
+      object.authority !== undefined && object.authority !== null
+        ? String(object.authority)
+        : "";
+    message.id =
+      object.id !== undefined && object.id !== null ? Number(object.id) : 0;
     return message;
   },
 
@@ -846,16 +774,8 @@ export const MsgRemoveMode = {
 
   fromPartial(object: DeepPartial<MsgRemoveMode>): MsgRemoveMode {
     const message = { ...baseMsgRemoveMode } as MsgRemoveMode;
-    if (object.authority !== undefined && object.authority !== null) {
-      message.authority = object.authority;
-    } else {
-      message.authority = "";
-    }
-    if (object.id !== undefined && object.id !== null) {
-      message.id = object.id;
-    } else {
-      message.id = 0;
-    }
+    message.authority = object.authority ?? "";
+    message.id = object.id ?? 0;
     return message;
   },
 };

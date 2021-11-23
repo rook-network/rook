@@ -63,11 +63,8 @@ export const GenericAuthorization = {
 
   fromJSON(object: any): GenericAuthorization {
     const message = { ...baseGenericAuthorization } as GenericAuthorization;
-    if (object.msg !== undefined && object.msg !== null) {
-      message.msg = String(object.msg);
-    } else {
-      message.msg = "";
-    }
+    message.msg =
+      object.msg !== undefined && object.msg !== null ? String(object.msg) : "";
     return message;
   },
 
@@ -79,11 +76,7 @@ export const GenericAuthorization = {
 
   fromPartial(object: DeepPartial<GenericAuthorization>): GenericAuthorization {
     const message = { ...baseGenericAuthorization } as GenericAuthorization;
-    if (object.msg !== undefined && object.msg !== null) {
-      message.msg = object.msg;
-    } else {
-      message.msg = "";
-    }
+    message.msg = object.msg ?? "";
     return message;
   },
 };
@@ -129,16 +122,14 @@ export const Grant = {
 
   fromJSON(object: any): Grant {
     const message = { ...baseGrant } as Grant;
-    if (object.authorization !== undefined && object.authorization !== null) {
-      message.authorization = Any.fromJSON(object.authorization);
-    } else {
-      message.authorization = undefined;
-    }
-    if (object.expiration !== undefined && object.expiration !== null) {
-      message.expiration = fromJsonTimestamp(object.expiration);
-    } else {
-      message.expiration = undefined;
-    }
+    message.authorization =
+      object.authorization !== undefined && object.authorization !== null
+        ? Any.fromJSON(object.authorization)
+        : undefined;
+    message.expiration =
+      object.expiration !== undefined && object.expiration !== null
+        ? fromJsonTimestamp(object.expiration)
+        : undefined;
     return message;
   },
 
@@ -155,16 +146,11 @@ export const Grant = {
 
   fromPartial(object: DeepPartial<Grant>): Grant {
     const message = { ...baseGrant } as Grant;
-    if (object.authorization !== undefined && object.authorization !== null) {
-      message.authorization = Any.fromPartial(object.authorization);
-    } else {
-      message.authorization = undefined;
-    }
-    if (object.expiration !== undefined && object.expiration !== null) {
-      message.expiration = object.expiration;
-    } else {
-      message.expiration = undefined;
-    }
+    message.authorization =
+      object.authorization !== undefined && object.authorization !== null
+        ? Any.fromPartial(object.authorization)
+        : undefined;
+    message.expiration = object.expiration ?? undefined;
     return message;
   },
 };
