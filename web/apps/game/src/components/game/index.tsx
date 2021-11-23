@@ -156,11 +156,11 @@ class GameComponent extends React.Component<GameProps, GameState> {
     if (!this.state.faction) return
     const index = this.findPopulaceIndex(this.state.cursor)
     if (index === null) return
-    let totalPopulation = this.state.faction.population[index].amount
+    const totalPopulation = this.state.faction.population[index].amount
     population = population === undefined || population > totalPopulation ? totalPopulation:population;
 
     const resp = await this.props.provider.tx.Move({
-      creator: this.props.provider.getAddress(),
+      creator: this.props.provider.address,
       gameId: this.props.gameID,
       populace: index,
       direction: direction,

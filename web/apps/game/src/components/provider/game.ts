@@ -7,16 +7,17 @@ import {
 import { SocketWrapper, SocketWrapperMessageEvent, SocketWrapperErrorEvent } from '@cosmjs/socket'
 import { Registry, DirectSecp256k1HdWallet } from '@cosmjs/proto-signing'
 import { SigningStargateClient, QueryClient, createProtobufRpcClient } from '@cosmjs/stargate'
+import { MsgExec } from '../../codec/cosmos/authz/v1beta1/tx'
+import { typeMsgExec } from './authorization'
 import { defaultFee } from './types'
 import { Provider } from './root'
 import { State } from '../../codec/rook/game/game'
 import config from '../../config';
-import { runInThisContext } from 'vm';
 
 export const typeMsgCreate = "/rook.game.MsgCreate"
 export const typeMsgBuild = "/rook.game.MsgBuild"
 export const typeMsgMove = "/rook.game.MsgMove"
-export const typeMsgChangeParams = "/rook.game.MsgChamgeParams"
+export const typeMsgChangeParams = "/rook.game.MsgChangeParams"
 
 export const eventGame = "game.game"
 export const eventNewBlock = "tendermint/event/NewBlock"
@@ -25,7 +26,7 @@ export const attributeGameID = "game_id"
 export const attributeState = "state"
 
 export class GameProvider {
-    private readonly address: string
+    public readonly address: string
     public query: GameQueryClient
     public tx: IGameMsgClient
 
@@ -90,6 +91,7 @@ export class GameProvider {
         registry.register(typeMsgBuild, MsgBuild)
         registry.register(typeMsgMove, MsgMove)
         registry.register(typeMsgChangeParams, MsgChangeParams)
+        registry.register(typeMsgExec, MsgExec)
     }
 
     async subscribeToGame(id: Long, onUpdate: (state: State) => void): Promise<void> {
@@ -173,10 +175,6 @@ export class GameProvider {
         console.log(state)
         this.onUpdate(state)
     }
-
-    getAddress(): string {
-        return this.address
-    }
 }
 
 export class GameMsgClient implements IGameMsgClient {
@@ -188,16 +186,37 @@ export class GameMsgClient implements IGameMsgClient {
         this.address = address
     }
 
-    private async send(request: any, typeUrl: string) {
+    private async send(request: any, typeUrl: string, authorize?: boolean) {
+        console.log(this.address)
+        if (authorize) {
+            const msgExecute: MsgExec = {
+                grantee: this.address,
+                msgs: [{
+                    typeUrl: typeUrl,
+                    value: request
+                }]
+            }
+            return await this.client.signAndBroadcast(
+                this.address,
+                [{
+                    typeUrl: typeMsgExec,
+                    value: msgExecute //MsgExec.encode(msgExecute).finish()
+                }],
+                defaultFee
+            )
+        }
         return await this.client.signAndBroadcast(
             this.address,
-            [{ typeUrl: typeUrl, value: request}],
+            [{ 
+                typeUrl: typeUrl, 
+                value: request,
+            }],
             defaultFee
         )
     }
 
     async Move(request: MsgMove): Promise<MsgMoveResponse> {
-        const resp = await this.send(request, typeMsgMove)
+        const resp = await this.send(request, typeMsgMove, true)
         console.log(resp.data)
         if (resp.data === undefined)
             throw new Error(resp.rawLog)
@@ -205,13 +224,15 @@ export class GameMsgClient implements IGameMsgClient {
     }
 
     async Build(request: MsgBuild): Promise<MsgBuildResponse> {
-        const resp = await this.send(request, typeMsgBuild)
+        const resp = await this.send(request, typeMsgBuild, true)
         console.log(resp.data)
         if (resp.data === undefined)
             throw new Error(resp.rawLog)
         return MsgBuildResponse.decode(new _m0.Reader(resp.data[0]!.data))
     }
 
+    // TODO: these haven't yet been implemented but we don't expect a player account
+    // to be executing any of these functions
     async Create(request: MsgCreate): Promise<MsgCreateResponse> {
         const resp = await this.send(request, typeMsgCreate)
         console.log(resp.data)

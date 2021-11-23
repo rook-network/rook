@@ -1,7 +1,7 @@
 import { QueryClient, SigningStargateClient, createProtobufRpcClient } from '@cosmjs/stargate';
 import { GenericAuthorization } from '../../codec/cosmos/authz/v1beta1/authz'
 import { QueryClientImpl as AuthzQueryClient } from '../../codec/cosmos/authz/v1beta1/query'
-import { MsgGrant } from '../../codec/cosmos/authz/v1beta1/tx'
+import { MsgGrant, MsgExec } from '../../codec/cosmos/authz/v1beta1/tx'
 import { MsgGrantAllowance } from '../../codec/cosmos/feegrant/v1beta1/tx'
 import { BasicAllowance, AllowedMsgAllowance } from '../../codec/cosmos/feegrant/v1beta1/feegrant'
 import { Any } from '../../codec/google/protobuf/any'
@@ -11,9 +11,10 @@ import { Registry } from '@cosmjs/proto-signing'
 
 const typeGenericAuthorization = "/cosmos.authz.v1beta1.GenericAuthorization"
 const typeMsgGrant = "/cosmos.authz.v1beta1.MsgGrant"
+export const typeMsgExec = "/cosmos.authz.v1beta1.MsgExec"
 const typeMsgGrantAllowance = "/cosmos.feegrant.v1beta1.MsgGrantAllowance"
 const typeBasicAllowance = "/cosmos.feegrant.v1beta1.BasicAllowance"
-const typeAlloweMsgAllowance = "/cosmos.feegrant.v1beta1.AllowMsgAllowance"
+const typeAllowedMsgAllowance = "/cosmos.feegrant.v1beta1.AllowedMsgAllowance"
 
 const buildGrant: GenericAuthorization = {
   msg: typeMsgBuild,
@@ -49,6 +50,8 @@ export class AuthorizationProvider {
 
   static register(registry: Registry) {
     registry.register(typeMsgGrant, MsgGrant)
+    registry.register(typeMsgGrantAllowance, MsgGrantAllowance)
+    registry.register(typeMsgExec, MsgExec)
   }
 
   async authorizePlayerAccount(player: string): Promise<void> {
@@ -131,7 +134,7 @@ export class AuthorizationProvider {
       granter: this.address,
       grantee: player,
       allowance: {
-        typeUrl: typeAlloweMsgAllowance,
+        typeUrl: typeAllowedMsgAllowance,
         value: AllowedMsgAllowance.encode(playerAllowance).finish()
       }
     }
