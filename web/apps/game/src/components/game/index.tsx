@@ -156,11 +156,14 @@ class GameComponent extends React.Component<GameProps, GameState> {
     if (!this.state.faction) return
     const index = this.findPopulaceIndex(this.state.cursor)
     if (index === null) return
-    const totalPopulation = this.state.faction.population[index].amount
+    let totalPopulation = this.state.faction.population[index].amount
+    // when moving away from a settlement at least one population must be left behind
+    if (this.state.faction.population[index].settlement !== Settlement.NONE)
+      totalPopulation--
     population = population === undefined || population > totalPopulation ? totalPopulation:population;
-
+    console.log("sending move request")
     const resp = await this.props.provider.tx.Move({
-      creator: this.props.provider.address,
+      creator: this.props.provider.mainAddress,
       gameId: this.props.gameID,
       populace: index,
       direction: direction,

@@ -6,7 +6,7 @@ import {
 } from '../../codec/rook/game/tx'
 import { SocketWrapper, SocketWrapperMessageEvent, SocketWrapperErrorEvent } from '@cosmjs/socket'
 import { Registry, DirectSecp256k1HdWallet } from '@cosmjs/proto-signing'
-import { SigningStargateClient, QueryClient, createProtobufRpcClient } from '@cosmjs/stargate'
+import { SigningStargateClient, QueryClient, createProtobufRpcClient, isBroadcastTxSuccess } from '@cosmjs/stargate'
 import { MsgExec } from '../../codec/cosmos/authz/v1beta1/tx'
 import { typeMsgExec } from './authorization'
 import { defaultFee } from './types'
@@ -26,7 +26,8 @@ export const attributeGameID = "game_id"
 export const attributeState = "state"
 
 export class GameProvider {
-    public readonly address: string
+    public readonly playerAddress: string
+    public readonly mainAddress: string
     public query: GameQueryClient
     public tx: IGameMsgClient
 
@@ -63,14 +64,15 @@ export class GameProvider {
             await provider.authz.authorizePlayerAccount(address)
         }
 
-        return new GameProvider(provider.getQuerier(), client, address)
+        return new GameProvider(provider.getQuerier(), client, address, mainAddress)
     }
 
-    constructor(querier: QueryClient, client: SigningStargateClient, address: string) {
+    constructor(querier: QueryClient, client: SigningStargateClient, address: string, mainAddress: string) {
         const protoRpcClient = createProtobufRpcClient(querier)
         this.query = new GameQueryClient(protoRpcClient)
         this.tx = new GameMsgClient(client, address)
-        this.address = address
+        this.playerAddress = address
+        this.mainAddress = mainAddress
         this.socket = new SocketWrapper(
             config.wsEndpoint,
             (event: SocketWrapperMessageEvent) => {
@@ -186,66 +188,59 @@ export class GameMsgClient implements IGameMsgClient {
         this.address = address
     }
 
-    private async send(request: any, typeUrl: string, authorize?: boolean) {
+    private async send(request: any, typeUrl: string) {
         console.log(this.address)
-        if (authorize) {
-            const msgExecute: MsgExec = {
-                grantee: this.address,
-                msgs: [{
-                    typeUrl: typeUrl,
-                    value: request
-                }]
-            }
-            return await this.client.signAndBroadcast(
-                this.address,
-                [{
-                    typeUrl: typeMsgExec,
-                    value: msgExecute //MsgExec.encode(msgExecute).finish()
-                }],
-                defaultFee
-            )
+        const msgExecute: MsgExec = {
+            grantee: this.address,
+            msgs: [{
+                typeUrl: typeUrl,
+                value: request
+            }]
         }
-        return await this.client.signAndBroadcast(
+        const resp = await this.client.signAndBroadcast(
             this.address,
-            [{ 
-                typeUrl: typeUrl, 
-                value: request,
+            [{
+                typeUrl: typeMsgExec,
+                value: msgExecute
             }],
             defaultFee
         )
+
+        if (!isBroadcastTxSuccess(resp))
+            throw new Error(`Transaction failed with code (${resp.code}): ${resp.rawLog}`)
+
+        return resp
     }
 
     async Move(request: MsgMove): Promise<MsgMoveResponse> {
-        const resp = await this.send(request, typeMsgMove, true)
+        const resp = await this.send(MsgMove.encode(request).finish(), typeMsgMove)
         console.log(resp.data)
-        if (resp.data === undefined)
-            throw new Error(resp.rawLog)
-        return MsgMoveResponse.decode(new _m0.Reader(resp.data[0]!.data))
+        return {}
     }
 
     async Build(request: MsgBuild): Promise<MsgBuildResponse> {
-        const resp = await this.send(request, typeMsgBuild, true)
+        const resp = await this.send(MsgBuild.encode(request).finish(), typeMsgBuild)
         console.log(resp.data)
-        if (resp.data === undefined)
-            throw new Error(resp.rawLog)
-        return MsgBuildResponse.decode(new _m0.Reader(resp.data[0]!.data))
+        return {}
     }
 
     // TODO: these haven't yet been implemented but we don't expect a player account
     // to be executing any of these functions
     async Create(request: MsgCreate): Promise<MsgCreateResponse> {
-        const resp = await this.send(request, typeMsgCreate)
-        console.log(resp.data)
-        if (resp.data === undefined)
-            throw new Error(resp.rawLog)
-        return MsgCreateResponse.decode(new _m0.Reader(resp.data[0]!.data))
+        throw new Error("Not implemented")
+        // const resp = await this.send(request, typeMsgCreate)
+        // console.log(resp.data)
+        // if (resp.data === undefined)
+        //     throw new Error(resp.rawLog)
+        // return MsgCreateResponse.decode(new _m0.Reader(resp.data[0]!.data))
     }
 
     async ChangeParams(request: MsgChangeParams): Promise<MsgChangeParamsResponse> {
-        const resp = await this.send(request, typeMsgChangeParams)
-        console.log(resp.data)
-        if (resp.data === undefined)
-            throw new Error(resp.rawLog)
-        return MsgChangeParamsResponse.decode(new _m0.Reader(resp.data[0]!.data))
+        throw new Error("Not implemented")
+        // const resp = await this.send(request, typeMsgChangeParams)
+        // console.log(resp.data)
+        // if (resp.data === undefined)
+        //     throw new Error(resp.rawLog)
+        // return MsgChangeParamsResponse.decode(new _m0.Reader(resp.data[0]!.data))
     }
 }

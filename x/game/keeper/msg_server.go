@@ -53,6 +53,8 @@ func (m msgServer) Move(goCtx context.Context, msg *types.MsgMove) (*types.MsgMo
 	resp := &types.MsgMoveResponse{}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	ctx.Logger().Error("Received Move Request", "msg", msg)
+
 	game, err := m.Keeper.GetGame(ctx, msg.GameId)
 	if err != nil {
 		return resp, err
@@ -64,6 +66,7 @@ func (m msgServer) Move(goCtx context.Context, msg *types.MsgMove) (*types.MsgMo
 	}
 
 	m.Keeper.SetGame(ctx, msg.GameId, &game)
+	ctx.Logger().Error("Finished Move Request", "msg", msg)
 	return resp, err
 }
 

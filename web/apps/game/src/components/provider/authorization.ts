@@ -55,6 +55,7 @@ export class AuthorizationProvider {
   }
 
   async authorizePlayerAccount(player: string): Promise<void> {
+    console.log("authorizing player " + player)
     const messages = [
       {
         typeUrl: typeMsgGrantAllowance,
@@ -111,7 +112,10 @@ export class AuthorizationProvider {
         authorization: {
           typeUrl: typeGenericAuthorization,
           value: GenericAuthorization.encode(buildGrant).finish()
-        }
+        },
+        // it's currently not possible to have no expiration so we set something
+        // far in the future (5 years)
+        expiration: setExpiry(5), 
       }
     }
   }
@@ -124,7 +128,8 @@ export class AuthorizationProvider {
         authorization: {
           typeUrl: typeGenericAuthorization,
           value: GenericAuthorization.encode(moveGrant).finish()
-        }
+        },
+        expiration: setExpiry(5),
       }
     }
   }
@@ -140,4 +145,12 @@ export class AuthorizationProvider {
     }
   }
 
+}
+
+function setExpiry(years: number): Date {
+  const d = new Date()
+  const y = d.getFullYear()
+  const months = d.getMonth()
+  const days = d.getDay()
+  return new Date(y + years, months, days)
 }
