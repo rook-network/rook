@@ -7,6 +7,7 @@ export interface MapProps {
   cursor: Position
   map: Map
   territory: (Territory | null)[]
+  setCursor: (index: number) => void
 }
 
 export function MapComponent(props: MapProps) {
@@ -53,6 +54,7 @@ export function MapComponent(props: MapProps) {
               territory={props.territory[val]}
               size={size}
               selected={isSelected(index)}
+              setCursor={props.setCursor}
             />
         ))}
       </div>

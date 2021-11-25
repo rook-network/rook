@@ -40,6 +40,7 @@ class GameComponent extends React.Component<GameProps, GameState> {
     this.load = this.load.bind(this)
     this.calculateTerritory = this.calculateTerritory.bind(this)
     this.handleKeyDown = this.handleKeyDown.bind(this)
+    this.setCursor = this.setCursor.bind(this)
     document.addEventListener('keydown', this.handleKeyDown)
   }
 
@@ -116,6 +117,23 @@ class GameComponent extends React.Component<GameProps, GameState> {
       case "d":
         this.move(Direction.RIGHT)
         break
+      case "q":
+        this.build(Settlement.QUARRY)
+        break;
+      case "f":
+        this.build(Settlement.FARM)
+        break;
+      case "t":
+        this.build(Settlement.TOWN)
+        break;
+      case "r":
+        this.build(Settlement.ROOK)
+        break;
+      case "c":
+        this.build(Settlement.CITY)
+        break;
+      case "l":
+        this.build(Settlement.LUMBERMILL)
     }
     return
   }
@@ -129,6 +147,13 @@ class GameComponent extends React.Component<GameProps, GameState> {
         })
       }
     }
+  }
+
+  setCursor(index: number): void {
+    if (!this.state.game || !this.state.game.map) return
+    const pos = indexToPosition(index, this.state.game.map.width)
+    console.log("setting cursor to " + pos.x + " and " + pos.y)
+    this.setState({ cursor: pos })
   }
 
   calculateTerritory() {
@@ -150,6 +175,10 @@ class GameComponent extends React.Component<GameProps, GameState> {
     }
     console.log(territory)
     this.setState({ territory: territory })
+  }
+
+  async build(settlement: Settlement): Promise<void> {
+    return
   }
 
   async move(direction: Direction, population?: number): Promise<void> {
@@ -199,7 +228,7 @@ class GameComponent extends React.Component<GameProps, GameState> {
     return (
       <>
         <ResourcesDisplay resources={this.state.faction.resources!}/>
-        <MapComponent map={this.state.game.map} territory={this.state.territory} cursor={this.state.cursor}/>
+        <MapComponent map={this.state.game.map} territory={this.state.territory} cursor={this.state.cursor} setCursor={this.setCursor}/>
       </>
     );
   }
@@ -207,6 +236,10 @@ class GameComponent extends React.Component<GameProps, GameState> {
 
 function positionToIndex(pos: Position, width: number): number {
   return pos.y * width + pos.x
+}
+
+function indexToPosition(index: number, width: number): Position {
+  return { x: index % width, y: Math.floor(index / width) }
 }
 
 function isOurFaction(faction: Faction, player: string): boolean {

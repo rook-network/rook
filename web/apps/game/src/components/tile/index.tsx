@@ -1,5 +1,5 @@
 import styles from './tile.module.less';
-import { Landscape, Populace, Settlement } from "../../codec/rook/game/game"
+import { Landscape, Populace, Position, Settlement } from "../../codec/rook/game/game"
 import Mountains1 from '../../assets/terrain/Mountains-1.png';
 import Mountains2 from '../../assets/terrain/Mountains-2.png';
 import Mountains3 from '../../assets/terrain/Mountains-3.png';
@@ -41,6 +41,7 @@ export interface TileProps {
   x: number;
   y: number;
   selected: boolean;
+  setCursor: (index: number) => void;
 }
 
 export type Territory = {
@@ -119,8 +120,12 @@ export function Tile(props: TileProps) {
     }
   }
 
+  const handleClick = (e: any) => {
+    props.setCursor(props.index)
+  }
+
   return (
-    <div className={styles.tile} style={{ 
+    <div className={styles.tile} onClick={handleClick} style={{ 
       marginLeft:props.x, marginTop:props.y, 
       backgroundColor:colour,
       width: props.size, height: props.size}}>
