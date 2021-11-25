@@ -11,7 +11,7 @@ import { MsgExec } from '../../codec/cosmos/authz/v1beta1/tx'
 import { typeMsgExec } from './authorization'
 import { defaultFee } from './types'
 import { Provider } from './root'
-import { State } from '../../codec/rook/game/game'
+import { State, Settlement } from '../../codec/rook/game/game'
 import config from '../../config';
 
 export const typeMsgCreate = "/rook.game.MsgCreate"
@@ -160,6 +160,10 @@ export class GameProvider {
                 faction.resources.wood = 0
             }
             for (const populace of faction.population) {
+                if (populace.settlement === undefined) {
+                    populace.settlement = Settlement.NONE
+                }
+
                 if (!populace.position) {
                     populace.position = { x: 0, y: 0 }
                     continue

@@ -63,7 +63,7 @@ export function Tile(props: TileProps) {
     colour = shadeColour(colour, -20)
     console.log("new colour: " + colour)
   }
-  if (props.territory && props.territory.populace.settlement !== Settlement.NONE) { 
+  if (props.territory && props.territory.populace.settlement !== Settlement.NONE && props.territory.populace.settlement !== undefined) { 
     switch(props.territory.populace.settlement) {
       case Settlement.CAPITAL:
         tile = Capital
@@ -94,7 +94,7 @@ export function Tile(props: TileProps) {
         break
 
       default:
-        console.error("unknown settlement")
+        console.error("unknown settlement " + props.territory.populace.settlement)
     }
   } else {
     switch (props.landscape) {

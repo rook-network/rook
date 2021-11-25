@@ -3,7 +3,7 @@ import React from 'react'
 import MapComponent from '../map';
 import { Territory } from '../tile';
 import { GameProvider } from "../provider";
-import { GameSnapshot, Position, Faction, Settlement, State, Direction } from "../../codec/rook/game/game";
+import { GameSnapshot, Position, Faction, Settlement, State, Direction, ResourceSet } from "../../codec/rook/game/game";
 import { Params } from "../../codec/rook/game/config";
 import { LoadingCard } from '../card/index';
 import { ResourcesDisplay } from '../gui'
@@ -156,6 +156,11 @@ class GameComponent extends React.Component<GameProps, GameState> {
     this.setState({ cursor: pos })
   }
 
+  getCost(settlement: Settlement): ResourceSet | null {
+    if (!this.state.params) return null
+    return this.state.params.constructionCost[settlement as number]
+  }
+
   calculateTerritory() {
     if (!this.state.game || !this.state.game.map)
       return
@@ -178,7 +183,19 @@ class GameComponent extends React.Component<GameProps, GameState> {
   }
 
   async build(settlement: Settlement): Promise<void> {
-    return
+    if (!this.state.faction) return
+    const index = this.findPopulaceIndex(this.state.cursor)
+    if (index === null) return
+    const cost = this.getCost(settlement)
+    if (cost === null) return
+    if (!canAfford(this.state.faction.resources!, cost)) return
+    const resp = await this.props.provider.tx.Build({
+      creator: this.props.provider.mainAddress,
+      gameId: this.props.gameID,
+      populace: index,
+      settlement: settlement
+    })
+    console.log(resp)
   }
 
   async move(direction: Direction, population?: number): Promise<void> {
@@ -262,3 +279,7 @@ function initCursor(faction?: Faction): Position {
 }
 
 export default GameComponent;
+
+function canAfford(balance: ResourceSet, cost: ResourceSet): boolean {
+  return balance.food >= cost.food && balance.stone >= cost.stone && balance.wood >= cost.wood
+}
