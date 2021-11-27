@@ -6,7 +6,7 @@ import { GameProvider } from "../provider";
 import { GameSnapshot, Position, Faction, Settlement, State, Direction, ResourceSet } from "../../codec/rook/game/game";
 import { Params } from "../../codec/rook/game/config";
 import { LoadingCard } from '../card/index';
-import { ResourcesDisplay } from '../gui'
+import { ResourcesDisplay, EndGameDisplay } from '../gui'
 import Long from 'long';
 
 const allyColour = "#0E9594"
@@ -16,6 +16,7 @@ export interface GameProps {
   gameID: Long
   provider: GameProvider
   address: string
+  quit: () => void
 }
 
 export interface GameState {
@@ -24,6 +25,8 @@ export interface GameState {
   territory?: (Territory | null)[]
   error?: Error
   faction?: Faction
+  completed: boolean
+  winners: string[]
   cursor: Position
 }
 
@@ -35,6 +38,8 @@ class GameComponent extends React.Component<GameProps, GameState> {
       params: undefined,
       error: undefined,
       faction: undefined,
+      completed: false,
+      winners: [],
       cursor: {x: 0, y: 0}
     }
     this.load = this.load.bind(this)
@@ -84,6 +89,11 @@ class GameComponent extends React.Component<GameProps, GameState> {
       this.setState({ game: game})
       this.calculateTerritory()
       this.updateUsersFaction()
+    }, (winners: string[]) => {
+      this.setState({
+        completed: true,
+        winners: winners,
+      })
     })
   }
 
@@ -183,6 +193,7 @@ class GameComponent extends React.Component<GameProps, GameState> {
   }
 
   async build(settlement: Settlement): Promise<void> {
+    if (this.state.completed) return
     if (!this.state.faction) return
     const index = this.findPopulaceIndex(this.state.cursor)
     if (index === null) return
@@ -199,6 +210,7 @@ class GameComponent extends React.Component<GameProps, GameState> {
   }
 
   async move(direction: Direction, population?: number): Promise<void> {
+    if (this.state.completed) return 
     if (!this.state.faction) return
     const index = this.findPopulaceIndex(this.state.cursor)
     if (index === null) return
@@ -244,6 +256,9 @@ class GameComponent extends React.Component<GameProps, GameState> {
 
     return (
       <>
+        { this.state.completed &&
+          <EndGameDisplay winningFaction={this.state.winners} quit={this.props.quit} />
+        }
         <ResourcesDisplay resources={this.state.faction.resources!}/>
         <MapComponent map={this.state.game.map} territory={this.state.territory} cursor={this.state.cursor} setCursor={this.setCursor}/>
       </>

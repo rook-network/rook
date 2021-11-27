@@ -37,6 +37,7 @@ class App extends React.Component<any, AppState> {
     this.connectWallet = this.connectWallet.bind(this)
     this.setGame = this.setGame.bind(this)
     this.findGame = this.findGame.bind(this)
+    this.leaveGame = this.leaveGame.bind(this)
   }
 
   async componentDidMount() {
@@ -111,6 +112,12 @@ class App extends React.Component<any, AppState> {
     })
   }
 
+  leaveGame(): void {
+    this.setState({
+      gameID: new Long(0)
+    })
+  }
+
   render() {
     if (!keplrEnabled()) {
       return <NotConnectedCard connectFn={this.connectWallet} /> 
@@ -147,6 +154,7 @@ class App extends React.Component<any, AppState> {
             gameID={this.state.gameID}
             provider={this.playerProvider}
             address={this.state.address}
+            quit={this.leaveGame}
           />
         }
       </div>

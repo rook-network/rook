@@ -33,6 +33,7 @@ export class GameProvider {
 
     private socket: SocketWrapper
     private onUpdate?: (state: State) => void
+    private onEnd?: (winners: string[]) => void
 
     public static async connect(provider: Provider) {
         const mainAddress = provider.getAddress()
@@ -96,12 +97,16 @@ export class GameProvider {
         registry.register(typeMsgExec, MsgExec)
     }
 
-    async subscribeToGame(id: Long, onUpdate: (state: State) => void): Promise<void> {
+    async subscribeToGame(
+        id: Long, 
+        onUpdate: (state: State) => void, 
+        onEnd: (winners: string[]) => void): Promise<void> {
         if (this.onUpdate) {
             throw new Error("already subscribed to game events")
         }
 
         this.onUpdate = onUpdate
+        this.onEnd = onEnd
 
         await this.socket.connected
 
@@ -129,7 +134,7 @@ export class GameProvider {
     }   
 
     parseGameEvent(events: any) {
-        if (!this.onUpdate) {
+        if (!this.onUpdate || !this.onEnd) {
             console.error("received game update but no subscription set")
             return
         }
@@ -139,47 +144,51 @@ export class GameProvider {
             return
         }
 
-        if (!events["game.game.state"]) {
-            console.error("no event containing game state updates")
+        if (events["game.game.state"]) {
+            const state = JSON.parse(events["game.game.state"]) as State
+            // need to sanitize the output because any value with a zero is omitted
+            if (!state.gaia) state.gaia = []
+            for (const faction of state.factions) {
+                if (!faction.resources) {
+                    faction.resources = {
+                        food: 0,
+                        stone: 0,
+                        wood: 0,
+                        population: 0,
+                        tech: 0,
+                    }
+                }
+                if (!faction.resources.wood) {
+                    faction.resources.wood = 0
+                }
+                for (const populace of faction.population) {
+                    if (populace.settlement === undefined) {
+                        populace.settlement = Settlement.NONE
+                    }
+    
+                    if (!populace.position) {
+                        populace.position = { x: 0, y: 0 }
+                        continue
+                    }
+    
+                    if (!populace.position.x) {
+                        populace.position.x = 0
+                    }
+                    if (!populace.position.y) {
+                        populace.position.y = 0
+                    }
+                }
+            }
+    
+            console.log(state)
+            this.onUpdate(state)
         }
 
-        const state = JSON.parse(events["game.game.state"]) as State
-        // need to sanitize the output because any value with a zero is omitted
-        if (!state.gaia) state.gaia = []
-        for (const faction of state.factions) {
-            if (!faction.resources) {
-                faction.resources = {
-                    food: 0,
-                    stone: 0,
-                    wood: 0,
-                    population: 0,
-                    tech: 0,
-                }
-            }
-            if (!faction.resources.wood) {
-                faction.resources.wood = 0
-            }
-            for (const populace of faction.population) {
-                if (populace.settlement === undefined) {
-                    populace.settlement = Settlement.NONE
-                }
-
-                if (!populace.position) {
-                    populace.position = { x: 0, y: 0 }
-                    continue
-                }
-
-                if (!populace.position.x) {
-                    populace.position.x = 0
-                }
-                if (!populace.position.y) {
-                    populace.position.y = 0
-                }
-            }
+        if (events["game.game.winners"]) {
+            const winners = JSON.parse(events["game.game.winners"]) as string[]
+            this.onEnd(winners)
         }
 
-        console.log(state)
-        this.onUpdate(state)
     }
 }
 
