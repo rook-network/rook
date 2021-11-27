@@ -1,6 +1,9 @@
 syntax = "proto3";
 package rook.game;
 
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/rook-network/rook/x/game/types";
 
 // Game is what is the in memory state and includes a map of territories
@@ -12,6 +15,7 @@ message Game {
   State state = 3;
   uint32 param_version = 4;
   map<uint32, Territory> territory = 5;
+  google.protobuf.Timestamp start_time = 6 [ (gogoproto.stdtime) = true ];
 }
 
 // GameSnapshot contains a complete snapshot representation of the state of any
@@ -27,6 +31,7 @@ message Overview {
   repeated string players = 1;
   Map map = 2;
   uint32 param_version = 3;
+  google.protobuf.Timestamp start_time = 4 [ (gogoproto.stdtime) = true ];
 }
 
 // State is the variable aspect of the game that

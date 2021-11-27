@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -20,7 +21,7 @@ var (
 
 func TestNewGame(t *testing.T) {
 	config.Map.Seed = 9876
-	game, err := SetupGame(players, &config, 1)
+	game, err := SetupGame(players, &config, 1, time.Now())
 	require.NoError(t, err)
 
 	require.Equal(t, len(game.State.Factions), len(game.Players))
@@ -116,6 +117,7 @@ func TestGameMove(t *testing.T) {
 		}},
 		{"battle ends in a draw", bob, 0, Direction_RIGHT, 1, nil, func(t *testing.T, game *Game) {
 			assertNoTerritory(t, game, 4)
+			assert.Equal(t, uint32(2), game.State.Factions[1].Population[0].Amount)
 			require.Len(t, game.State.Gaia, 1)
 		}},
 		{"invalid player", "jimmy", 0, Direction_RIGHT, 0, ErrPlayerNotInGame, nil},
@@ -123,7 +125,7 @@ func TestGameMove(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			game, err := SetupGame(players, &config, 1)
+			game, err := SetupGame(players, &config, 1, time.Now())
 			require.NoError(t, err)
 
 			buildCustomMap(game, []rune{
@@ -168,7 +170,70 @@ func TestGameMove(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestGameCombat(t *testing.T) {
+	testCases := []struct {
+		description string
+		player      string
+		amount      uint32
+		direction   Direction
+		assertion   func(t *testing.T, game *Game)
+	}{
+		{"defeat opponent", charles, 7, Direction_UP, func(t *testing.T, game *Game) {
+			assertNoTerritory(t, game, 3)
+			assert.Len(t, game.State.Factions[2].Population, 1)
+			assert.Len(t, game.State.Factions[0].Population, 0)
+			assert.Equal(t, &Populace{
+				Position:   &Position{X: 1, Y: 0},
+				Amount:     2,
+				Settlement: Settlement_NONE,
+				Used:       false,
+			}, game.State.Factions[2].Population[0])
+		}},
+		{"defender is stronger", alice, 5, Direction_DOWN, func(t *testing.T, game *Game) {
+			assertNoTerritory(t, game, 1)
+			assert.Len(t, game.State.Factions[0].Population, 0)
+			assert.Equal(t, 2, game.State.Factions[2].Population[0].Amount)
+		}},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			game, err := SetupGame(players, &config, 1, time.Now())
+			require.NoError(t, err)
+
+			buildCustomMap(game, []rune{
+				'P', 'F',
+				'P', 'P',
+			}, 2)
+			forceSetStartingPopulace(game, [][]*Populace{
+				{{
+					Position:   &Position{X: 1, Y: 0},
+					Amount:     5,
+					Settlement: Settlement_NONE,
+				}},
+				{{
+					Position:   &Position{X: 0, Y: 0},
+					Amount:     3,
+					Settlement: Settlement_QUARRY,
+				}},
+				{{
+					Position:   &Position{X: 1, Y: 1},
+					Amount:     7,
+					Settlement: Settlement_NONE,
+				}},
+			})
+			err = game.Move(tc.player, 0, tc.direction, tc.amount)
+			require.NoError(t, err)
+
+			game.Update(params)
+
+			if tc.assertion != nil {
+				tc.assertion(t, game)
+			}
+		})
+	}
 }
 
 func TestGameBuild(t *testing.T) {
@@ -189,7 +254,7 @@ func TestGameBuild(t *testing.T) {
 		}},
 		{"quarry must neighbor a mountain", bob, 0, Settlement_QUARRY, ErrQuarryLocation, nil},
 		{"lumbermill must be in a forest", bob, 0, Settlement_LUMBERMILL, ErrLumbermillLocation, nil},
-		{"succesful build", bob, 0, Settlement_FARM, nil, func(t *testing.T, game *Game) {
+		{"successful build", bob, 0, Settlement_FARM, nil, func(t *testing.T, game *Game) {
 			assert.Equal(t, Settlement_FARM, game.State.Factions[1].Population[0].Settlement)
 			assert.Equal(t, &ResourceSet{Wood: 2, Food: 7, Stone: 9, Population: 1}, game.State.Factions[1].Resources)
 			assertTurnUsed(t, game, bob, 0)
@@ -206,7 +271,7 @@ func TestGameBuild(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			config.Initial.Resources = &ResourceSet{Wood: 10, Food: 10, Stone: 10, Population: 1}
-			game, err := SetupGame(players, &config, 1)
+			game, err := SetupGame(players, &config, 1, time.Now())
 			require.NoError(t, err)
 
 			buildCustomMap(game, []rune{
@@ -244,6 +309,66 @@ func TestGameBuild(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMergeFactions(t *testing.T) {
+	game, err := SetupGame(players, &config, 1, time.Now())
+	require.NoError(t, err)
+
+	buildCustomMap(game, []rune{'P', 'P', 'P', 'P'}, 2)
+	forceSetStartingPopulace(game, [][]*Populace{
+		{{
+			Position: NewPosition(0, 0),
+			Amount: 12,
+			Settlement: Settlement_CAPITAL,
+		}},
+		{{
+			Position: NewPosition(1, 0),
+			Amount: 4,
+			Settlement: Settlement_CAPITAL,
+		}},
+		{{
+			Position: NewPosition(1, 1),
+			Amount: 3,
+			Settlement: Settlement_CAPITAL,
+		}},
+	})
+
+	err = game.Move(alice, 0, Direction_RIGHT, 11)
+	require.NoError(t, err)
+
+	game.Update(params)
+	finished, _ := game.IsCompleted(time.Now(), params)
+	require.False(t, finished)
+
+	require.Len(t, game.State.Factions, 2)
+	require.Equal(t, &Faction{
+		Players: []string{alice, bob},
+		Population: []*Populace{
+			{
+				Position: NewPosition(0, 0),
+				Amount: 3,
+				Settlement: Settlement_CAPITAL,
+			},
+			{
+				Position: NewPosition(1, 0),
+				Amount: 9,
+				Settlement: Settlement_CAPITAL,
+			},
+		},
+		Resources: NewResources(13, 13, 13, 8),
+	}, game.State.Factions[0])
+
+	err = game.Move(alice, 1, Direction_DOWN, 8)
+	require.NoError(t, err)
+
+	game.Update(params)
+	finished, victors := game.IsCompleted(time.Now(), params)
+	require.True(t, finished, victors)
+	require.Equal(t, []string{alice, bob}, victors)
+
+	require.Len(t, game.State.Factions, 2)
+	require.True(t, game.State.Factions[1].IsEmpty())
 }
 
 func buildCustomMap(g *Game, landscapes []rune, width uint32) {

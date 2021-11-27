@@ -3,12 +3,13 @@ package types
 import (
 	"fmt"
 	"math/rand"
+	"time"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // CONSTRUCTORS
-func SetupGame(players []string, config *Config, paramVersion uint32) (*Game, error) {
+func SetupGame(players []string, config *Config, paramVersion uint32, start time.Time) (*Game, error) {
 	gameMap := GenerateMap(config.Map)
 	teams := len(players)
 	if config.Initial.Teams > 1 {
@@ -37,6 +38,7 @@ func SetupGame(players []string, config *Config, paramVersion uint32) (*Game, er
 		State:        NewState(factions, []*Populace{}),
 		ParamVersion: paramVersion,
 		Territory:    make(map[uint32]*Territory),
+		StartTime:    &start,
 	}
 	game.calculateTerritory()
 
@@ -204,16 +206,24 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 
 			case existingPopulace.Amount < amount:
 				// attacker is victorious
-				amount -= existingPopulace.Amount
-				// reduce the existing population to 0. This will get flushed at
-				// the end of the block
-				existingPopulace.Amount = 0
 				// create a new populace in its place
 				faction.Population = append(faction.Population, &Populace{
-					Amount:     amount,
+					Amount:     amount - existingPopulace.Amount,
 					Position:   newPos,
 					Settlement: existingPopulace.Settlement,
 				})
+
+				// If the last capital has been captured then we merge the two
+				// factions
+				if existingPopulace.Settlement == Settlement_CAPITAL {
+					if g.State.Factions[territory.Faction].Capitals() == 1 {
+						g.MergeFactions(factionIdx, int(territory.Faction))
+					}
+				}
+				// reduce the existing population to 0. This will get flushed at
+				// the end of the block
+				existingPopulace.Amount = 0
+
 				// update the territory
 				territory.Faction = uint32(g.playerIndex(player))
 				// add the index of the new populace to the territory
@@ -303,6 +313,7 @@ func (g *Game) RemovePlayer(player string) {
 // in that step, updates the population and performs any other passive actions
 func (g *Game) Update(params Params) {
 	for _, faction := range g.State.Factions {
+		faction.Flush()
 		faction.Reap(params)
 	}
 	g.resetUsedPopulace()
@@ -315,6 +326,63 @@ func (g Game) Snapshot() GameSnapshot {
 		State:        g.State,
 		ParamVersion: g.ParamVersion,
 	}
+}
+
+// MergeFactions merges two faction together
+func (g Game) MergeFactions(f1, f2 int) {
+	// if this wasn't the final merge then remove the faction
+	if len(g.State.Factions) > 2 {
+		g.State.Factions[f1].Merge(g.State.Factions[f2])
+		for _, territory := range g.Territory {
+			if territory.Faction == uint32(f2) {
+				territory.Faction = uint32(f1)
+			} 
+		}
+
+		g.State.Factions = append(g.State.Factions[:f2], g.State.Factions[f2+1:]...)
+		for _, territory := range g.Territory {
+			if territory.Faction > uint32(f2) {
+				territory.Faction--
+			}
+		}
+	} else {
+		// else treat the faction as if it were sacked so we know who the winning team are
+		g.SackFaction(f1, f2)
+	}
+}
+
+// Sacking a faction takes all the resources but still leaves the faction in tack
+func (g Game) SackFaction(f1, f2 int) {
+	g.State.Factions[f1].Sack(g.State.Factions[f2])
+	for _, territory := range g.Territory {
+		if territory.Faction == uint32(f2) {
+			territory.Faction = uint32(f1)
+		} 
+	}
+}
+
+// IsCompleted checks the termination conditions of the game and returns the winning team
+// if there is one. TODO: we should add a timeout
+func (g Game) IsCompleted(now time.Time, params Params) (bool, []string) {
+	if g.HasExpired(now, params.MaxGameDuration) {
+		return true, []string{}
+	}
+	count := 0
+	winners := []string{}
+	for _, faction := range g.State.Factions {
+		if !faction.IsEmpty() {
+			count++
+			winners = faction.Players
+			if count > 1 {
+				return false, []string{}
+			}
+		}
+	}
+	return true, winners
+}
+
+func (g Game) HasExpired(now time.Time, maxAge time.Duration) bool {
+	return g.StartTime.Add(maxAge).Before(now)
 }
 
 func (g Game) playerIndex(player string) int {

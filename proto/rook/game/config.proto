@@ -2,6 +2,8 @@ syntax = "proto3";
 package rook.game;
 
 import "rook/game/game.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
 
 option go_package = "github.com/rook-network/rook/x/game/types";
 
@@ -26,6 +28,14 @@ message InitializationConfig {
 }
 
 message Params {
+  // the resources that a settlement produces
   repeated ResourceSet production_rate = 1;
+  // the resource that a settlement requires to build
   repeated ResourceSet construction_cost = 2;
+  // the maximum duration a game can last before a draw is called
+  google.protobuf.Duration max_game_duration = 3 [
+    (gogoproto.stdduration) = true,
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"game_lifespan\""
+  ];
 }

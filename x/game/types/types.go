@@ -48,3 +48,7 @@ func (r *ResourceSet) Add(res *ResourceSet) {
 	r.Wood += res.Wood
 	r.Population += res.Population
 }
+
+func (r ResourceSet) IsNone() bool {
+	return r.Food == 0 && r.Stone == 0 && r.Wood == 0 && r.Population == 0
+}

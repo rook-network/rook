@@ -24,6 +24,16 @@ func (f Faction) HasPlayer(player string) bool {
 	return false
 }
 
+func (f *Faction) Flush() {
+	newPop := make([]*Populace, 0)
+	for _, p := range f.Population {
+		if p.Amount != 0 {
+			newPop = append(newPop, p)
+		}
+	}
+	f.Population = newPop
+}
+
 func (f *Faction) Reap(params Params) {
 	for _, pop := range f.Population {
 		produce := params.ProductionRate[int(pop.Settlement)]
@@ -32,8 +42,21 @@ func (f *Faction) Reap(params Params) {
 	}
 }
 
-func (f *Faction) FindPopulace() {
+func (f Faction) IsEmpty() bool {
+	return len(f.Population) == 0 && f.Resources.IsNone()
+}
 
+func (f *Faction) Merge(f2 *Faction) {
+	f.Players = append(f.Players, f2.Players...)
+	f.Resources.Add(f2.Resources)
+	f.Population = append(f.Population, f2.Population...)
+}
+
+func (f *Faction) Sack(f2 *Faction) {
+	f.Resources.Add(f2.Resources)
+	f.Population = append(f.Population, f2.Population...)
+	f2.Resources = NewResources(0, 0, 0, 0)
+	f2.Population = make([]*Populace, 0)
 }
 
 func (f *Faction) Capitals() int {

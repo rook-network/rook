@@ -1,6 +1,8 @@
 package types
 
 import (
+	"time"
+
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
@@ -129,6 +131,7 @@ func DefaultParams() Params {
 			{Wood: 8, Food: 3, Stone: 1},    // FARM
 			{Wood: 0, Food: 5, Stone: 9},    // ROOK
 		},
+		MaxGameDuration: 1 * time.Hour,
 	}
 }
 

@@ -40,7 +40,7 @@ func (k Keeper) CreateGame(ctx sdk.Context, players []string, config types.Confi
 
 	params := k.GetLatestParamsVersion(ctx)
 
-	game, err := types.SetupGame(players, &config, params)
+	game, err := types.SetupGame(players, &config, params, ctx.BlockTime())
 	if err != nil {
 		return 0, err
 	}
@@ -85,9 +85,15 @@ func (k Keeper) UpdateGames(ctx sdk.Context) {
 			panic("param version for game is missing")
 		}
 		game.Update(p)
-		memStore.Set(types.GameKey(id), k.cdc.MustMarshal(&game))
-		// emit the events for the updated state
-		ctx.EventManager().EmitEvent(types.NewGameUpdatedEvent(id, game.State))
+		if finished, victors := game.IsCompleted(ctx.BlockTime(), p); finished {
+			memStore.Delete(types.GameKey(id))
+			// emit the events for the completed game
+			ctx.EventManager().EmitEvent(types.NewFinishedGameEvent(id, victors))
+		} else {
+			memStore.Set(types.GameKey(id), k.cdc.MustMarshal(&game))
+			// emit the events for the updated state
+			ctx.EventManager().EmitEvent(types.NewGameUpdatedEvent(id, game.State))
+		}
 	}
 }
 

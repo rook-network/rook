@@ -1,6 +1,7 @@
 /* eslint-disable */
 import Long from "long";
 import _m0 from "protobufjs/minimal";
+import { Timestamp } from "../../google/protobuf/timestamp";
 
 export const protobufPackage = "rook.game";
 
@@ -177,6 +178,7 @@ export interface Game {
   state?: State;
   paramVersion: number;
   territory: { [key: number]: Territory };
+  startTime?: Date;
 }
 
 export interface Game_TerritoryEntry {
@@ -199,6 +201,7 @@ export interface Overview {
   players: string[];
   map?: Map;
   paramVersion: number;
+  startTime?: Date;
 }
 
 /**
@@ -278,6 +281,12 @@ export const Game = {
         writer.uint32(42).fork()
       ).ldelim();
     });
+    if (message.startTime !== undefined) {
+      Timestamp.encode(
+        toTimestamp(message.startTime),
+        writer.uint32(50).fork()
+      ).ldelim();
+    }
     return writer;
   },
 
@@ -308,6 +317,11 @@ export const Game = {
             message.territory[entry5.key] = entry5.value;
           }
           break;
+        case 6:
+          message.startTime = fromTimestamp(
+            Timestamp.decode(reader, reader.uint32())
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -337,6 +351,10 @@ export const Game = {
         message.territory[Number(key)] = Territory.fromJSON(value);
       });
     }
+    message.startTime =
+      object.startTime !== undefined && object.startTime !== null
+        ? fromJsonTimestamp(object.startTime)
+        : undefined;
     return message;
   },
 
@@ -359,6 +377,8 @@ export const Game = {
         obj.territory[k] = Territory.toJSON(v);
       });
     }
+    message.startTime !== undefined &&
+      (obj.startTime = message.startTime.toISOString());
     return obj;
   },
 
@@ -382,6 +402,7 @@ export const Game = {
         }
       });
     }
+    message.startTime = object.startTime ?? undefined;
     return message;
   },
 };
@@ -555,6 +576,12 @@ export const Overview = {
     if (message.paramVersion !== 0) {
       writer.uint32(24).uint32(message.paramVersion);
     }
+    if (message.startTime !== undefined) {
+      Timestamp.encode(
+        toTimestamp(message.startTime),
+        writer.uint32(34).fork()
+      ).ldelim();
+    }
     return writer;
   },
 
@@ -575,6 +602,11 @@ export const Overview = {
         case 3:
           message.paramVersion = reader.uint32();
           break;
+        case 4:
+          message.startTime = fromTimestamp(
+            Timestamp.decode(reader, reader.uint32())
+          );
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -594,6 +626,10 @@ export const Overview = {
       object.paramVersion !== undefined && object.paramVersion !== null
         ? Number(object.paramVersion)
         : 0;
+    message.startTime =
+      object.startTime !== undefined && object.startTime !== null
+        ? fromJsonTimestamp(object.startTime)
+        : undefined;
     return message;
   },
 
@@ -608,6 +644,8 @@ export const Overview = {
       (obj.map = message.map ? Map.toJSON(message.map) : undefined);
     message.paramVersion !== undefined &&
       (obj.paramVersion = message.paramVersion);
+    message.startTime !== undefined &&
+      (obj.startTime = message.startTime.toISOString());
     return obj;
   },
 
@@ -619,6 +657,7 @@ export const Overview = {
         ? Map.fromPartial(object.map)
         : undefined;
     message.paramVersion = object.paramVersion ?? 0;
+    message.startTime = object.startTime ?? undefined;
     return message;
   },
 };
@@ -1225,6 +1264,32 @@ export type DeepPartial<T> = T extends Builtin
   : T extends {}
   ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+function toTimestamp(date: Date): Timestamp {
+  const seconds = numberToLong(date.getTime() / 1_000);
+  const nanos = (date.getTime() % 1_000) * 1_000_000;
+  return { seconds, nanos };
+}
+
+function fromTimestamp(t: Timestamp): Date {
+  let millis = t.seconds.toNumber() * 1_000;
+  millis += t.nanos / 1_000_000;
+  return new Date(millis);
+}
+
+function fromJsonTimestamp(o: any): Date {
+  if (o instanceof Date) {
+    return o;
+  } else if (typeof o === "string") {
+    return new Date(o);
+  } else {
+    return fromTimestamp(Timestamp.fromJSON(o));
+  }
+}
+
+function numberToLong(number: number) {
+  return Long.fromNumber(number);
+}
 
 if (_m0.util.Long !== Long) {
   _m0.util.Long = Long as any;

@@ -2,6 +2,7 @@
 import Long from "long";
 import _m0 from "protobufjs/minimal";
 import { ResourceSet } from "../../rook/game/game";
+import { Duration } from "../../google/protobuf/duration";
 
 export const protobufPackage = "rook.game";
 
@@ -26,8 +27,12 @@ export interface InitializationConfig {
 }
 
 export interface Params {
+  /** the resources that a settlement produces */
   productionRate: ResourceSet[];
+  /** the resource that a settlement requires to build */
   constructionCost: ResourceSet[];
+  /** the maximum duration a game can last before a draw is called */
+  maxGameDuration?: Duration;
 }
 
 const baseConfig: object = {};
@@ -340,6 +345,12 @@ export const Params = {
     for (const v of message.constructionCost) {
       ResourceSet.encode(v!, writer.uint32(18).fork()).ldelim();
     }
+    if (message.maxGameDuration !== undefined) {
+      Duration.encode(
+        message.maxGameDuration,
+        writer.uint32(26).fork()
+      ).ldelim();
+    }
     return writer;
   },
 
@@ -362,6 +373,9 @@ export const Params = {
             ResourceSet.decode(reader, reader.uint32())
           );
           break;
+        case 3:
+          message.maxGameDuration = Duration.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -378,6 +392,10 @@ export const Params = {
     message.constructionCost = (object.constructionCost ?? []).map((e: any) =>
       ResourceSet.fromJSON(e)
     );
+    message.maxGameDuration =
+      object.maxGameDuration !== undefined && object.maxGameDuration !== null
+        ? Duration.fromJSON(object.maxGameDuration)
+        : undefined;
     return message;
   },
 
@@ -397,6 +415,10 @@ export const Params = {
     } else {
       obj.constructionCost = [];
     }
+    message.maxGameDuration !== undefined &&
+      (obj.maxGameDuration = message.maxGameDuration
+        ? Duration.toJSON(message.maxGameDuration)
+        : undefined);
     return obj;
   },
 
@@ -408,6 +430,10 @@ export const Params = {
     message.constructionCost = (object.constructionCost ?? []).map((e) =>
       ResourceSet.fromPartial(e)
     );
+    message.maxGameDuration =
+      object.maxGameDuration !== undefined && object.maxGameDuration !== null
+        ? Duration.fromPartial(object.maxGameDuration)
+        : undefined;
     return message;
   },
 };

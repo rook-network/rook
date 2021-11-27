@@ -16,6 +16,7 @@ const (
 	AttributePlayers       = "players"
 	AttributeConfig        = "config"
 	AttributeParamsVersion = "params_version"
+	AttributeWinners       = "winners"
 )
 
 func NewGameEvent(gameID uint64, players []string, config Config, paramsVersion uint32) sdk.Event {
@@ -39,5 +40,12 @@ func NewGameUpdatedEvent(gameID uint64, state *State) sdk.Event {
 	return sdk.NewEvent(EventGame,
 		sdk.NewAttribute(AttributeID, fmt.Sprintf("%d", gameID)),
 		sdk.NewAttribute(AttributeState, string(stateBytes)),
+	)
+}
+
+func NewFinishedGameEvent(gameID uint64, winningFaction []string) sdk.Event {
+	return sdk.NewEvent(EventGame,
+		sdk.NewAttribute(AttributeID, fmt.Sprintf("%d", gameID)),
+		sdk.NewAttribute(AttributeWinners, strings.Join(winningFaction, ",")),
 	)
 }
