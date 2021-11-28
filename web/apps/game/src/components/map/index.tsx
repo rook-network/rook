@@ -12,10 +12,10 @@ export interface MapProps {
 
 export function MapComponent(props: MapProps) {
   const size = 80
-  const screenWidth = document.body.clientWidth
-  const screenHeight = document.body.clientHeight
-  const rows = Math.ceil(screenHeight / size)
-  const cols = Math.ceil(screenWidth / size)
+  // const screenWidth = document.body.clientWidth
+  // const screenHeight = document.body.clientHeight
+  // const rows = Math.ceil(screenHeight / size)
+  // const cols = Math.ceil(screenWidth / size)
   const calcX = (index: number): number => {
     return Math.floor(index % props.map.width) * size
   }
@@ -23,19 +23,12 @@ export function MapComponent(props: MapProps) {
     return Math.floor(index / props.map.width) * size
   }
 
-  
-
-
-  console.log(props.cursor)
-
   const height = props.map.tiles.length/props.map.width
   const centerX = Math.floor(props.map.width/2)
   const centerY = Math.floor(height/2)
   const offset = { x: centerX - props.cursor.x, y: centerY - props.cursor.y }
-  console.log(offset)
 
   const grid = serialize(shift(createGrid(height, props.map.width), offset))
-  console.log(grid)
 
   const isSelected = (index: number): boolean => {
     return (Math.floor(index % props.map.width) === centerX 

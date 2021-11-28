@@ -194,7 +194,7 @@ func TestGameCombat(t *testing.T) {
 		{"defender is stronger", alice, 5, Direction_DOWN, func(t *testing.T, game *Game) {
 			assertNoTerritory(t, game, 1)
 			assert.Len(t, game.State.Factions[0].Population, 0)
-			assert.Equal(t, 2, game.State.Factions[2].Population[0].Amount)
+			assert.Equal(t, uint32(2), game.State.Factions[2].Population[0].Amount)
 		}},
 	}
 
@@ -318,18 +318,18 @@ func TestMergeFactions(t *testing.T) {
 	buildCustomMap(game, []rune{'P', 'P', 'P', 'P'}, 2)
 	forceSetStartingPopulace(game, [][]*Populace{
 		{{
-			Position: NewPosition(0, 0),
-			Amount: 12,
+			Position:   NewPosition(0, 0),
+			Amount:     12,
 			Settlement: Settlement_CAPITAL,
 		}},
 		{{
-			Position: NewPosition(1, 0),
-			Amount: 4,
+			Position:   NewPosition(1, 0),
+			Amount:     4,
 			Settlement: Settlement_CAPITAL,
 		}},
 		{{
-			Position: NewPosition(1, 1),
-			Amount: 3,
+			Position:   NewPosition(1, 1),
+			Amount:     3,
 			Settlement: Settlement_CAPITAL,
 		}},
 	})
@@ -346,13 +346,13 @@ func TestMergeFactions(t *testing.T) {
 		Players: []string{alice, bob},
 		Population: []*Populace{
 			{
-				Position: NewPosition(0, 0),
-				Amount: 3,
+				Position:   NewPosition(0, 0),
+				Amount:     3,
 				Settlement: Settlement_CAPITAL,
 			},
 			{
-				Position: NewPosition(1, 0),
-				Amount: 9,
+				Position:   NewPosition(1, 0),
+				Amount:     9,
 				Settlement: Settlement_CAPITAL,
 			},
 		},

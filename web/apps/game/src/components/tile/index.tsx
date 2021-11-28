@@ -59,9 +59,7 @@ export function Tile(props: TileProps) {
     amount = props.territory.populace.amount
   }
   if (props.selected) {
-    // colour = "#fc033d";
     colour = shadeColour(colour, -20)
-    console.log("new colour: " + colour)
   }
   if (props.territory && props.territory.populace.settlement !== Settlement.NONE && props.territory.populace.settlement !== undefined) { 
     switch(props.territory.populace.settlement) {

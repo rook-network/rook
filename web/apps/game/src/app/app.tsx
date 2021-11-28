@@ -119,30 +119,60 @@ class App extends React.Component<any, AppState> {
   }
 
   render() {
+    const testnetLabel = (
+      <div style={{ position: "absolute", right: "30px", top: "30px", fontFamily: "Arial, Helvetica, sans-serif", fontWeight: "bold" }}>
+          TESTNET
+      </div>
+    )
+    let isConnected = false
+    const header = (
+      <>
+        { testnetLabel }
+        <Account 
+            address={this.state.address} 
+            balance={this.state.balance} 
+            isConnected={isConnected} 
+        />
+      </>
+    )
+
     if (!keplrEnabled()) {
-      return <NotConnectedCard connectFn={this.connectWallet} /> 
+      return ( <>
+        { header }
+        <NotConnectedCard connectFn={this.connectWallet} /> 
+      </> )
     }
 
     if (this.state.error) {
-      return <ErrorCard error={this.state.error.message} />
+      return ( <>
+        { header }
+        <ErrorCard error={this.state.error.message} />
+      </> )
     }
 
     if (this.state.loadingMsg) {
-      return <LoadingCard message={this.state.loadingMsg} />
+      return ( <>
+        { header }
+        <LoadingCard message={this.state.loadingMsg} />
+      </> )
     }
     
     if (!this.mainProvider || !this.playerProvider) {
-      return <LoadingCard message="Connecting to Rook account..."/>
+      return ( <>
+        { header }
+        <LoadingCard message="Connecting to Rook account..."/>
+      </> )
     }
 
-    const isConnected = this.mainProvider !== null
+    isConnected = this.mainProvider !== null
     return (
-      <div>
+      <>
         <Account 
           address={this.state.address} 
           balance={this.state.balance} 
           isConnected={isConnected} 
         />
+        { testnetLabel }
         { this.state.gameID.eq(0) ?
           <Matchmaker 
             modes={this.state.modes} 
@@ -157,7 +187,7 @@ class App extends React.Component<any, AppState> {
             quit={this.leaveGame}
           />
         }
-      </div>
+      </>
     );
   }
 }

@@ -336,7 +336,7 @@ func (g Game) MergeFactions(f1, f2 int) {
 		for _, territory := range g.Territory {
 			if territory.Faction == uint32(f2) {
 				territory.Faction = uint32(f1)
-			} 
+			}
 		}
 
 		g.State.Factions = append(g.State.Factions[:f2], g.State.Factions[f2+1:]...)
@@ -357,7 +357,7 @@ func (g Game) SackFaction(f1, f2 int) {
 	for _, territory := range g.Territory {
 		if territory.Faction == uint32(f2) {
 			territory.Faction = uint32(f1)
-		} 
+		}
 	}
 }
 

@@ -180,7 +180,6 @@ class GameComponent extends React.Component<GameProps, GameState> {
       const isUser = isOurFaction(faction, this.props.address)
       for (const populace of faction.population) {
         const pos = positionToIndex(populace.position!, this.state.game.map.width)
-        console.log(pos)
         territory[pos] = {
           populace: populace,
           colour: isUser ? allyColour : enemyColour,
@@ -188,7 +187,6 @@ class GameComponent extends React.Component<GameProps, GameState> {
         }
       }
     }
-    console.log(territory)
     this.setState({ territory: territory })
   }
 

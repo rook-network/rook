@@ -21,6 +21,8 @@ func TestGame(t *testing.T) {
 	alice, bob, charles := addrs[0].String(), addrs[1].String(), addrs[2].String()
 	config := types.DefaultConfig()
 	config.Map.Seed = 123
+	config.Map.Width = 10
+	config.Map.Height = 10
 	config.Initial.Resources.Population = 5
 	config.Initial.Resources.Wood = 7
 	var id uint64 = 1
@@ -43,7 +45,9 @@ func TestGame(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, uint32(1), getGameResp.Game.ParamVersion)
 	gameMap := types.GenerateMap(config.Map)
+	t.Log(gameMap.Print())
 	require.Equal(t, gameMap, getGameResp.Game.Map)
+	require.Equal(t, types.NewPosition(4, 3), getGameResp.Game.State.Factions[0].Population[0].Position)
 
 	stateRequest := &types.QueryGameStateRequest{Id: id}
 	getStateResponse, err := querier.State(goCtx, stateRequest)
@@ -53,6 +57,7 @@ func TestGame(t *testing.T) {
 	for idx, faction := range getStateResponse.State.Factions {
 		require.Contains(t, faction.Players, addrs[idx].String())
 	}
+	require.Equal(t, *getGameResp.Game.State, getStateResponse.State)
 
 	moveRequest := types.NewMsgMove(alice, id, 0, types.Direction_LEFT, 3)
 	_, err = server.Move(goCtx, moveRequest)
@@ -65,13 +70,10 @@ func TestGame(t *testing.T) {
 	require.Equal(t, uint64(1), getStateResponse.State.Step)
 	require.Len(t, getStateResponse.State.Factions[0].Population, 2)
 
-	t.Log(getStateResponse.State.Factions[0].Population)
-	t.Log(getStateResponse.State.Factions[0].Resources)
-
-	pop1 := types.NewPopulace(4, types.NewPosition(14, 11), types.Settlement_CAPITAL, false)
+	pop1 := types.NewPopulace(4, types.NewPosition(4, 3), types.Settlement_CAPITAL, false)
 	require.Equal(t, pop1, getStateResponse.State.Factions[0].Population[0])
 
-	pop2 := types.NewPopulace(3, types.NewPosition(13, 11), types.Settlement_NONE, false)
+	pop2 := types.NewPopulace(3, types.NewPosition(3, 3), types.Settlement_NONE, false)
 	require.Equal(t, pop2, getStateResponse.State.Factions[0].Population[1])
 
 	resources := types.NewResources(6, 6, 8, 7)
@@ -79,6 +81,10 @@ func TestGame(t *testing.T) {
 
 	buildRequest := types.NewMsgBuild(alice, id, 1, types.Settlement_FARM)
 	_, err = server.Build(goCtx, buildRequest)
+	require.NoError(t, err)
+
+	moveRequest = types.NewMsgMove(alice, id, 0, types.Direction_UP, 2)
+	_, err = server.Move(goCtx, moveRequest)
 	require.NoError(t, err)
 
 	querier.UpdateGames(ctx)
@@ -90,5 +96,6 @@ func TestGame(t *testing.T) {
 	require.Equal(t, types.Settlement_FARM, getStateResponse.State.Factions[0].Population[1].Settlement)
 	resources = types.NewResources(6, 6, 1, 9)
 	require.Equal(t, resources, getStateResponse.State.Factions[0].Resources)
+	require.Len(t, getStateResponse.State.Factions[0].Population, 3)
 
 }

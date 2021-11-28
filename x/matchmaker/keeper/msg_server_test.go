@@ -79,10 +79,9 @@ func TestMatchmakerHostAndJoinPublicRoom(t *testing.T) {
 	require.Equal(t, []string{charles}, room2.Pending)
 	require.True(t, room2.HasQuorum())
 
-	// alice tries to join the same room again but should return an error
+	// alice tries to join the same room. There should be no error
 	_, err = server.Join(goCtx, msgJoin2)
-	require.Error(t, err)
-	require.Contains(t, err.Error(), types.ErrPlayerAlreadyInRoom.Error())
+	require.NoError(t, err)
 
 	// emma tries to find a game with the same mode.
 	msgFind := types.NewMsgFind(emma, queryModesResp.Modes[0].ModeId)
@@ -220,7 +219,9 @@ func TestMatchmakerAddAndRemoveModes(t *testing.T) {
 
 	// check that the genesis state is correct
 	genState := app.MatchmakerKeeper.ExportGenesis(ctx)
-	require.Equal(t, types.DefaultGenesis(), genState)
+	defaultGen := types.DefaultGenesis()
+	defaultGen.NextModeId++
+	require.Equal(t, *defaultGen, genState)
 	require.Len(t, genState.InitialModes, 1)
 
 	// Query all the current modes

@@ -7,12 +7,14 @@ import {
 import { SocketWrapper, SocketWrapperMessageEvent, SocketWrapperErrorEvent } from '@cosmjs/socket'
 import { Registry, DirectSecp256k1HdWallet } from '@cosmjs/proto-signing'
 import { SigningStargateClient, QueryClient, createProtobufRpcClient, isBroadcastTxSuccess } from '@cosmjs/stargate'
+import { Tendermint34Client, BroadcastTxSyncResponse } from '@cosmjs/tendermint-rpc'
 import { MsgExec } from '../../codec/cosmos/authz/v1beta1/tx'
 import { typeMsgExec } from './authorization'
 import { defaultFee } from './types'
 import { Provider } from './root'
 import { State, Settlement } from '../../codec/rook/game/game'
 import config from '../../config';
+import { TxRaw } from '../../codec/cosmos/tx/v1beta1/tx';
 
 export const typeMsgCreate = "/rook.game.MsgCreate"
 export const typeMsgBuild = "/rook.game.MsgBuild"
@@ -30,7 +32,8 @@ export class GameProvider {
     public readonly mainAddress: string
     public query: GameQueryClient
     public tx: IGameMsgClient
-
+    
+    private tmClient: Tendermint34Client
     private socket: SocketWrapper
     private onUpdate?: (state: State) => void
     private onEnd?: (winners: string[]) => void
@@ -65,15 +68,19 @@ export class GameProvider {
             await provider.authz.authorizePlayerAccount(address)
         }
 
-        return new GameProvider(provider.getQuerier(), client, address, mainAddress)
+        const tmClient = await Tendermint34Client.connect(config.rpcEndpoint)
+
+        return new GameProvider(provider.getQuerier(), client, tmClient, address, mainAddress)
     }
 
-    constructor(querier: QueryClient, client: SigningStargateClient, address: string, mainAddress: string) {
+    constructor(querier: QueryClient, client: SigningStargateClient, tmClient: Tendermint34Client,
+        address: string, mainAddress: string) {
         const protoRpcClient = createProtobufRpcClient(querier)
         this.query = new GameQueryClient(protoRpcClient)
-        this.tx = new GameMsgClient(client, address)
+        this.tx = new GameMsgClient(client, tmClient, address)
         this.playerAddress = address
         this.mainAddress = mainAddress
+        this.tmClient = tmClient
         this.socket = new SocketWrapper(
             config.wsEndpoint,
             (event: SocketWrapperMessageEvent) => {
@@ -185,8 +192,8 @@ export class GameProvider {
         }
 
         if (events["game.game.winners"]) {
-            const winners = JSON.parse(events["game.game.winners"]) as string[]
-            this.onEnd(winners)
+            console.log(events["game.game.winners"])
+            this.onEnd(events["game.game.winners"] as string[])
         }
 
     }
@@ -194,15 +201,16 @@ export class GameProvider {
 
 export class GameMsgClient implements IGameMsgClient {
     private client: SigningStargateClient
+    private tmClient: Tendermint34Client
     private readonly address: string
 
-    constructor(client: SigningStargateClient, address: string) {
+    constructor(client: SigningStargateClient, tmClient: Tendermint34Client, address: string) {
         this.client = client
+        this.tmClient = tmClient
         this.address = address
     }
 
-    private async send(request: any, typeUrl: string) {
-        console.log(this.address)
+    private async send(request: any, typeUrl: string): Promise<BroadcastTxSyncResponse> {
         const msgExecute: MsgExec = {
             grantee: this.address,
             msgs: [{
@@ -210,30 +218,38 @@ export class GameMsgClient implements IGameMsgClient {
                 value: request
             }]
         }
-        const resp = await this.client.signAndBroadcast(
+        const txRaw = await this.client.sign(
             this.address,
             [{
                 typeUrl: typeMsgExec,
                 value: msgExecute
             }],
-            defaultFee
+            defaultFee,
+            ""
         )
-
-        if (!isBroadcastTxSuccess(resp))
-            throw new Error(`Transaction failed with code (${resp.code}): ${resp.rawLog}`)
+        const txBytes = TxRaw.encode(txRaw).finish();
+        const resp = this.tmClient.broadcastTxSync({ tx: txBytes })
 
         return resp
     }
 
     async Move(request: MsgMove): Promise<MsgMoveResponse> {
-        const resp = await this.send(MsgMove.encode(request).finish(), typeMsgMove)
-        console.log(resp.data)
+        try {
+            const resp = await this.send(MsgMove.encode(request).finish(), typeMsgMove)
+            console.log(resp)
+        } catch (e) {
+            console.error(e)
+        }
         return {}
     }
 
     async Build(request: MsgBuild): Promise<MsgBuildResponse> {
-        const resp = await this.send(MsgBuild.encode(request).finish(), typeMsgBuild)
-        console.log(resp.data)
+        try {
+            const resp = await this.send(MsgBuild.encode(request).finish(), typeMsgBuild)
+            console.log(resp)
+        } catch (e) {
+            console.error(e)
+        }
         return {}
     }
 

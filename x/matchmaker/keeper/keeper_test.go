@@ -79,7 +79,7 @@ func TestCreateModes(t *testing.T) {
 	require.NoError(t, mode.ValidateBasic())
 
 	modeID := keeper.GetNextModeID(ctx)
-	require.Equal(t, uint32(1), modeID)
+	require.Equal(t, uint32(2), modeID)
 
 	keeper.SetMode(ctx, modeID, mode)
 	keeper.IncrementNextModeID(ctx)
