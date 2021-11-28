@@ -8,7 +8,7 @@ export interface EndGameProps {
 }
 
 export const EndGameDisplay = (props: EndGameProps) => {
-  if (props.winningFaction.length === 0) {
+  if (props.winningFaction.length === 0 || props.winningFaction[0] === "") {
     return (
       <Card>
         <Close quit={props.quit} />
@@ -26,8 +26,6 @@ export const EndGameDisplay = (props: EndGameProps) => {
         Congratulations {winningPlayer}
       </div>
     </Card>
-    // <div onClick={props.quit} className={styles.endGame}>
-    // </div>
   )
 }
 

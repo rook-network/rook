@@ -236,6 +236,100 @@ func TestGameCombat(t *testing.T) {
 	}
 }
 
+type movement struct {
+	populace uint32
+	direction Direction
+	amount uint32
+}
+
+func NewMovement(populace uint32, direction Direction, amount uint32) movement {
+	return movement{
+		populace,
+		direction,
+		amount,
+	}
+}
+
+
+func TestCombiningForces(t *testing.T) {
+	testCases := []struct {
+		movements []movement
+		assertions func(t *testing.T, game *Game)
+	} {
+		{
+			[]movement{
+				NewMovement(0, Direction_LEFT, 12), 
+				NewMovement(1, Direction_DOWN, 5),
+			}, func (t *testing.T, game *Game) {
+			require.Equal(t, []*Populace{
+				{
+					Position: NewPosition(1, 1),
+					Amount: 26,
+					Settlement: Settlement_NONE,
+				},
+				{
+					Position: NewPosition(2, 2),
+					Amount: 39,
+					Settlement: Settlement_CAPITAL,
+				},
+			}, game.State.Factions[0].Population)
+		}},
+	}
+
+	for idx, tc := range testCases {
+		t.Run(fmt.Sprintf("test %d", idx), func(t *testing.T) {
+			game, err := SetupGame([]string{alice, bob}, &config, 1, time.Now())
+			require.NoError(t, err)
+		
+			buildCustomMap(game, []rune{
+				'P', 'P', 'P',
+				'L', 'P', 'P',
+				'M', 'P', 'F',
+			}, 3)
+			forceSetStartingPopulace(game, [][]*Populace{
+				{
+					{
+						Position: NewPosition(2, 0),
+						Amount: 12,
+						Settlement: Settlement_NONE,
+					},
+					{
+						Position: NewPosition(1, 0),
+						Amount: 5,
+						Settlement: Settlement_NONE,
+					},
+					{
+						Position: NewPosition(1, 1),
+						Amount: 9,
+						Settlement: Settlement_NONE,
+					}, 
+					{
+						Position: NewPosition(2, 2),
+						Amount: 37,
+						Settlement: Settlement_CAPITAL,
+					},
+				},
+				{{
+					Position: NewPosition(0, 0),
+					Amount: 4,
+					Settlement: Settlement_NONE,
+				}},
+			})
+			for _, movement := range tc.movements {
+				err := game.Move(alice, movement.populace, movement.direction, movement.amount)
+				require.NoError(t, err)
+			}
+
+			game.Update(params)
+
+			tc.assertions(t, game)
+
+		})
+	}
+
+
+}
+
 func TestGameBuild(t *testing.T) {
 	testCases := []struct {
 		description string

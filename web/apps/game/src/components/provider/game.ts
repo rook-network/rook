@@ -6,7 +6,7 @@ import {
 } from '../../codec/rook/game/tx'
 import { SocketWrapper, SocketWrapperMessageEvent, SocketWrapperErrorEvent } from '@cosmjs/socket'
 import { Registry, DirectSecp256k1HdWallet } from '@cosmjs/proto-signing'
-import { SigningStargateClient, QueryClient, createProtobufRpcClient, isBroadcastTxSuccess } from '@cosmjs/stargate'
+import { SigningStargateClient, QueryClient, createProtobufRpcClient, SignerData } from '@cosmjs/stargate'
 import { Tendermint34Client, BroadcastTxSyncResponse } from '@cosmjs/tendermint-rpc'
 import { MsgExec } from '../../codec/cosmos/authz/v1beta1/tx'
 import { typeMsgExec } from './authorization'
@@ -69,15 +69,24 @@ export class GameProvider {
         }
 
         const tmClient = await Tendermint34Client.connect(config.rpcEndpoint)
+        const account = await client.getAccount(address)
+        if (account === null) {
+            throw new Error("account not found: " + address)
+        }
+        const signerData: SignerData = {
+            accountNumber: account.accountNumber,
+            sequence: account.sequence,
+            chainId: await client.getChainId(),
+        }
 
-        return new GameProvider(provider.getQuerier(), client, tmClient, address, mainAddress)
+        return new GameProvider(provider.getQuerier(), client, tmClient, address, mainAddress, signerData)
     }
 
     constructor(querier: QueryClient, client: SigningStargateClient, tmClient: Tendermint34Client,
-        address: string, mainAddress: string) {
+        address: string, mainAddress: string, signerData: SignerData) {
         const protoRpcClient = createProtobufRpcClient(querier)
         this.query = new GameQueryClient(protoRpcClient)
-        this.tx = new GameMsgClient(client, tmClient, address)
+        this.tx = new GameMsgClient(client, tmClient, address, signerData)
         this.playerAddress = address
         this.mainAddress = mainAddress
         this.tmClient = tmClient
@@ -203,14 +212,21 @@ export class GameMsgClient implements IGameMsgClient {
     private client: SigningStargateClient
     private tmClient: Tendermint34Client
     private readonly address: string
+    private accountNumber: number
+    private sequence: number
+    private readonly chainID: string
 
-    constructor(client: SigningStargateClient, tmClient: Tendermint34Client, address: string) {
+    constructor(client: SigningStargateClient, tmClient: Tendermint34Client, address: string, signerData: SignerData) {
         this.client = client
         this.tmClient = tmClient
         this.address = address
+        this.accountNumber = signerData.accountNumber
+        this.sequence = signerData.sequence
+        this.chainID = signerData.chainId
     }
 
-    private async send(request: any, typeUrl: string): Promise<BroadcastTxSyncResponse> {
+    
+    private async send(request: any, typeUrl: string): Promise<void> {
         const msgExecute: MsgExec = {
             grantee: this.address,
             msgs: [{
@@ -225,12 +241,21 @@ export class GameMsgClient implements IGameMsgClient {
                 value: msgExecute
             }],
             defaultFee,
-            ""
+            "",
+            {
+                accountNumber: this.accountNumber,
+                sequence: this.sequence,
+                chainId: this.chainID,
+            }
         )
         const txBytes = TxRaw.encode(txRaw).finish();
-        const resp = this.tmClient.broadcastTxSync({ tx: txBytes })
+        try {
+            await this.tmClient.broadcastTxSync({ tx: txBytes })
+        } catch (e) {
+            console.log(e)
+        }
 
-        return resp
+        this.sequence++
     }
 
     async Move(request: MsgMove): Promise<MsgMoveResponse> {
