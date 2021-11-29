@@ -181,9 +181,6 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 
 	// All validity checks have passed. Now we update state.
 
-	// mark the populace as used it's move
-	faction.Population[populace].Used = true
-
 	newIndex := g.Map.GetNeighbor(index, direction)
 	territory, ok := g.Territory[newIndex]
 	newPos := g.Map.GetPosition(newIndex)

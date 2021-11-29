@@ -1,8 +1,9 @@
 import React from 'react';
 import { ReactComponent as Logo } from './tower.svg';
-import { ReactComponent as Snapshot1 } from './snapshot-1.svg';
-import { ReactComponent as Snapshot2 } from './snapshot-2.svg';
-import { ReactComponent as Snapshot3 } from './snapshot-3.svg';
+import Town from './Town.png';
+import Temple from './Temple.png';
+import Capital from './Capital.png';
+import Gameplay from './Gameplay.png';
 import Wallet, { WalletInfo } from '../components/wallet/'
 import { Provider } from '../components/provider'
 import { isBroadcastTxSuccess } from '@cosmjs/stargate';
@@ -43,7 +44,11 @@ class App extends React.Component<{}, IAppState> {
   }
 
   redirectToDocs() {
-    window.location.href = "https://arcane-systems.github.io/rook";
+    window.location.href = "https://rook-network.github.io/rook";
+  }
+
+  redirectToGame() {
+    window.location.href = "http://localhost:4200/"
   }
 
   async claimTokens() {
@@ -107,43 +112,60 @@ class App extends React.Component<{}, IAppState> {
             </td>
             </table>
         </Header>
-        <Content style={{ margin: "30px" }}>
+        <Content style={{ margin: "auto", display: "block", maxWidth: "1600px"}}>
             <Row justify="space-around">
-            <Col span={6}>
+              <Col span={22} style={{ marginBottom: "5%"}}>
                 <Card>
-                <Title>Claim</Title>
-                <Text type="secondary">Start your journey as an ATOM tokenholder by claiming your first airdrop</Text>
-                <br />
-                <br />
-                <Button type="primary" style={{float: "right"}} onClick={this.claimTokens}>Claim</Button>
-                <br />
-                <br />
-                <Snapshot1 height="40vh" width="100%" style={{margin: '10px'}}/>
+                  <table style={{margin: "20px", width: "100%"}}>
+                    <tr>
+                      <td style={{width: "50%", paddingLeft: "30px", paddingRight: "20px"}}>
+                        <Title>Rook</Title>
+                        <Title level={4}>If you can't beat them, join them!</Title><br />
+                        <Text type="secondary">The Play-to-Earn Coalitional Strategy Game. Assemble your faction. Outwit your opponents. Be the last team standing.</Text>
+                      </td>
+                      <td style={{width: "50%"}}>
+                        <img src={Gameplay} alt=""></img>
+                      </td>
+                    </tr>
+                  </table>
                 </Card>
-            </Col>
-            <Col span={6}>
-                <Card>
-                <Snapshot2 height="40vh" width="100%" style={{margin: '10px'}}/>
-                <Title>Learn</Title>
-                <Text type="secondary">Peek into the docs to learn how to play</Text>
-                {/* <Text type="secondary">Get a feel for the game by entering the Dojo</Text> */}
-                <br />
-                <br />
-                <Button type="primary" style={{float: "right"}} onClick={this.redirectToDocs}>Enter</Button>
-                </Card>
-            </Col>
-            <Col span={6}>
-                <Card>
-                <Title>Play</Title>
-                <Text type="secondary">Try out the alpha version</Text>
-                <br />
-                <br />
-                <Button type="primary" style={{float: "right"}} disabled>Coming Soon</Button>
-                <br />
-                <br />
-                <Snapshot3 height="40vh" width="100%" style={{margin: '10px'}}/>
-                </Card>
-            </Col>
+              </Col>
+            </Row>
+            <Row justify="space-around">
+              <Col span={6}>
+                  <Card>
+                  <Title>Claim</Title>
+                  <Text type="secondary">Start your journey as an ATOM tokenholder by claiming your first airdrop</Text>
+                  <br />
+                  <br />
+                  <Button disabled type="primary" style={{float: "right"}} onClick={this.claimTokens}>Claim</Button>
+                  <br />
+                  <br />
+                  <img src={Town} alt="" style={{margin: "auto", display: "block", height: "100%", width: "100%", maxWidth:"300px"}}/>
+                  </Card>
+              </Col>
+              <Col span={6}>
+                  <Card>
+                  <img src={Temple} alt="" style={{margin: "auto", display: "block", height: "100%", width: "100%", maxWidth:"300px"}}/>
+                  <Title>Learn</Title>
+                  <Text type="secondary">Peek into the docs to learn how to play</Text>
+                  <br />
+                  <br />
+                  <Button type="primary" style={{float: "right"}} onClick={this.redirectToDocs}>Enter</Button>
+                  </Card>
+              </Col>
+              <Col span={6}>
+                  <Card style={{maxHeight: "800px"}}>
+                  <Title>Play</Title>
+                  <Text type="secondary">Try out the Babylon Testnet</Text>
+                  <br />
+                  <br />
+                  <Button type="primary" style={{float: "right"}} onClick={this.redirectToGame} >Play</Button>
+                  <br />
+                  <br />
+                  <img src={Capital} alt="" style={{margin: "auto", display: "block", height: "100%", width: "100%", maxWidth:"300px"}}/>
+                  </Card>
+              </Col>
             </Row>
         </Content>
       </Layout>    

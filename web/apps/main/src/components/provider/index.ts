@@ -1,5 +1,5 @@
 import { defaultRegistryTypes, SigningStargateClient, BroadcastTxResponse } from '@cosmjs/stargate';
-import { Registry } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing'
+import { Registry } from '@cosmjs/proto-signing'
 import config from "../../config";
 import { MsgActivate } from "../../codec/rook/claim/tx"
 
