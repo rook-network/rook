@@ -1,5 +1,7 @@
 package types
 
+import "fmt"
+
 func NewPosition(x, y uint32) *Position {
 	return &Position{X: x, Y: y}
 }
@@ -10,6 +12,10 @@ func PositionFromIndex(index uint32, width uint32) *Position {
 
 func (p Position) Equals(pos *Position) bool {
 	return p.X == pos.X && p.Y == pos.Y
+}
+
+func (p Position) Print() string {
+	return fmt.Sprintf("x: %d, y: %d", p.X, p.Y)
 }
 
 // Resources

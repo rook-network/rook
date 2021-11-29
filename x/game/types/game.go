@@ -229,6 +229,9 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 				// add the index of the new populace to the territory
 				territory.Populace = uint32(len(faction.Population) - 1)
 
+				// mark the new populace as used it's move
+				faction.Population[len(faction.Population)-1].Used = true
+
 			case existingPopulace.Amount == amount:
 				// There is a draw.
 				// If the settlement is a capital than they get the benefit of
@@ -258,8 +261,11 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 
 		// Is there any remainding population at the old position
 		if pop.Amount == 0 {
+			// NOTE: the populace itself will get flushed in end block
 			delete(g.Territory, index)
-			// the populace itself will get flushed in end block
+		} else {
+			// mark the entire populace as used it's move
+			faction.Population[populace].Used = true
 		}
 
 	} else {
@@ -268,6 +274,8 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 			pop.Position = newPos
 			g.Territory[newIndex] = g.Territory[index].Copy()
 			delete(g.Territory, index)
+			// mark the populace as used it's move
+			faction.Population[populace].Used = true
 		} else { // with a portion of the population
 			pop.Amount -= amount
 			faction.Population = append(faction.Population, &Populace{
@@ -276,6 +284,8 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 				Settlement: g.getFactionlessSettlementAtPos(newPos),
 			})
 			g.Territory[newIndex] = NewTerritory(g.playerIndex(player), len(faction.Population)-1)
+			// mark the new populace as used it's move
+			faction.Population[len(faction.Population)-1].Used = true
 		}
 	}
 

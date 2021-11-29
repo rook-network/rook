@@ -1,5 +1,7 @@
 package types
 
+import "fmt"
+
 func NewFaction(players []string, resources *ResourceSet, startingPosition *Position) *Faction {
 	return &Faction{
 		Players:   players,
@@ -67,6 +69,15 @@ func (f *Faction) Capitals() int {
 		}
 	}
 	return count
+}
+
+func (f Faction) Print() string {
+	out := ""
+	for idx, pop := range f.Population {
+		out += fmt.Sprintf("index: %d, position: %s, amount: %d, settlement: %v, used: %v\n",
+			idx, pop.Position.Print(), pop.Amount, pop.Settlement, pop.Used)
+	}
+	return out
 }
 
 func NewPopulace(amount uint32, pos *Position, settlement Settlement, used bool) *Populace {
