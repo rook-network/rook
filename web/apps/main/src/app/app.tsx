@@ -5,7 +5,7 @@ import Temple from './Temple.png';
 import Capital from './Capital.png';
 import Gameplay from './Gameplay.png';
 import Wallet, { WalletInfo } from '../components/wallet/'
-import { Provider } from '../components/provider'
+import { Provider, keplrEnabled } from '../components/provider'
 import { isBroadcastTxSuccess } from '@cosmjs/stargate';
 import { Layout, Menu, Typography, Row, Col, Card, Input, Button } from "antd";
 
@@ -37,10 +37,15 @@ class App extends React.Component<{}, IAppState> {
     }
     this.claimTokens = this.claimTokens.bind(this)
     this.connectWallet = this.connectWallet.bind(this)
+    this.tryConnectWallet = this.tryConnectWallet.bind(this)
   }
 
   async componentDidMount() {
-    this.connectWallet()
+    if (keplrEnabled()) {
+      setTimeout(async () => {
+        await this.tryConnectWallet()
+      }, 100)
+    }
   }
 
   redirectToDocs() {
@@ -81,6 +86,14 @@ class App extends React.Component<{}, IAppState> {
     }
   }
 
+  async tryConnectWallet() {
+    try {
+      await this.connectWallet()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   async connectWallet() {
     const address = await this.provider.connectWallet()
     if (address == null) return 
@@ -108,7 +121,7 @@ class App extends React.Component<{}, IAppState> {
                 </div>
             </td>
             <td style={{ float: "right" }}>
-                <Wallet wallet={this.state.wallet} connect={this.connectWallet}></Wallet>
+                <Wallet wallet={this.state.wallet} connect={this.tryConnectWallet}></Wallet>
             </td>
             </table>
         </Header>
