@@ -37,15 +37,6 @@ class App extends React.Component<{}, IAppState> {
     }
     this.claimTokens = this.claimTokens.bind(this)
     this.connectWallet = this.connectWallet.bind(this)
-    this.tryConnectWallet = this.tryConnectWallet.bind(this)
-  }
-
-  async componentDidMount() {
-    if (keplrEnabled()) {
-      setTimeout(async () => {
-        await this.tryConnectWallet()
-      }, 100)
-    }
   }
 
   redirectToDocs() {
@@ -53,7 +44,7 @@ class App extends React.Component<{}, IAppState> {
   }
 
   redirectToGame() {
-    window.location.href = "http://localhost:4200/"
+    window.location.href = "http://play.rook.network"
   }
 
   async claimTokens() {
@@ -86,14 +77,6 @@ class App extends React.Component<{}, IAppState> {
     }
   }
 
-  async tryConnectWallet() {
-    try {
-      await this.connectWallet()
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
   async connectWallet() {
     const address = await this.provider.connectWallet()
     if (address == null) return 
@@ -121,7 +104,7 @@ class App extends React.Component<{}, IAppState> {
                 </div>
             </td>
             <td style={{ float: "right" }}>
-                <Wallet wallet={this.state.wallet} connect={this.tryConnectWallet}></Wallet>
+                <Wallet wallet={this.state.wallet} connect={this.connectWallet}></Wallet>
             </td>
             </table>
         </Header>

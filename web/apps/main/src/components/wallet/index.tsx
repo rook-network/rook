@@ -2,6 +2,7 @@ import styles from "./wallet.module.less"
 import React from 'react';
 import { Button } from 'antd';
 import { CreditCardOutlined } from '@ant-design/icons'
+import { keplrEnabled } from '../provider'
 
 export interface WalletInfo {
     chainID: string
@@ -11,21 +12,22 @@ export interface WalletInfo {
 }
 
 interface IWalletProps {
-    wallet: WalletInfo,
+    wallet: WalletInfo
     connect: () => void
 }
 
 interface IWalletState {
-    toggle: boolean
+    error?: string
 }
 
 class Wallet extends React.Component<IWalletProps, IWalletState> {
     constructor(props: IWalletProps) {
         super(props);
-        this.setState({
-            toggle: false
-        })
+        this.state = {
+            error: undefined,
+        }
         this.toggle = this.toggle.bind(this)
+        this.tryConnect = this.tryConnect.bind(this)
     }
 
     toggle() {
@@ -45,11 +47,45 @@ class Wallet extends React.Component<IWalletProps, IWalletState> {
         }
     }
 
+    async tryConnect() {
+        try { 
+            if (!keplrEnabled()) {
+                // if this was already the error then the second click takes
+                // the user to the keplr page
+                if (this.state.error === "Please Install Keplr") {
+                    window.location.href = "https://www.keplr.app/"
+                } else {
+                    this.setState({ error: "Please Install Keplr"})
+                }
+            } else {
+                await this.props.connect()
+            }
+        } catch (e: any) {
+            const err = e.message as string
+            
+            if (err.includes("Failed to fetch")) {
+                this.setState({ 
+                    error: "Blockchain Unavailable"
+                })
+            } else {
+                console.error(err)
+            }
+        }
+    }
+
     render() {
+        if (this.state.error) {
+            return (
+                <div>
+                    <Button type="primary" onClick={this.tryConnect}>{this.state.error}</Button>
+                </div>
+            )
+        }
+
         if (this.props.wallet.address === "") {
             return (
                 <div>
-                    <Button type="primary" onClick={this.props.connect}>No Wallet Connected</Button>
+                    <Button type="primary" onClick={this.tryConnect}>No Wallet Connected</Button>
                 </div>
             )
         }
