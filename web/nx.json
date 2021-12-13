@@ -41,5 +41,25 @@
       "tags": [],
       "implicitDependencies": ["main"]
     }
-  }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/react"
+  },
+  "generators": {
+    "@nrwl/react": {
+      "application": {
+        "style": "less",
+        "linter": "eslint",
+        "babel": true
+      },
+      "component": {
+        "style": "less"
+      },
+      "library": {
+        "style": "less",
+        "linter": "eslint"
+      }
+    }
+  },
+  "defaultProject": "main"
 }

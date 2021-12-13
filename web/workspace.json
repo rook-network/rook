@@ -1,6 +1,58 @@
 {
   "version": 2,
   "projects": {
+    "faucet": {
+      "root": "apps/faucet",
+      "sourceRoot": "apps/faucet/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/faucet",
+            "main": "apps/faucet/src/main.ts",
+            "tsConfig": "apps/faucet/tsconfig.app.json",
+            "assets": ["apps/faucet/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/faucet/src/environments/environment.ts",
+                  "with": "apps/faucet/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "faucet:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["apps/faucet/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/faucet"],
+          "options": {
+            "jestConfig": "apps/faucet/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "game": {
       "root": "apps/game",
       "sourceRoot": "apps/game/src",
@@ -202,25 +254,5 @@
         }
       }
     }
-  },
-  "cli": {
-    "defaultCollection": "@nrwl/react"
-  },
-  "generators": {
-    "@nrwl/react": {
-      "application": {
-        "style": "less",
-        "linter": "eslint",
-        "babel": true
-      },
-      "component": {
-        "style": "less"
-      },
-      "library": {
-        "style": "less",
-        "linter": "eslint"
-      }
-    }
-  },
-  "defaultProject": "main"
+  }
 }
