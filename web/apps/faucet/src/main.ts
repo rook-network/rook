@@ -72,23 +72,11 @@ app.get('/brrr/:address', async (req, res) => {
     denom: process.env.FAUCET_DENOM
   }]
 
+  res.send({ message: 'Broadcasting message to send ' + amount + ' ' + prefix + ' tokens from the faucet.' });
+
   try {
     const resp = await signer.sendTokens(address, recipient.toString(), token, defaultFee)
-    if (isBroadcastTxSuccess(resp)) {
-      try {
-        await db.put<AccountModel>({
-          _id: recipient,
-          _rev: data._rev,
-          timestamp: currentTime
-        })
-      } catch (err) {
-        console.error(err)
-        return res.status(500).send()
-      }
-      res.send({ message: 'Successfully collected ' + amount + ' ' + prefix + ' tokens from the faucet.' });
-    } else {
-      res.send({ error: "Failed to broadcast tx: " + resp.rawLog})
-    }
+    console.log(resp)
   } catch(err) {
     console.error(err)
     res.send({ error: "Error broadcasting tx: " + err })
