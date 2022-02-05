@@ -1,7 +1,7 @@
 import * as express from 'express';
-import { StdFee, SigningStargateClient, isBroadcastTxSuccess } from '@cosmjs/stargate';
+import { StdFee, SigningStargateClient } from '@cosmjs/stargate';
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { config } from 'dotenv';
+import * as config from './config.json';
 import * as PouchDB from 'pouchdb';
 
 type AccountModel = {
@@ -13,9 +13,9 @@ type AccountModel = {
 const app = express();
 let signer: SigningStargateClient
 let address: string
-const cooldown = process.env.FAUCET_AMOUNT !== "" ? parseInt(process.env.FAUCET_COOLDOWN_SECONDS) : 60*60*24
-const amount = process.env.FAUCET_AMOUNT !== "" ? parseInt(process.env.FAUCET_AMOUNT) : 1000000
-const prefix = process.env.FAUCET_CHAIN_PREFIX
+const cooldown = config.FAUCET_AMOUNT
+const amount = config.FAUCET_AMOUNT
+const prefix = config.FAUCET_CHAIN_PREFIX
 const defaultFee: StdFee = {
   amount: [],
   gas: "100000"
@@ -69,7 +69,7 @@ app.get('/brrr/:address', async (req, res) => {
 
   const token = [{
     amount: amount.toString(),
-    denom: process.env.FAUCET_DENOM
+    denom: config.FAUCET_DENOM
   }]
 
   res.send({ message: 'Broadcasting message to send ' + amount + ' ' + prefix + ' tokens from the faucet.' });
@@ -83,9 +83,7 @@ app.get('/brrr/:address', async (req, res) => {
   }
 });
 
-config()
-
-const port = process.env.PORT || 8000;
+const port = config.FAUCET_PORT || 8000;
 const server = app.listen(port, async () => {
   try {
     await init()
@@ -101,17 +99,17 @@ async function init() {
     throw new Error('FAUCET_CHAIN_PREFIX must be defined')
   }
 
-  if (process.env.FAUCET_DENOM === undefined) {
+  if (config.FAUCET_DENOM === undefined) {
     throw new Error('FAUCET_DENOM must be defined')
   }
 
-  if (process.env.FAUCET_MNEMONIC === undefined) {
+  if (config.FAUCET_MNEMONIC === undefined || config.FAUCET_MNEMONIC === "") {
     throw new Error('FAUCET_MNEMONIC must be defined')
   }
 
-  const wallet = await DirectSecp256k1HdWallet.fromMnemonic(process.env.FAUCET_MNEMONIC, { prefix: prefix})
+  const wallet = await DirectSecp256k1HdWallet.fromMnemonic(config.FAUCET_MNEMONIC, { prefix: prefix})
   signer = await SigningStargateClient.connectWithSigner(
-    process.env.FAUCET_RPC,
+    config.FAUCET_RPC,
     wallet
   )
   
@@ -122,7 +120,7 @@ async function init() {
   const balances = await signer.getAllBalances(address)
   const exists = checkBalance(balances)
   if (!exists) {
-    throw new Error("account " + address + " doesn't contain any " + process.env.FAUCET_DENOM + " tokens.")
+    throw new Error("account " + address + " doesn't contain any " + config.FAUCET_DENOM + " tokens.")
   }
 
   console.log(`Starting faucet on http://localhost:${port} with address: ${address}`);
@@ -141,7 +139,7 @@ interface Coin {
 function checkBalance(balances: readonly Coin[], min = 1): boolean {
   let exists = false
   for (const balance of balances) {
-    if (balance.denom === process.env.FAUCET_DENOM && parseInt(balance.amount) >= min) {
+    if (balance.denom === config.FAUCET_DENOM && parseInt(balance.amount) >= min) {
       exists = true
     }
   }
