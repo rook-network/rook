@@ -149,13 +149,15 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 			fmt.Sprintf("%d >= %d", int(populace), len(faction.Population)))
 	}
 
+	pop := faction.Population[int(populace)]
+
+	
 	// Validate that the player's populace has not already acted
-	if faction.Population[populace].Used {
+	if pop.Used {
 		return sdkerrors.Wrap(ErrPopulaceAlreadActed,
 			fmt.Sprintf("step=%d, populace=%d", g.State.Step, populace))
 	}
 
-	pop := faction.Population[int(populace)]
 
 	// Validate that the amount to move is less than or equal to total
 	// population
@@ -175,12 +177,11 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 	// abandoning a settlement with the exception of a capital which
 	// must always be occupied (in conflicts over a capital, there can
 	// never be a draw)
-	if pop.Amount == amount && pop.Settlement == Settlement_CAPITAL {
-		return sdkerrors.Wrap(ErrAbandoningCapital, pop.Position.String())
+	if pop.Amount <= amount {
+		amount = pop.Amount - 1
 	}
 
 	// All validity checks have passed. Now we update state.
-
 	newIndex := g.Map.GetNeighbor(index, direction)
 	territory, ok := g.Territory[newIndex]
 	newPos := g.Map.GetPosition(newIndex)
@@ -267,7 +268,7 @@ func (g *Game) Move(player string, populace uint32, direction Direction, amount 
 
 	} else {
 		// The player is marching into new unchartered territory
-		if amount == pop.Amount { // with the entire population
+		if amount == pop.Amount { // with the entire population // this is never happening now, should we remove?
 			pop.Position = newPos
 			g.Territory[newIndex] = g.Territory[index].Copy()
 			delete(g.Territory, index)
