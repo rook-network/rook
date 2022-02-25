@@ -131,7 +131,7 @@ export class GameProvider {
             method: "subscribe",
             id: "0",
             params: {
-                query: `${eventGame}.${attributeGameID}='${id.toString()}'`
+                id: id.toString()
             }
         }))
         console.log("subscribed to game " + id.toString())
